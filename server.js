@@ -4,7 +4,7 @@ var express = require('express');
 var app = express();
 
 // Serve up static build assets
-app.use('/build', express.static(__dirname + '/build'));
+app.use('/out', express.static(__dirname + '/out'));
 
 // All other requests serve up the index.html page 
 app.get('/*', function(req, res) {

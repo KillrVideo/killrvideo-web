@@ -31,4 +31,4 @@ node_modules
 /typings
 
 # Build output
-/build
+/out
