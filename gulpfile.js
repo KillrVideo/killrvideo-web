@@ -27,7 +27,7 @@ gulp.task('build.release', [ 'js.release', 'uglify', 'css', 'minify', 'assets' ]
 gulp.task('server', [ 'build.debug' ], function(cb) {
   nodemon({
     script: 'server.js',
-    ignore: [ 'src/**/*', cfg.BUILD_OUTPUT, RELEASE_OUTPUT, 'gulpfile.js' ]
+    ignore: [ 'src/**/*', 'build/**/*', cfg.BUILD_OUTPUT, RELEASE_OUTPUT, 'gulpfile.js' ]
   });
   
   var firstStart = true;
