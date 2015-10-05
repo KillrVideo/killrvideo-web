@@ -69,7 +69,35 @@ a:hover {
 }
 
 #what-is-this {
-    padding-top: 60px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #dedede;
+  padding-top: 60px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #dedede;
+}
+
+/**
+ * Footer
+ */
+footer {
+  background-color: #222;
+  color: #888;
+  height: 50px;
+  padding: 1.4em 0 0;
+}
+
+footer a {
+  color: #888;
+}
+
+/* This will push the footer to the bottom */
+html, body, #killrvideo, #killrvideo > div {
+  height: 100%;
+}
+
+#body-wrapper {
+  min-height: 100%;
+  margin-bottom: -50px;
+}
+
+#push-footer {
+  height: 50px;
 }
