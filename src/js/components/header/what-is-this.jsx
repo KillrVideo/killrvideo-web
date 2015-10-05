@@ -1,5 +1,7 @@
 const React = require('react');
 const Collapse = require('react-bootstrap').Collapse;
+const Button = require('react-bootstrap').Button;
+const Icon = require('../shared/icon');
 
 class WhatIsThis extends React.Component {
   render() {
@@ -12,12 +14,13 @@ class WhatIsThis extends React.Component {
               <div className="col-sm-4">
                 <h4><em>What</em> is KillrVideo?</h4>
                 <p>
-                  KillrVideo is a sample web application developed in C# and uses <a href="http://www.datastax.com/products/datastax-enterprise" target="_blank">DataStax Enterprise</a> 
-                  running on Microsoft Azure as the database platform. The site demonstrates a number of DataStax Enterprise components in action including
-                  <a href="http://www.datastax.com/products/datastax-enterprise-production-certified-cassandra" target="_blank">Apache Cassandra</a>,
-                  <a href="http://www.datastax.com/products/datastax-enterprise-analytics" target="_blank">DSE Analytics</a>, and
-                  <a href="http://www.datastax.com/products/datastax-enterprise-search" target="_blank">DSE Search</a>. The application's code, data models, data and more 
-                  are freely available on GitHub.
+                  KillrVideo is a sample web application developed in C# and  
+                  uses <a href="http://www.datastax.com/products/datastax-enterprise" target="_blank">DataStax Enterprise</a> running 
+                  on Microsoft Azure as the database platform. The site demonstrates a number of DataStax Enterprise components in action
+                  including <a href="http://www.datastax.com/products/datastax-enterprise-production-certified-cassandra" target="_blank">Apache Cassandra</a>  
+                  , <a href="http://www.datastax.com/products/datastax-enterprise-analytics" target="_blank">DSE Analytics</a>  
+                  , and <a href="http://www.datastax.com/products/datastax-enterprise-search" target="_blank">DSE Search</a>. The application's  
+                  code, data models, data and more are freely available on GitHub.
                 </p>
                 <hr className="visible-xs-block"/>
               </div>
@@ -29,9 +32,9 @@ class WhatIsThis extends React.Component {
                   for any bugs, improvements, etc. are accepted (and greatly appreciated).
                 </p>
                 <br/>
-                <a href="https://github.com/luketillman/killrvideo-csharp" className="btn btn-success" target="_blank">
-                  <i className="fa fa-github"></i> Get the code
-                </a>
+                <Button bsStyle="success" href="https://github.com/luketillman/killrvideo-csharp" target="_blank">
+                  <Icon icon="github"/> Get the code
+                </Button>
                 <hr className="visible-xs-block"/>
               </div>
               

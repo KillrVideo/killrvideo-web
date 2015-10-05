@@ -60,14 +60,21 @@ function build(opts) {
   var b = browserify(browserifyOpts);
   if (opts.debug) {
     b = watchify(b);
-    b.on('update', bundle);
+    b.on('update', function(ids) {
+        ids.forEach(function(id) {
+          gutil.log('Changes detected to', gutil.colors.magenta(id))
+        })
+        gutil.log('Rebundling...');
+      })
+      .on('update', bundle)
+      .on('log', function(msg) { gutil.log(msg); });
   }
   
   function bundle() {
     return b.transform(babelify)
       .bundle()
       .on('error', function(err) {
-        gutil.log('Browserify error:', err);
+        gutil.log(gutil.colors.red('Browserify error:'), err.message);
         this.emit('end');
       })
       .pipe(source(FILE_NAME))

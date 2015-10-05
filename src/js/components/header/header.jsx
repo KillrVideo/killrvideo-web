@@ -28,6 +28,8 @@ class Header extends React.Component {
   }
   
   render() {
+    // TODO: Switch to react-bootstrap navbar once brand/header with collapse is implemented
+    // (see https://github.com/react-bootstrap/react-bootstrap/pull/1184)
     return (
       <div id="header">
         <nav className="navbar navbar-default navbar-fixed-top" role="navigation" id="navbar-main">
@@ -47,10 +49,9 @@ class Header extends React.Component {
 
               <ul className="nav navbar-nav navbar-right">
                 <li>
-                    <a href="#" onClick={e => this.toggleWhatIsThis()} className={this.state.showWhatIsThis ? 'dropup' : ''}
-                       data-toggle="collapse" data-target=".navbar-collapse.in, #what-is-this">
-                      What is this? <span className="caret"></span>
-                    </a>
+                  <a href="#" onClick={e => this.toggleWhatIsThis()} className={this.state.showWhatIsThis ? 'dropup' : ''}>
+                    What is this? <span className="caret"></span>
+                  </a>
                 </li>
                 { /* Registration/sign in for users that aren't logged in */ }
                 <li className={this.state.loggedIn ? 'hidden' : ''}>
