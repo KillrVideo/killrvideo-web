@@ -1,27 +1,33 @@
 const React = require('react');
 const _ = require('lodash');
 
+const history = require('../../history');
+
 class SearchBox extends React.Component {
   constructor(props) {
     super(props);
     
     this.state = {
+      query: '',
       suggestions: []
     };
   }
   
-  handleQueryChange(e) {
-    // TODO: Search suggestions
+  handleSearch(e) {
+    // Go to search results
+    e.preventDefault();
+    history.pushState(null, '/search/results', { query: this.state.query });
   }
   
-  componentDidMount() {
-    // Use debounce to trigger search suggestions only after the user has stopped typing for 1 second
-    this.handleQueryChange = _.debounce(this.handleQueryChange, 1000);
+  handleQueryChange(e) {
+    // TODO: Search suggestions (using debounce?)
+    this.setState({ query: e.target.value });
   }
     
   render() {
     return (
-      <form id="search-box" autoComplete="off" className="navbar-form navbar-left" role="search" method="GET" action="/search/results">
+      <form id="search-box" autoComplete="off" className="navbar-form navbar-left" role="search" method="GET" action="/search/results" 
+            onSubmit={e => this.handleSearch(e)}>
         <div className="input-group">
           <span className="input-group-btn">
             <button className="btn btn-default" type="submit">

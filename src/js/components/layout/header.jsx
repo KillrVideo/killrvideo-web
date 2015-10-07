@@ -1,4 +1,6 @@
 const React = require('react');
+const ReactRouter = require('react-router');
+const Link = ReactRouter.Link;
 
 const Image = require('../shared/image');
 const WhatIsThis = require('./what-is-this');
@@ -40,9 +42,9 @@ class Header extends React.Component {
                 <span className="icon-bar"></span>
                 <span className="icon-bar"></span>
               </button>
-              <a href="/" className="navbar-brand" id="logo">
+              <Link to="/" className="navbar-brand" id="logo">
                 <Image src="killrvideo.png" alt="KillrVideo.com Logo" />
-              </a>
+              </Link>
             </div>
             <div className="navbar-collapse collapse">
               <SearchBox />
@@ -55,10 +57,10 @@ class Header extends React.Component {
                 </li>
                 { /* Registration/sign in for users that aren't logged in */ }
                 <li className={this.state.loggedIn ? 'hidden' : ''}>
-                  <a id="sign-in" href="/account/signin" className="text-uppercase">Sign in</a>
+                  <Link id="sign-in" to="/account/signin" className="text-uppercase">Sign in</Link>
                 </li>
                 <li className={this.state.loggedIn ? 'hidden' : ''}>
-                  <a id="register" href="/account/register" className="bg-success text-uppercase">Register</a>
+                  <Link id="register" to="/account/register" className="bg-success text-uppercase">Register</Link>
                 </li>
 
                 { /* Menu for users that are logged in */ }

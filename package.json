@@ -27,6 +27,7 @@
     "gulp-uglify": "^1.4.1",
     "gulp-util": "^3.0.6",
     "gulp-watch": "^4.3.5",
+    "history": "^1.12.2",
     "lodash": "^3.10.1",
     "merge-stream": "^1.0.0",
     "nodemon": "^1.7.1",

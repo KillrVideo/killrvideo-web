@@ -1,11 +1,12 @@
 const React = require('react');
+const Link = require('react-router').Link;
 
 // Component for the site's footer
 class Footer extends React.Component {
   render() {
     let sampleData;
     if (this.props.dev) {
-      sampleData = <li><a href="/sampledata">Add Sample Data</a></li>
+      sampleData = <li><Link to="/sampledata">Add Sample Data</Link></li>
     }
     
     return (

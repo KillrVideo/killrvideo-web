@@ -4,6 +4,9 @@ const Router = ReactRouter.Router;
 const Route = ReactRouter.Route;
 const IndexRoute = ReactRouter.IndexRoute;
 
+// History used by the router
+const history = require('../history');
+
 // Components rendered by router
 const Layout = require('./layout/layout');
 const Views = require('./views');
@@ -11,10 +14,10 @@ const Views = require('./views');
 class App extends React.Component {
   render() {
     return (
-      <Router>
+      <Router history={history}>
         <Route path="/" component={Layout}>
           <IndexRoute component={Views.Home} />
-          <Route path="/account/info" component={Views.Account.Info} />
+          <Route path="/account/info(/:userId)" component={Views.Account.Info} />
           <Route path="/account/register" component={Views.Account.Register} />
           <Route path="/account/signin" component={Views.Account.SignIn} />
           <Route path="/sampledata" component={Views.SampleData} />

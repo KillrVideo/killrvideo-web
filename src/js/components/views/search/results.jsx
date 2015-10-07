@@ -4,7 +4,7 @@ class SearchResults extends React.Component {
   render() {
     return (
       <div>
-        Search Results
+        Search Results for {this.props.location.query.query}
       </div>
     );
   }
