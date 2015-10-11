@@ -11,6 +11,8 @@ var source = require('vinyl-source-stream');
 var del = require('del');
 var path = require('path');
 var _ = require('lodash');
+var nodeResolve = require('resolve');
+var merge = require('merge-stream');
 
 var cfg = require('./build-config');
 
@@ -18,6 +20,13 @@ var cfg = require('./build-config');
 var ENTRY_POINT = './src/js/app.js';
 var FILE_NAME = 'killrvideo.js';
 var MINIFIED_FILE_NAME = 'killrvideo.min.js';
+
+var VENDOR_LIBS = [
+  'react', 'react-bootstrap', 'react-router', 'eventemitter3', 'flux', 'history', 'keymirror', 'lodash', 'validate.js'
+];
+var VENDOR_FILE_NAME = 'vendor.js';
+var VENDOR_MINIFIED_FILE_NAME = 'vendor.min.js';
+
 var BUILD_OUTPUT = path.join(cfg.BUILD_OUTPUT, 'js');
 
 // Clean the JS output folder
@@ -35,17 +44,41 @@ gulp.task('js.debug', [ 'clean.js' ], function() {
 });
 
 // Build for release and compress/uglify JavaScript
-gulp.task('js.release', [ 'clean.js' ], function(cb) {
+gulp.task('js.release', [ 'clean.js' ], function() {
   return build({ debug: false });
 });
 
+// Build vendor bundle
+gulp.task('js.vendor', [ 'clean.js' ], function() {
+  var b = browserify({ debug: false });
+  VENDOR_LIBS.forEach(function(lib) {
+    b.require(nodeResolve.sync(lib), { expose: lib });
+  });
+  
+  return b.bundle()
+    .on('error', function(err) {
+      gutil.log(gutil.colors.red('Browserify error:'), err.message);
+      this.emit('end');
+    })
+    .pipe(source(VENDOR_FILE_NAME))
+    .pipe(gulp.dest(BUILD_OUTPUT));
+});
+
 // Uglify Javascript and output
-gulp.task('uglify', [ 'js.release' ], function() {
+gulp.task('uglify', [ 'js.release', 'js.vendor' ], function() {
   var jsOutput = path.join(BUILD_OUTPUT, FILE_NAME);
-  return gulp.src(jsOutput)
+  var uglifyApp = gulp.src(jsOutput)
     .pipe(streamify(uglify()))
     .pipe(rename(MINIFIED_FILE_NAME))
     .pipe(gulp.dest(BUILD_OUTPUT));
+  
+  var vendorOutput = path.join(BUILD_OUTPUT, VENDOR_FILE_NAME);
+  var uglifyVendor = gulp.src(vendorOutput)
+    .pipe(streamify(uglify()))
+    .pipe(rename(VENDOR_MINIFIED_FILE_NAME))
+    .pipe(gulp.dest(BUILD_OUTPUT));
+    
+  return merge(uglifyApp, uglifyVendor);
 });
 
 // Builds JS and if debug is enabled, does incremental builds on updates to JSX
@@ -54,11 +87,15 @@ function build(opts) {
   var browserifyOpts = _.assign({
     extensions: [ '.jsx' ],
     entries: [ ENTRY_POINT ],
-    paths: [ './node_modules', './src/js' ]
+    paths: [ './src/js' ]
   }, opts);
   
   // Create the appropriate browserify object (use watchify for dev to allow incremental builds)
   var b = browserify(browserifyOpts);
+  
+  // Tell browserify about external vendor dependencies
+  VENDOR_LIBS.forEach(function(lib) { b.external(lib); });
+  
   if (opts.debug) {
     b = watchify(b);
     b.on('update', function(ids) {

@@ -37,6 +37,7 @@
     "react": "^0.13.3",
     "react-bootstrap": "^0.26.1",
     "react-router": "^1.0.0-rc1",
+    "resolve": "^1.1.6",
     "validate.js": "^0.8.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.4.0"

@@ -20,8 +20,8 @@ gulp.task('clean.release', function() {
 });
 
 // Build aliases for debug/release builds
-gulp.task('build.debug', [ 'js.debug', 'css', 'assets' ]);
-gulp.task('build.release', [ 'js.release', 'uglify', 'css', 'minify', 'assets' ]);
+gulp.task('build.debug', [ 'js.debug', 'js.vendor', 'css', 'assets' ]);
+gulp.task('build.release', [ 'js.release', 'js.vendor', 'uglify', 'css', 'minify', 'assets' ]);
 
 // Start a development server
 gulp.task('server', [ 'build.debug' ], function(cb) {
