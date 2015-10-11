@@ -1,12 +1,12 @@
 const EventEmitter = require('eventemitter3');
 const validateJs = require('validate.js');
 const Dispatcher = require('lib/dispatcher');
-const ActionTypes = require('./validation-input-constants').ActionTypes;
+const ActionTypes = require('./validation-constants').ActionTypes;
 
 const CHANGE_EVENT = 'change';
 const VALIDATION_OPTIONS = { format: 'flat' };
 
-class ValidationInputStore extends EventEmitter {
+class ValidationStore extends EventEmitter {
   constructor() {
     super();
     
@@ -62,17 +62,22 @@ class ValidationInputStore extends EventEmitter {
   }
   
   _validate(id) {
-    let input = this._getInputById(id, true);
+    let input = this._getInputById(id, false);
+    if (!input) {
+      return false;
+    }
     return this._validateInput(input);
   }
   
   _show(id) {
-    let input = this._getInputById(id, true);
+    let input = this._getInputById(id, false);
+    if (!input) return;
     input.state.validationVisible = true;
   }
   
   _hide(id) {
-    let input = this._getInputById(id, true);
+    let input = this._getInputById(id, false);
+    if (!input) return;
     input.state.validationVisible = false;
   }
   
@@ -105,39 +110,49 @@ class ValidationInputStore extends EventEmitter {
 }
 
 // Singleton instance of the store
-const store = new ValidationInputStore();
+const store = new ValidationStore();
 
 // Register for actions from the dispatcher
 store.dispatchToken = Dispatcher.register(function(action) {
   switch(action.type) {
-    case ActionTypes.ADD:
+    case ActionTypes.ADD_INPUT:
       store._addInput(action.id, action.fieldName, action.constraints, action.initialValue);
       store._emitChange();
       break;
       
-    case ActionTypes.REMOVE:
+    case ActionTypes.REMOVE_INPUT:
       store._removeInput(action.id);
       store._emitChange();
       break;
     
-    case ActionTypes.TRACK_VALUE:
+    case ActionTypes.TRACK_INPUT_VALUE:
       store._trackValue(action.id, action.newValue);
       break;
       
-    case ActionTypes.VALIDATE:
-      if (store._validate(action.id)) {
-        store._emitChange();
-      }
+    case ActionTypes.VALIDATE_INPUTS:
+      // Validate the list of ids passed and if validation state changed, emit the change event
+      let changes = false;
+      action.ids.forEach(function(id) {
+        if (store._validate(id)) changes = true;
+      });
+      if (changes) store._emitChange();
       break;
     
-    case ActionTypes.SHOW:
-      store._show(action.id);
+    case ActionTypes.SHOW_MESSAGES:
+      // Show messages for all ids supplied
+      action.ids.forEach(function(id) {
+        store._show(id);
+      });
       store._emitChange();
       break;
       
-    case ActionTypes.HIDE:
-      store._hide(action.id);
+    case ActionTypes.HIDE_MESSAGES:
+      // Hide messages for all ids supplied
+      action.ids.forEach(function(id) {
+        store._hide(id);
+      });
       store._emitChange();
+      break;
       
     default:
       // No op
