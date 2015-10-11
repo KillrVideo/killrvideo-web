@@ -1,7 +1,7 @@
 const React = require('react');
 const _ = require('lodash');
 
-const history = require('../../history');
+const history = require('lib/history');
 
 class SearchBox extends React.Component {
   constructor(props) {

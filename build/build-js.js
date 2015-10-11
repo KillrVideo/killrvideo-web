@@ -54,6 +54,7 @@ function build(opts) {
   var browserifyOpts = _.assign({
     extensions: [ '.jsx' ],
     entries: [ ENTRY_POINT ],
+    paths: [ './node_modules', './src/js' ]
   }, opts);
   
   // Create the appropriate browserify object (use watchify for dev to allow incremental builds)

@@ -5,7 +5,7 @@ const Route = ReactRouter.Route;
 const IndexRoute = ReactRouter.IndexRoute;
 
 // History used by the router
-const history = require('../history');
+const history = require('lib/history');
 
 // Components rendered by router
 const Layout = require('./layout/layout');
