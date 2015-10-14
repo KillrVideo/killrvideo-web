@@ -32,7 +32,7 @@ class WhatIsThis extends Component {
                 </p>
                 <br/>
                 <Button bsStyle="success" href="https://github.com/luketillman/killrvideo-csharp" target="_blank">
-                  <Icon icon="github"/> Get the code
+                  <Icon name="github"/> Get the code
                 </Button>
                 <hr className="visible-xs-block"/>
               </div>

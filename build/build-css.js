@@ -13,7 +13,7 @@ var cfg = require('./build-config');
 var FILES = [
   './node_modules/bootswatch/cosmo/bootstrap.css',
   './node_modules/font-awesome/css/font-awesome.css',
-  './src/css/app.css'
+  './src/css/*'
 ];
 var FILE_NAME = 'killrvideo.css';
 var MINIFIED_FILE_NAME = 'killrvideo.min.css';
