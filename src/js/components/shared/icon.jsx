@@ -1,7 +1,7 @@
-const React = require('react');
+import React, { Component, PropTypes } from 'react';
 
 // Create component for displaying Font Awesome icons
-class Icon extends React.Component {
+class Icon extends Component {
   render() {
     let fontAwesomeClass = 'fa fa-' + this.props.icon; 
     return (
@@ -9,5 +9,9 @@ class Icon extends React.Component {
     );
   }
 }
+
+Icon.propTypes = {
+  icon: PropTypes.string.isRequired
+};
 
 export default Icon;

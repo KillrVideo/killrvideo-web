@@ -17,12 +17,18 @@ var merge = require('merge-stream');
 var cfg = require('./build-config');
 
 // Some constants
-var ENTRY_POINT = './src/js/app.js';
+var ENTRY_POINT = './src/js/index.jsx';
 var FILE_NAME = 'killrvideo.js';
 var MINIFIED_FILE_NAME = 'killrvideo.min.js';
 
 var VENDOR_LIBS = [
-  'react', 'react-bootstrap', 'react-router', 'eventemitter3', 'flux', 'history', 'keymirror', 'lodash', 'validate.js'
+  // Third party libs
+  'babel-core/polyfill', 'history', 'lodash', 'react', 'react-bootstrap', 'react-redux',
+  'react-router', 'redux', 'redux-actions', 'redux-devtools', 'redux-form', 'redux-logger', 'redux-router',
+  'redux-thunk', 'validate.js',
+  
+  // Node libs that are shimmed by browserify
+  'url'
 ];
 var VENDOR_FILE_NAME = 'vendor.js';
 var VENDOR_MINIFIED_FILE_NAME = 'vendor.min.js';

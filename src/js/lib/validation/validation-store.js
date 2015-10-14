@@ -1,5 +1,6 @@
 const EventEmitter = require('eventemitter3');
 const validateJs = require('validate.js');
+const _ = require('lodash');
 const Dispatcher = require('lib/dispatcher');
 const ActionTypes = require('./validation-constants').ActionTypes;
 
@@ -10,7 +11,8 @@ class ValidationStore extends EventEmitter {
   constructor() {
     super();
     
-    this._inputs = {};
+    this._constraints = {};
+    this._values = {};
   }
   
   addChangeListener(cb, ctx) {
@@ -28,6 +30,30 @@ class ValidationStore extends EventEmitter {
   
   _emitChange() {
     this.emit(CHANGE_EVENT);
+  }
+ 
+  _addField(fieldName, constraints, initialValue) {
+    if (this._constraints[fieldName] || this._values[fieldName]) {
+      throw new Error(`Field with name ${fieldName} already exists.`);
+    }
+    
+    this._constraints[fieldName] = constraints;
+    this._values[fieldName] = initialValue;
+    this._validateFields([ fieldName ]);
+  }
+  
+  _removeField(fieldName) {
+    delete this._constraints[fieldName];
+    delete this._values[fieldName];
+  }
+  
+  _updateFieldValue(fieldName, value) {
+    this._values[fieldName] = value;
+  }
+  
+  _validateFields(fieldNames) {
+    let values = _.pick(this._values, fieldNames);
+    let constraints = _.pick()
   }
   
   _addInput(id, fieldName, constraints, initialValue) {

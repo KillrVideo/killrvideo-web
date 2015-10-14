@@ -1,8 +1,8 @@
-const React = require('react');
-const Link = require('react-router').Link;
+import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
 
 // Component for the site's footer
-class Footer extends React.Component {
+class Footer extends Component {
   render() {
     let sampleData;
     if (this.props.dev) {
@@ -23,5 +23,9 @@ class Footer extends React.Component {
     );
   }
 }
+
+Footer.propTypes = {
+  dev: PropTypes.bool
+};
 
 export default Footer;

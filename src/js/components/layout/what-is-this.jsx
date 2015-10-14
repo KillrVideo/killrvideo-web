@@ -1,12 +1,11 @@
-const React = require('react');
-const Collapse = require('react-bootstrap').Collapse;
-const Button = require('react-bootstrap').Button;
-const Icon = require('../shared/icon');
+import React, { Component, PropTypes } from 'react';
+import { Button, Collapse } from 'react-bootstrap';
+import Icon from 'components/shared/icon';
 
-class WhatIsThis extends React.Component {
+class WhatIsThis extends Component {
   render() {
     return (
-      <Collapse in={this.props.open}>
+      <Collapse in={this.props.showWhatIsThis}>
         <div id="what-is-this">
           <div className="container">
             <div className="row">
@@ -53,7 +52,7 @@ class WhatIsThis extends React.Component {
   
                 { /* On mobile, add a link to hide the what is this UI */ }
                 <br/>
-                <a href="#" className="visible-xs-block text-muted small dropup" onClick={e => this.props.toggleOpen()}>
+                <a href="#" className="visible-xs-block text-muted small dropup" onClick={e => this.props.toggleWhatIsThis()}>
                   <span className="caret"></span> Hide 'What is This?'
                 </a>
               </div>

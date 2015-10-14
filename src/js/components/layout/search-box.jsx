@@ -1,43 +1,35 @@
-const React = require('react');
-const _ = require('lodash');
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+import { reduxForm } from 'redux-form';
+import { bindActionCreators } from 'redux';
+import validate from 'validate.js';
 
-const history = require('lib/history');
+import { searchBoxChange } from 'actions';
 
-class SearchBox extends React.Component {
-  constructor(props) {
-    super(props);
-    
-    this.state = {
-      query: '',
-      suggestions: []
-    };
-  }
-  
-  handleSearch(e) {
-    // Go to search results
-    e.preventDefault();
-    history.pushState(null, '/search/results', { query: this.state.query });
-  }
-  
+class SearchBox extends Component { 
   handleQueryChange(e) {
-    // TODO: Search suggestions (using debounce?)
-    this.setState({ query: e.target.value });
+    // Let form state update
+    this.props.fields.query.handleChange(e);
+    // Dispatch action
+    this.props.searchBoxChange(e.target.value);
   }
     
   render() {
+    const { fields: { query: { onChange, ...queryOther } }, suggestions, handleSubmit } = this.props;
+    
     return (
       <form id="search-box" autoComplete="off" className="navbar-form navbar-left" role="search" method="GET" action="/search/results" 
-            onSubmit={e => this.handleSearch(e)}>
+            onSubmit={handleSubmit}>
         <div className="input-group">
           <span className="input-group-btn">
             <button className="btn btn-default" type="submit">
               <span className="glyphicon glyphicon-search" title="Search"></span><span className="hidden">Search</span>
             </button>
           </span>
-          <input type="text" className="form-control" name="query" placeholder="Search"
-                 list="navbar-search-suggestions" onChange={e => this.handleQueryChange(e)} />
+          <input type="text" {...queryOther} onChange={e => this.handleQueryChange(e)} className="form-control" name="query" 
+                 placeholder="Search" list="navbar-search-suggestions" />
           <datalist id="navbar-search-suggestions">
-            {this.state.suggestions.map( s => <option>{s}</option> )}
+            {suggestions.map((s, idx) => <option value={s} key={s}></option>)}
           </datalist>
         </div>
       </form>
@@ -45,4 +37,35 @@ class SearchBox extends React.Component {
   }
 }
 
-export default SearchBox;
+SearchBox.propTypes = {
+  // Provided by redux-form
+  fields: PropTypes.object.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  // Other
+  onSubmit: PropTypes.func.isRequired,
+  suggestions: PropTypes.arrayOf(PropTypes.string).isRequired
+};
+
+const searchConstraints = {
+  query: { presence: true }
+};
+
+// Apply form component
+SearchBox = reduxForm({
+  form: 'search',
+  fields: [ 'query' ],
+  validate: vals => { return validate(vals, searchConstraints) || {}; }
+})(SearchBox);
+
+function mapStateToProps(state) {
+  return { form: state.form };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    ...bindActionCreators({ searchBoxChange }, dispatch),
+    dispatch    // Redux form needs dispatch
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SearchBox);

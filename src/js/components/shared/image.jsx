@@ -1,10 +1,10 @@
-const React = require('react');
-const url = require('url');
+import React, { Component, PropTypes } from 'react';
+import { resolve } from 'url';
 
 // Create component for displaying images with correct path
-class Image extends React.Component {
+class Image extends Component {
   getSrc(src) {
-    return url.resolve('/static/images/', src);
+    return resolve('/static/images/', src);
   }
   
   render() {
@@ -13,6 +13,11 @@ class Image extends React.Component {
     );
   }
 }
+
+Image.propTypes = {
+  src: PropTypes.string.isRequired,
+  alt: PropTypes.string.isRequired
+};
 
 // Export image component
 export default Image;
