@@ -1,16 +1,29 @@
 import React, { Component, PropTypes } from 'react';
 import { Button } from 'react-bootstrap';
 import Icon from 'components/shared/icon';
-import { range } from 'lodash';
+import { range, union } from 'lodash';
 
 import VideoPreview from './video-preview';
 
 class VideoPreviewList extends Component {
+  componentDidMount() {
+    this.props.getVideos(this.props.list, VideoPreviewList.queries.videos);
+  }
+  
+  nextPage() {
+    this.props.nextPage(this.props.list);
+  }
+  
+  previousPage() {
+    this.props.previousPage(this.props.list);
+  }
+  
   getTitle() {
     if (!this.props.title) {
       return;
     }
     
+    // Highlight the first word in the title by wrapping with an em
     const idx = this.props.title.indexOf(' ');
     if (idx > 0) {
       return (
@@ -24,13 +37,13 @@ class VideoPreviewList extends Component {
   }
   
   getVideoPreview(idx) {
-    if (idx >= this.props.videos.length) {
-      return <li></li>;
-    }
-    
     const video = this.props.videos[idx];
+    if (!video) {
+      return (<li key={idx}></li>);
+    }
+        
     return (
-      <li className="popout-on-hover">
+      <li className="popout-on-hover" key={video.videoId}>
         <VideoPreview video={video} />
         {/* Shim for holding the width of the li when the video preview is "popped out" on hover in larger viewports */ }
         <div className="hidden-xs video-preview-shim"></div>
@@ -43,18 +56,14 @@ class VideoPreviewList extends Component {
     
     const video = this.props.videos[4];
     return (
-      <li className="hidden-xs">
+      <li className="hidden-xs" key={video.videoId}>
         <VideoPreview video={video} />
         {/* Overlay for hover that allows navigation to next page */}
-        <div className="video-preview-list-nextpageoverlay" onClick={e => this.pageClick(e)}>
-          <Icon name="chevron-cirle-right" size="4x" />
+        <div className="video-preview-list-nextpageoverlay" onClick={e => this.nextPage()}>
+          <Icon name="chevron-circle-right" size="4x" />
         </div>
       </li>
     );
-  }
-  
-  pageClick(e) {
-    console.log('Page click!');
   }
   
   render() {
@@ -67,11 +76,11 @@ class VideoPreviewList extends Component {
             {this.getFirstVideoOfNextPage()}
           </ul>
           <div className="video-preview-list-nav">
-            <Button bsStyle="primary" title="Next Page" onClick={e => this.pageClick(e)}>
+            <Button bsStyle="primary" title="Next Page" disabled={this.props.nextPageDisabled} onClick={() => this.nextPage()}>
               <Icon name="caret-down" size="lg" className="visible-xs-inline" />
               <Icon name="caret-right" size="lg" className="hidden-xs" />
             </Button>
-            <Button bsStyle="default" title="Previous Page" onClick={e => this.pageClick(e)}>
+            <Button bsStyle="default" title="Previous Page" disabled={this.props.previousPageDisabled} onClick={() => this.previousPage()}>
               <Icon name="caret-up" size="lg" className="visible-xs-inline" />
               <Icon name="caret-left" size="lg" className="hidden-xs" />
             </Button>
@@ -82,10 +91,32 @@ class VideoPreviewList extends Component {
   }
 }
 
+// Static query definitions
+VideoPreviewList.queries = {
+  // Queries for getting page of videos
+  videos(videosRoot, startIndex) {
+    let prefixPaths = [ videosRoot, { from: startIndex, length: 5 } ];
+    return [
+      [ ...prefixPaths, [ 'videoId' ] ],
+      ...VideoPreview.queries.video(prefixPaths)
+    ]
+  }
+};
+
 // Prop validation
 VideoPreviewList.propTypes = {
+  // Properties
   title: PropTypes.string,
-  videos: PropTypes.arrayOf(PropTypes.object).isRequired
+  list: PropTypes.string.isRequired,
+  isLoading: PropTypes.bool.isRequired,
+  videos: PropTypes.arrayOf(PropTypes.object).isRequired,
+  nextPageDisabled: PropTypes.bool.isRequired,
+  previousPageDisabled: PropTypes.bool.isRequired,
+  
+  // Actions
+  getVideos: PropTypes.func.isRequired,
+  nextPage: PropTypes.func.isRequired,
+  previousPage: PropTypes.func.isRequired
 };
 
 export default VideoPreviewList;

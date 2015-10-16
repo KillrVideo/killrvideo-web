@@ -8,6 +8,7 @@ var watch = require('gulp-watch');
 require('./build/build-assets');
 require('./build/build-css');
 require('./build/build-js');
+require('./build/build-sample-data');
 
 var cfg = require('./build/build-config');
 

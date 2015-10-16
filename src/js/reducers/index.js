@@ -2,7 +2,9 @@ import { combineReducers } from 'redux';
 import { reducer as formReducer } from 'redux-form';
 import { routerStateReducer } from 'redux-router';
 import * as ActionTypes from 'actions';
-import { merge } from 'lodash';
+
+// Reducers in other files
+import videoPreviewLists from './video-preview-lists'; 
 
 // Handle what is this UI state
 function whatIsThis(state = { visible: false }, action) {
@@ -36,12 +38,15 @@ function search(state = { suggestions: [] }, action) {
   }
 }
 
+
+
 const rootReducer = combineReducers({
   router: routerStateReducer,
   form: formReducer,
   whatIsThis: whatIsThis,
   loginState: loginState,
-  search: search
+  search: search,
+  videoPreviewLists: videoPreviewLists
 });
 
 export default rootReducer;

@@ -9,3 +9,4 @@ export const SEARCH_BOX_CHANGE = 'SEARCH_BOX_CHANGE';
 
 export const searchBoxSubmit = createAction(SEARCH_BOX_SUBMIT, data => data);
 export const searchBoxChange = createAction(SEARCH_BOX_CHANGE, query => query);
+
