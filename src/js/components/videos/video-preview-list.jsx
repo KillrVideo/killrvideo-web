@@ -1,9 +1,10 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import { Button } from 'react-bootstrap';
 import Icon from 'components/shared/icon';
-import { range, union } from 'lodash';
-
+import { range } from 'lodash';
 import VideoPreview from './video-preview';
+import { getVideos, nextPage, previousPage } from 'actions/video-preview-list';
 
 class VideoPreviewList extends Component {
   componentDidMount() {
@@ -105,9 +106,11 @@ VideoPreviewList.queries = {
 
 // Prop validation
 VideoPreviewList.propTypes = {
-  // Properties
+  // Properties passed in
   title: PropTypes.string,
   list: PropTypes.string.isRequired,
+  
+  // Properties from redux store
   isLoading: PropTypes.bool.isRequired,
   videos: PropTypes.arrayOf(PropTypes.object).isRequired,
   nextPageDisabled: PropTypes.bool.isRequired,
@@ -119,4 +122,12 @@ VideoPreviewList.propTypes = {
   previousPage: PropTypes.func.isRequired
 };
 
-export default VideoPreviewList;
+function mapStateToProps(state, ownProps) {
+  // Grab the public state for the specified list and pass as props
+  const { videoPreviewLists: { [ownProps.list]: listState } } = state;
+  return {
+    ...listState
+  };
+}
+
+export default connect(mapStateToProps, { getVideos, nextPage, previousPage })(VideoPreviewList);
