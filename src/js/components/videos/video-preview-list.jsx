@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Button } from 'react-bootstrap';
 import Icon from 'components/shared/icon';
 import { range } from 'lodash';
+import classNames from 'classnames';
 import VideoPreview from './video-preview';
 import { getVideos, nextPage, previousPage } from 'actions/video-preview-list';
 
@@ -34,7 +35,24 @@ class VideoPreviewList extends Component {
       );
     }
     
-    return <h3 className="section-divider"><span>{this.props.title}</span></h3>
+    return (<h3 className="section-divider"><span>{this.props.title}</span></h3>);
+  }
+  
+  getLoading() {
+    if (this.props.isLoading === false) return;
+    
+    const classes = classNames({
+      'video-preview-list-loading': true,
+      'overlay': this.props.videos.length > 0
+    });
+    
+    return (
+      <div className={classes}>
+        <h4>
+          <Icon name="spinner" animate="spin" /> Loading...
+        </h4>
+      </div>
+    );
   }
   
   getVideoPreview(idx) {
@@ -72,6 +90,7 @@ class VideoPreviewList extends Component {
       <div>
         {this.getTitle()}
         <div className="video-preview-list">
+          {this.getLoading()}
           <ul className="list-unstyled">
             {range(0, 4).map(idx => this.getVideoPreview(idx))}
             {this.getFirstVideoOfNextPage()}
