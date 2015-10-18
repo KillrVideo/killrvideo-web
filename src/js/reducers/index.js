@@ -4,7 +4,8 @@ import { routerStateReducer } from 'redux-router';
 import * as ActionTypes from 'actions';
 
 // Reducers in other files
-import videoPreviewLists from './video-preview-lists'; 
+import videoPreviewLists from './video-preview-lists';
+import viewVideo from './view-video';
 
 // Handle what is this UI state
 function whatIsThis(state = { visible: false }, action) {
@@ -46,7 +47,8 @@ const rootReducer = combineReducers({
   whatIsThis: whatIsThis,
   loginState: loginState,
   search: search,
-  videoPreviewLists: videoPreviewLists
+  videoPreviewLists: videoPreviewLists,
+  viewVideo: viewVideo
 });
 
 export default rootReducer;
