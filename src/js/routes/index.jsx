@@ -8,5 +8,6 @@ export default (
     <Route path="/account/signin" component={Views.Account.SignIn} />
     <Route path="/account/register" component={Views.Account.Register} />
     <Route path="/search/results" component={Views.Search.Results} />
+    <Route path="/view/:videoId" component={Views.Videos.View} />
   </Route>
 );

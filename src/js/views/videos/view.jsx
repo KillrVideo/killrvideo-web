@@ -1,11 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 
-class SearchResults extends Component {
+class ViewVideo extends Component {
   render() {
     return (
       <div>
-        Search Results
+        A video!
       </div>
     );
   }
@@ -16,4 +16,4 @@ function mapStateToProps(state) {
   return {};
 }
 
-export default connect(mapStateToProps)(SearchResults);
+export default connect(mapStateToProps)(ViewVideo);

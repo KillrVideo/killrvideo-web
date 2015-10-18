@@ -6,6 +6,7 @@ import { range } from 'lodash';
 import classNames from 'classnames';
 import VideoPreview from './video-preview';
 import { getVideos, nextPage, previousPage } from 'actions/video-preview-list';
+import { pushState } from 'redux-router';
 
 class VideoPreviewList extends Component {
   componentDidMount() {
@@ -18,6 +19,10 @@ class VideoPreviewList extends Component {
   
   previousPage() {
     this.props.previousPage(this.props.list);
+  }
+  
+  gotoVideo(videoId) {
+    this.props.pushState(null, `/view/${videoId}`);
   }
   
   getTitle() {
@@ -63,7 +68,7 @@ class VideoPreviewList extends Component {
         
     return (
       <li className="popout-on-hover" key={video.videoId}>
-        <VideoPreview video={video} />
+        <VideoPreview video={video} onClick={e => this.gotoVideo(video.videoId)} />
         {/* Shim for holding the width of the li when the video preview is "popped out" on hover in larger viewports */ }
         <div className="hidden-xs video-preview-shim"></div>
       </li>
@@ -138,7 +143,8 @@ VideoPreviewList.propTypes = {
   // Actions
   getVideos: PropTypes.func.isRequired,
   nextPage: PropTypes.func.isRequired,
-  previousPage: PropTypes.func.isRequired
+  previousPage: PropTypes.func.isRequired,
+  pushState: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state, ownProps) {
@@ -149,4 +155,4 @@ function mapStateToProps(state, ownProps) {
   };
 }
 
-export default connect(mapStateToProps, { getVideos, nextPage, previousPage })(VideoPreviewList);
+export default connect(mapStateToProps, { getVideos, nextPage, previousPage, pushState })(VideoPreviewList);

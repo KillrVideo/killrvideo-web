@@ -3,15 +3,11 @@ import moment from 'moment';
 
 // Component for rendering a video preview
 class VideoPreview extends Component {
-  videoClick() {
-    console.log('Video click!');
-  }
-  
   render() {
     const v = this.props.video;
     const imageStyle = { backgroundImage: `url(${v.previewImageLocation})` };
     return (
-      <div className="video-preview" onClick={e => this.videoClick()}>
+      <div className="video-preview" onClick={e => this.props.onClick()}>
         <div className="video-preview-image" style={imageStyle}>
         </div>
 
@@ -49,7 +45,7 @@ VideoPreview.queries = {
 // Prop validation
 VideoPreview.propTypes = {
   video: PropTypes.object.isRequired,
-  onClick: PropTypes.func
+  onClick: PropTypes.func.isRequired
 };
 
 export default VideoPreview;
