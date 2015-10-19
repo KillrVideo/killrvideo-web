@@ -52,7 +52,7 @@
   {
     "videoId": "60c4871a-7151-469f-ab11-8bf36f754394",
     "addedDate": "2015-09-16 09:13:40-0600",
-    "description": "SNL cast members Beck Bennett and Kyle Mooney recall their most memorable moments from season 40 – the 40th anniversary special and playing video ...",
+    "description": "SNL cast members Beck Bennett and Kyle Mooney recall their most memorable moments from season 40 ï¿½ the 40th anniversary special and playing video ...",
     "location": "siAjx3Syi6U",
     "locationType": 0,
     "name": "Beck Bennett and Kyle Mooney's Most Memorable Season 40 Moments - SNL",
@@ -152,7 +152,7 @@
   {
     "videoId": "9613d865-cf16-4cb3-b7fc-f17350750ab6",
     "addedDate": "2015-09-06 18:00:01-0600",
-    "description": "SNL cast member Kenan Thompson recalls his most memorable moment from season 40 – the night of the 40th anniversary special. Subscribe to the SNL ...",
+    "description": "SNL cast member Kenan Thompson recalls his most memorable moment from season 40 ï¿½ the night of the 40th anniversary special. Subscribe to the SNL ...",
     "location": "Xo3AAoev68M",
     "locationType": 0,
     "name": "Kenan Thompson's  Most Memorable Season 40 Moment - SNL",
@@ -207,6 +207,16 @@
     "locationType": 0,
     "name": "Haddad SMASH - A Short on how Cassandra is \\",
     "previewImageLocation": "//img.youtube.com/vi/rxIBOZd6RqM/hqdefault.jpg",
+    "tags": ["cassandra", "datastax"]
+  },
+  {
+    "videoId": "4d67c2de-bc1b-4bfd-8dea-9e3ffa5a19c6",
+    "addedDate": "2015-09-19 07:26:36+0000",
+    "description": "In this session youâ€™ll learn just enough to get started with NoSQL Apache Cassandra and Java, including how to install, build and try out some basic API calls.",
+    "location": "https://killrvideomedia.blob.core.windows.net/asset-1515c18d-f4f5-402d-9f00-d5a5e3c66490/IMG_1600._H264_2200kbps_AAC_und_ch2_128kbps.mp4?sv=2012-02-12&sr=c&si=054d5069-8b48-4beb-bc9f-0fb6d6700129&sig=yU%2F13cT9vhKRpDjOBqTG0ggpMXyQ%2FZyaP6xY18wPeKc%3D&se=2042-07-01T07%3A26%3A35Z",
+    "locationType": 1,
+    "name": "Getting Started with Apache Cassandra and Java",
+    "previewImageLocation": "https://killrvideomedia.blob.core.windows.net/asset-8ae9935e-da77-42a5-80d1-64ce4079da1a/IMG_1600._H264_2200kbps_AAC_und_ch2_128kbps_480x272_00.11.30.4639266_2_2-13-2015_7.26%20AM.jpg?sv=2012-02-12&sr=c&si=efee8110-30b1-440d-97e1-aa575cd264a8&sig=OlumfK1CrlYk3Ki8bcHVErM8696tcNR5lkn%2FsSKEiIg%3D&se=2042-07-01T07%3A26%3A36Z",
     "tags": ["cassandra", "datastax"]
   }
 ]

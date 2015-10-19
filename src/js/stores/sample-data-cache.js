@@ -731,6 +731,34 @@ const cache = {
           "1da49baf-fe2f-430a-b78b-8d529a3ad140"
         ]
       }
+    },
+    "4d67c2de-bc1b-4bfd-8dea-9e3ffa5a19c6": {
+      "videoId": "4d67c2de-bc1b-4bfd-8dea-9e3ffa5a19c6",
+      "addedDate": "2015-09-19 07:26:36+0000",
+      "description": "In this session you’ll learn just enough to get started with NoSQL Apache Cassandra and Java, including how to install, build and try out some basic API calls.",
+      "location": "https://killrvideomedia.blob.core.windows.net/asset-1515c18d-f4f5-402d-9f00-d5a5e3c66490/IMG_1600._H264_2200kbps_AAC_und_ch2_128kbps.mp4?sv=2012-02-12&sr=c&si=054d5069-8b48-4beb-bc9f-0fb6d6700129&sig=yU%2F13cT9vhKRpDjOBqTG0ggpMXyQ%2FZyaP6xY18wPeKc%3D&se=2042-07-01T07%3A26%3A35Z",
+      "locationType": 1,
+      "name": "Getting Started with Apache Cassandra and Java",
+      "previewImageLocation": "https://killrvideomedia.blob.core.windows.net/asset-8ae9935e-da77-42a5-80d1-64ce4079da1a/IMG_1600._H264_2200kbps_AAC_und_ch2_128kbps_480x272_00.11.30.4639266_2_2-13-2015_7.26%20AM.jpg?sv=2012-02-12&sr=c&si=efee8110-30b1-440d-97e1-aa575cd264a8&sig=OlumfK1CrlYk3Ki8bcHVErM8696tcNR5lkn%2FsSKEiIg%3D&se=2042-07-01T07%3A26%3A36Z",
+      "tags": [
+        "cassandra",
+        "datastax"
+      ],
+      "views": 1084,
+      "author": {
+        "$type": "ref",
+        "value": [
+          "usersById",
+          "2858cf98-c580-4b03-8aff-d5aa2c0a476f"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "4d67c2de-bc1b-4bfd-8dea-9e3ffa5a19c6"
+        ]
+      }
     }
   },
   "recentVideos": {
@@ -738,63 +766,63 @@ const cache = {
       "$type": "ref",
       "value": [
         "videosById",
-        "8cbed57c-f1b8-4c7d-9e6a-8cb57fa375f5"
+        "4d67c2de-bc1b-4bfd-8dea-9e3ffa5a19c6"
       ]
     },
     "1": {
       "$type": "ref",
       "value": [
         "videosById",
-        "60c4871a-7151-469f-ab11-8bf36f754394"
+        "8cbed57c-f1b8-4c7d-9e6a-8cb57fa375f5"
       ]
     },
     "2": {
       "$type": "ref",
       "value": [
         "videosById",
-        "a603ed5b-997c-4ac2-97e6-c12cf5626c4d"
+        "60c4871a-7151-469f-ab11-8bf36f754394"
       ]
     },
     "3": {
       "$type": "ref",
       "value": [
         "videosById",
-        "ef18c5f9-3ac0-4555-b19d-99fc4fdb2d32"
+        "a603ed5b-997c-4ac2-97e6-c12cf5626c4d"
       ]
     },
     "4": {
       "$type": "ref",
       "value": [
         "videosById",
-        "eb108e32-ac9e-43cd-bcbf-66f25fd4c8bf"
+        "ef18c5f9-3ac0-4555-b19d-99fc4fdb2d32"
       ]
     },
     "5": {
       "$type": "ref",
       "value": [
         "videosById",
-        "9613d865-cf16-4cb3-b7fc-f17350750ab6"
+        "eb108e32-ac9e-43cd-bcbf-66f25fd4c8bf"
       ]
     },
     "6": {
       "$type": "ref",
       "value": [
         "videosById",
-        "9b18aeac-bbe0-449c-b3ab-4866d5423182"
+        "9613d865-cf16-4cb3-b7fc-f17350750ab6"
       ]
     },
     "7": {
       "$type": "ref",
       "value": [
         "videosById",
-        "dbbd95cb-23bb-406a-a5bd-095c90380b74"
+        "9b18aeac-bbe0-449c-b3ab-4866d5423182"
       ]
     },
     "8": {
       "$type": "ref",
       "value": [
         "videosById",
-        "23150684-9c3f-4bf7-b841-5fac538d60c8"
+        "dbbd95cb-23bb-406a-a5bd-095c90380b74"
       ]
     }
   },
@@ -882,6 +910,10 @@ const cache = {
     "1da49baf-fe2f-430a-b78b-8d529a3ad140": {
       "count": 31,
       "total": 86
+    },
+    "4d67c2de-bc1b-4bfd-8dea-9e3ffa5a19c6": {
+      "count": 37,
+      "total": 124
     }
   }
 };
