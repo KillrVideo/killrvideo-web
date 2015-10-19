@@ -1,0 +1,217 @@
+/* ------------------------------------------------------------
+    View Video Page
+   ------------------------------------------------------------ */
+#view-video-title {
+  font-weight: 400;
+  margin-top: 0;
+}
+
+#view-video-embed, #view-video-details {
+  margin-bottom: 2em;
+}
+
+#view-video-details > div:first-child {
+  position: relative;
+  height: 238px;
+  overflow: hidden;
+  padding-right: 15px;    /* Leave room for scrollbar */
+  margin-bottom: 15px;
+}
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  #view-video-details > div:first-child {
+    height: 304px;
+  }
+}
+
+/* Video ratings when viewing videos */
+.video-rating-and-sharing {
+  margin-bottom: 1em;
+}
+
+.video-rating-average, .video-rating-stars, .video-rating-share {
+  border: 1px solid #dedede;
+  height: 43px;
+}
+
+.video-rating-average {
+  margin-right: -15px;
+  padding: 7px 0;
+  border-right: none;
+  font-size: 86%;
+  color: #888;
+  text-align: center;
+}
+
+.video-rating-average > div {
+  display: inline-block;
+  text-align: left;
+  line-height: 1;
+}
+
+.video-rating-average > div > h4 {
+  float: left;
+  font-weight: bold;
+  color: #ffc000;
+  margin-top: 3px;
+  margin-bottom: 0;
+}
+
+.video-rating-average > div > span {
+  padding-left: 0.5em;
+}
+
+.video-rating-stars {
+  margin-left: -15px;
+  margin-right: -15px;
+  padding: 9px 0;
+  text-align: center;
+  font-size: 18px;
+}
+
+.video-rating span.star {
+  font-family: FontAwesome;
+  font-weight: normal;
+  font-style: normal;
+  display: inline-block;
+}
+
+.video-rating.video-rating-enabled span.star {
+  cursor: pointer;
+}
+
+.video-rating span.star:before {
+  color: #888;
+  content: "\f006";
+  padding-right: 5px;
+}
+
+.video-rating span.star.filled:before {
+  content: "\f005";
+  color: #ffc000;
+}
+
+.video-rating span.star.highlighted:before {
+  content: "\f005";
+  color: #ffc000;
+}
+
+.video-rating-share {
+  margin-left: -15px;
+  border-left: none;
+}
+
+.video-rating-share > a {
+  color: #888;
+}
+
+.video-rating-share > a:hover {
+  color: #666;
+}
+
+/* Video author and tags */
+#view-video-author {
+  font-size: 86%;
+  line-height: 1;
+  margin-bottom: 1em;
+}
+
+#view-video-author > a > img {
+  display: block;
+  float: left;
+  margin-right: 10px;
+}
+
+#view-video-tags {
+  line-height: 175%;
+  margin-bottom: 1em;
+}
+
+/* Video date description */
+#view-video-date {
+  font-size: 86%;
+  margin-bottom: 0.5em;
+}
+
+#view-video-description {
+  font-size: 86%;
+}
+
+#view-video-description span.read-more,
+#view-video-description div.details > span.read-less {
+  display: block;
+  border-top: 1px solid #dedede;
+  text-align: center;
+  font-size: 86%;
+  margin-top: 1em;
+}
+
+#view-video-description span.read-more > a,
+#view-video-description div.details > span.read-less > a {
+  position: relative;
+  display: inline-block;
+  top: -1em;
+  padding: 0.25em 0.5em;
+  border: 1px solid #dedede;
+  background-color: #fff;
+  color: #888;
+}
+
+#view-video-description span.read-more > a:hover,
+#view-video-description div.details > span.read-less > a:hover {
+  color: #666;
+}
+
+/* Video comments */
+.video-comments {
+  font-size: 86%;
+}
+
+.video-comments > li {
+  margin-left: 30px;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.video-comments > li > a.pull-left {
+  margin-left: -30px;
+  margin-top: 0.5em;
+}
+
+.video-comments > li > div img {
+  display: block;
+}
+
+/* User comments */
+.user-comments > li {
+  margin-left: 120px;
+  margin-bottom: 20px;
+}
+
+.user-comments > li > div {
+  margin-left: -120px;
+}
+
+.user-comments > li > div img {
+  width: 100px;
+  height: auto;
+}
+
+/* Add comment */
+.video-add-comment form textarea {
+  height: 47px;
+}
+
+.video-add-comment form button {
+  display: none;
+}
+
+.video-add-comment form.inProgress textarea {
+  height: 74px;
+}
+
+.video-add-comment form.inProgress button,
+.video-add-comment form button:active {
+  display: inline-block;
+}

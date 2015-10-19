@@ -10,8 +10,8 @@ class VideoPlayerYouTube extends Component {
 }
 
 VideoPlayerYouTube.queries = {
-  video() {
-    return [ 'location' ];
+  video(videoPath) {
+    return [ ...videoPath, 'location' ];
   }
 };
 

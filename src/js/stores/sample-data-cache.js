@@ -154,11 +154,19 @@ const cache = {
       "tags": [
         "saturday night live"
       ],
+      "views": 8216,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "5ff9758b-534a-402d-9069-4912a1249066"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "9b18aeac-bbe0-449c-b3ab-4866d5423182"
         ]
       }
     },
@@ -174,11 +182,19 @@ const cache = {
         "azure",
         "database"
       ],
+      "views": 8626,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "5ff9758b-534a-402d-9069-4912a1249066"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "9edb9d5b-3d87-4404-bff9-2ab43b5fff24"
         ]
       }
     },
@@ -194,11 +210,19 @@ const cache = {
         "cat",
         "funny"
       ],
+      "views": 364,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "1438150b-9923-4ea8-be4b-bb1f5b8953bb"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "23150684-9c3f-4bf7-b841-5fac538d60c8"
         ]
       }
     },
@@ -216,11 +240,19 @@ const cache = {
         "database",
         "microsoft"
       ],
+      "views": 9599,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "1438150b-9923-4ea8-be4b-bb1f5b8953bb"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "29160f69-2d5c-4c21-8ec6-9e5b5ab8cdff"
         ]
       }
     },
@@ -235,11 +267,19 @@ const cache = {
       "tags": [
         "azure"
       ],
+      "views": 617,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "e6774c59-c61c-4276-9d65-50b08c4f43d7"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "d03f6fa0-cf6f-4ee0-8c79-51c5ea400794"
         ]
       }
     },
@@ -254,11 +294,19 @@ const cache = {
       "tags": [
         "snl"
       ],
+      "views": 2153,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "853b3f42-f4dc-4c76-9a5b-2cdb24dd7762"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "60c4871a-7151-469f-ab11-8bf36f754394"
         ]
       }
     },
@@ -274,11 +322,19 @@ const cache = {
         "cat",
         "grumpy cat"
       ],
+      "views": 7055,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "16eddb0f-350d-436d-ad46-47d9047475b3"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "8cbed57c-f1b8-4c7d-9e6a-8cb57fa375f5"
         ]
       }
     },
@@ -294,11 +350,19 @@ const cache = {
         "windows",
         "windows 10"
       ],
+      "views": 7279,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "98394fdc-6501-4321-9667-64d1ffe00cfd"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "af7e2503-90ac-4400-a3c7-66f7180345f5"
         ]
       }
     },
@@ -314,11 +378,19 @@ const cache = {
         "cloud",
         "microsoft"
       ],
+      "views": 8612,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "e3ce573d-bbd3-49bd-8c35-136d22ea2bf9"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "e7ff43b8-f7f7-41a4-bd7d-1ee93111c845"
         ]
       }
     },
@@ -335,11 +407,19 @@ const cache = {
         "database",
         "microsoft"
       ],
+      "views": 1165,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "05824998-92d6-4b3c-adef-cb38258bbd51"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "544727d6-e1b1-44f9-a591-aee10b0d68d4"
         ]
       }
     },
@@ -355,11 +435,19 @@ const cache = {
         "cat",
         "funny"
       ],
+      "views": 9125,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "2858cf98-c580-4b03-8aff-d5aa2c0a476f"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "4a4fa5d8-1fc2-4d08-b6f8-0bcfd7648954"
         ]
       }
     },
@@ -375,11 +463,19 @@ const cache = {
         "azure",
         "cat"
       ],
+      "views": 112,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "f72a008e-b6c8-4f0b-912b-a33054e3afbc"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "0e13e7ae-5810-4b71-91b5-fb8a49a54b01"
         ]
       }
     },
@@ -396,11 +492,19 @@ const cache = {
         "cassandra",
         "database"
       ],
+      "views": 578,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "1438150b-9923-4ea8-be4b-bb1f5b8953bb"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "23a0b22b-198b-4ae4-8274-c32758c19426"
         ]
       }
     },
@@ -416,11 +520,19 @@ const cache = {
         "movie",
         "trailer"
       ],
+      "views": 787,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "e3ce573d-bbd3-49bd-8c35-136d22ea2bf9"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "ef18c5f9-3ac0-4555-b19d-99fc4fdb2d32"
         ]
       }
     },
@@ -437,11 +549,19 @@ const cache = {
         "grumpy cat",
         "movie"
       ],
+      "views": 469,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "45c23913-12f2-4e85-9fb8-23dc2fd26aa5"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "bfde0944-48e0-4d66-a299-c9d73c07df5b"
         ]
       }
     },
@@ -456,11 +576,19 @@ const cache = {
       "tags": [
         "snl"
       ],
+      "views": 9659,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "5ff9758b-534a-402d-9069-4912a1249066"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "9613d865-cf16-4cb3-b7fc-f17350750ab6"
         ]
       }
     },
@@ -476,11 +604,19 @@ const cache = {
         "cassandra",
         "database"
       ],
+      "views": 7079,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "e6774c59-c61c-4276-9d65-50b08c4f43d7"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "dbbd95cb-23bb-406a-a5bd-095c90380b74"
         ]
       }
     },
@@ -496,11 +632,19 @@ const cache = {
         "azure",
         "database"
       ],
+      "views": 7051,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "e3ce573d-bbd3-49bd-8c35-136d22ea2bf9"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "eb108e32-ac9e-43cd-bcbf-66f25fd4c8bf"
         ]
       }
     },
@@ -516,11 +660,19 @@ const cache = {
         "cat",
         "grumpy cat"
       ],
+      "views": 1060,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "98394fdc-6501-4321-9667-64d1ffe00cfd"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "a603ed5b-997c-4ac2-97e6-c12cf5626c4d"
         ]
       }
     },
@@ -536,11 +688,19 @@ const cache = {
         "cloud",
         "microsoft"
       ],
+      "views": 3718,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "45c23913-12f2-4e85-9fb8-23dc2fd26aa5"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "bcc1bc70-01e3-41d6-bbd5-410d803a2f6f"
         ]
       }
     },
@@ -556,11 +716,19 @@ const cache = {
         "cassandra",
         "datastax"
       ],
+      "views": 6580,
       "author": {
         "$type": "ref",
         "value": [
           "usersById",
           "6a38fae2-ee42-4a39-a30f-7894fbe6a043"
+        ]
+      },
+      "rating": {
+        "$type": "ref",
+        "value": [
+          "videoRatingsById",
+          "1da49baf-fe2f-430a-b78b-8d529a3ad140"
         ]
       }
     }
@@ -628,6 +796,92 @@ const cache = {
         "videosById",
         "23150684-9c3f-4bf7-b841-5fac538d60c8"
       ]
+    }
+  },
+  "videoRatingsById": {
+    "9b18aeac-bbe0-449c-b3ab-4866d5423182": {
+      "count": 18,
+      "total": 61
+    },
+    "9edb9d5b-3d87-4404-bff9-2ab43b5fff24": {
+      "count": 52,
+      "total": 150
+    },
+    "23150684-9c3f-4bf7-b841-5fac538d60c8": {
+      "count": 39,
+      "total": 112
+    },
+    "29160f69-2d5c-4c21-8ec6-9e5b5ab8cdff": {
+      "count": 59,
+      "total": 190
+    },
+    "d03f6fa0-cf6f-4ee0-8c79-51c5ea400794": {
+      "count": 20,
+      "total": 77
+    },
+    "60c4871a-7151-469f-ab11-8bf36f754394": {
+      "count": 28,
+      "total": 86
+    },
+    "8cbed57c-f1b8-4c7d-9e6a-8cb57fa375f5": {
+      "count": 40,
+      "total": 132
+    },
+    "af7e2503-90ac-4400-a3c7-66f7180345f5": {
+      "count": 27,
+      "total": 113
+    },
+    "e7ff43b8-f7f7-41a4-bd7d-1ee93111c845": {
+      "count": 26,
+      "total": 91
+    },
+    "544727d6-e1b1-44f9-a591-aee10b0d68d4": {
+      "count": 40,
+      "total": 141
+    },
+    "4a4fa5d8-1fc2-4d08-b6f8-0bcfd7648954": {
+      "count": 32,
+      "total": 99
+    },
+    "0e13e7ae-5810-4b71-91b5-fb8a49a54b01": {
+      "count": 30,
+      "total": 76
+    },
+    "23a0b22b-198b-4ae4-8274-c32758c19426": {
+      "count": 28,
+      "total": 67
+    },
+    "ef18c5f9-3ac0-4555-b19d-99fc4fdb2d32": {
+      "count": 42,
+      "total": 108
+    },
+    "bfde0944-48e0-4d66-a299-c9d73c07df5b": {
+      "count": 40,
+      "total": 138
+    },
+    "9613d865-cf16-4cb3-b7fc-f17350750ab6": {
+      "count": 33,
+      "total": 112
+    },
+    "dbbd95cb-23bb-406a-a5bd-095c90380b74": {
+      "count": 29,
+      "total": 98
+    },
+    "eb108e32-ac9e-43cd-bcbf-66f25fd4c8bf": {
+      "count": 48,
+      "total": 144
+    },
+    "a603ed5b-997c-4ac2-97e6-c12cf5626c4d": {
+      "count": 30,
+      "total": 96
+    },
+    "bcc1bc70-01e3-41d6-bbd5-410d803a2f6f": {
+      "count": 36,
+      "total": 119
+    },
+    "1da49baf-fe2f-430a-b78b-8d529a3ad140": {
+      "count": 31,
+      "total": 86
     }
   }
 };

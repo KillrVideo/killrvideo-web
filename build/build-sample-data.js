@@ -22,6 +22,12 @@ gulp.task('sample-data', function(cb) {
     videosById: _.indexBy(videos, 'videoId')
   };
   
+  // Give each video a number of views
+  _.forEach(jsonGraph.videosById, function(video) {
+    var last10 = video.videoId.substr(video.videoId.length - 11, 10);
+    video.views = parseInt('0x' + last10) % 10000; 
+  });
+  
   // Add some video projections
   jsonGraph.recentVideos = _(videos)
     .sortByOrder(function(val) {
@@ -33,12 +39,29 @@ gulp.task('sample-data', function(cb) {
       return acc;
     }, {});
   
-  // Give the videos a reference to a user
-  _.forEach(jsonGraph.videosById, function(video) {
-    var idx = parseInt('0x' + video.videoId.substr(0, 1)) % users.length;
-    video.author = $ref('usersById["' + users[idx].userId + '"]');
+  jsonGraph.videoRatingsById = _.mapValues(jsonGraph.videosById, function(video) {
+    // Use last 5 "digits" of video id as the number of 1...5 star ratings where each "digit" is the number of ratings for a given  
+    // star level (i.e. the last "digit" is the number of 5 star ratings, second to last is number of 4 star ratings, etc)
+    var last5 = video.videoId.substr(video.videoId.length - 6, 5).split('');
+    return _.reduce(last5, function(acc, val, idx) {
+      var count = parseInt('0x' + val);
+      var total = (idx + 1) * count;
+      acc.count += count;
+      acc.total += total;
+      return acc;
+    }, { count: 0, total: 0 });
   });
   
+  // Give the videos some references
+  _.forEach(jsonGraph.videosById, function(video) {
+    // Give a reference to an author in usersById
+    var idx = parseInt('0x' + video.videoId.substr(0, 1)) % users.length;
+    video.author = $ref('usersById["' + users[idx].userId + '"]');
+    
+    // Give a reference to ratings information in videoRatingsById
+    video.rating = $ref('videoRatingsById["' + video.videoId + '"]');
+  });
+    
   // Output the file
   var output = path.join(OUTPUT_FOLDER, OUTPUT_FILE_NAME);
   var stream = fs.createWriteStream(output);

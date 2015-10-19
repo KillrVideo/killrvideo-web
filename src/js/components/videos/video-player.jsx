@@ -32,6 +32,17 @@ class VideoPlayer extends Component {
   }
 }
 
+VideoPlayer.queries = {
+  video(videoPath) {
+    // We don't know which information we'll need yet since we don't know the location type so just get what both would need
+    return [
+      [ ...videoPath, 'locationType' ],
+      VideoPlayerYouTube.queries.video(videoPath),
+      VideoPlayerUpload.queries.video(videoPath)
+    ];
+  }
+};
+
 // Prop types
 VideoPlayer.propTypes = {
   video: PropTypes.object.isRequired
