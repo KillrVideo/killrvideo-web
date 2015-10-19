@@ -81,7 +81,7 @@ class VideoPreviewList extends Component {
     const video = this.props.videos[4];
     return (
       <li className="hidden-xs" key={video.videoId}>
-        <VideoPreview video={video} />
+        <VideoPreview video={video} onClick={() => {}} />
         {/* Overlay for hover that allows navigation to next page */}
         <div className="video-preview-list-nextpageoverlay" onClick={e => this.nextPage()}>
           <Icon name="chevron-circle-right" size="4x" />

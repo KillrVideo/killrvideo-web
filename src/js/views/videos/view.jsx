@@ -20,6 +20,11 @@ class ViewVideo extends Component {
     }
   }
   
+  recordPlayback() {
+    // TODO: record playback stats
+    console.log('Playback started!');
+  }
+  
   render() {
     const video = this.props.viewVideo.video;
     const ratingEnabled = !!this.props.loggedInUser;
@@ -28,7 +33,7 @@ class ViewVideo extends Component {
       <div>
         <Row>
           <Col md={7} xs={12} id="view-video-embed">
-            <VideoPlayer video={video} />
+            <VideoPlayer video={video} onPlaybackStarted={() => this.recordPlayback()} />
           </Col>
           <Col md={5} xs={12} id="view-video-details">
             { /* TODO: Scrollable video details */ }
@@ -74,7 +79,7 @@ ViewVideo.propTypes = {
   // From the router parameter (based on URL)
   videoId: PropTypes.string.isRequired,
   // From redux
-  video: PropTypes.object.isRequired
+  viewVideo: PropTypes.object.isRequired
 };
 
 function mapStateToProps(state) {

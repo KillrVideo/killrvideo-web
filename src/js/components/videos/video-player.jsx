@@ -14,10 +14,10 @@ class VideoPlayer extends Component {
     let videoPlayer;
     switch(this.props.video.locationType) {
       case VideoLocationTypes.YOUTUBE:
-        videoPlayer = <VideoPlayerYouTube video={this.props.video} />;
+        videoPlayer = <VideoPlayerYouTube video={this.props.video} onPlaybackStarted={this.props.onPlaybackStarted} />;
         break;
       case VideoLocationTypes.UPLOAD:
-        videoPlayer = <VideoPlayerUpload video={this.props.video} />;
+        videoPlayer = <VideoPlayerUpload video={this.props.video} onPlaybackStarted={this.props.onPlaybackStarted} />;
         break;
       default:
         videoPlayer = <div></div>;
@@ -45,7 +45,8 @@ VideoPlayer.queries = {
 
 // Prop types
 VideoPlayer.propTypes = {
-  video: PropTypes.object.isRequired
+  video: PropTypes.object.isRequired,
+  onPlaybackStarted: PropTypes.func.isRequired
 };
 
 export default VideoPlayer;
