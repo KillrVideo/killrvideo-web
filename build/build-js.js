@@ -23,9 +23,9 @@ var MINIFIED_FILE_NAME = 'killrvideo.min.js';
 
 var VENDOR_LIBS = [
   // Third party libs
-  'babel-core/polyfill', 'classnames', 'falcor', 'history', 'lodash', 'moment', 'react', 'react-bootstrap', 'react-redux',
-  'react-router', 'redux', 'redux-actions', 'redux-devtools', 'redux-form', 'redux-logger', 'redux-router',
-  'redux-thunk', 'validate.js',
+  'babel-core/polyfill', 'bluebird', 'classnames', 'falcor', 'history', 'load-script', 'lodash', 'moment', 'react', 
+  'react-bootstrap', 'react-redux', 'react-router', 'redux', 'redux-actions', 'redux-devtools', 'redux-form', 'redux-logger', 
+  'redux-router', 'redux-thunk', 'validate.js',
   
   // Node libs that are shimmed by browserify
   'url'
