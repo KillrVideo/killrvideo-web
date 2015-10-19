@@ -13,6 +13,7 @@ var cfg = require('./build-config');
 var FILES = [
   './node_modules/bootswatch/cosmo/bootstrap.css',
   './node_modules/font-awesome/css/font-awesome.css',
+  './node_modules/video.js/dist/video-js.css',
   './src/css/*'
 ];
 var FILE_NAME = 'killrvideo.css';

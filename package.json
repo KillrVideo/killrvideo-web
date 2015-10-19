@@ -50,6 +50,7 @@
     "redux-thunk": "^1.0.0",
     "resolve": "^1.1.6",
     "validate.js": "^0.8.0",
+    "video.js": "^5.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.4.0"
   }
