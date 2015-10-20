@@ -16,7 +16,8 @@ var IMAGE_FILES = [
 var FONT_OUTPUT = path.join(cfg.BUILD_OUTPUT, 'fonts');
 var FONT_FILES = [
   './node_modules/bootstrap/dist/fonts/*',
-  './node_modules/font-awesome/fonts/*'
+  './node_modules/font-awesome/fonts/*',
+  './node_modules/video.js/dist/font/*'
 ];
 
 // Clean images and fonts output folders

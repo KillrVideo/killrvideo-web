@@ -4,6 +4,8 @@ var livereload = require('gulp-livereload');
 var minifyCss = require('gulp-minify-css');
 var rename = require('gulp-rename');
 var watch = require('gulp-watch');
+var replace = require('gulp-replace');
+var gulpif = require('gulp-if');
 var del = require('del');
 var path = require('path');
 
@@ -20,6 +22,10 @@ var FILE_NAME = 'killrvideo.css';
 var MINIFIED_FILE_NAME = 'killrvideo.min.css';
 var BUILD_OUTPUT = path.join(cfg.BUILD_OUTPUT, 'css');
 
+function isVideoJs(file) {
+  return file.relative === 'video-js.css';
+}
+
 // Clean the CSS output folder
 gulp.task('clean.css', function() {
   return del(BUILD_OUTPUT);
@@ -28,6 +34,7 @@ gulp.task('clean.css', function() {
 // Concat any css and put in output directory
 gulp.task('css', [ 'clean.css' ], function() {
   return gulp.src(FILES)
+    .pipe(gulpif(isVideoJs, replace('url(\'font/', 'url(\'fonts/')))  // Replace "font/" path with "fonts/" (for video.js CSS)
     .pipe(concat(FILE_NAME))
     .pipe(gulp.dest(BUILD_OUTPUT))
     .pipe(livereload());
