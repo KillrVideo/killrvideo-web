@@ -3,9 +3,9 @@ import { Row, Col } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { getVideo } from 'actions/view-video';
 
-import VideoPlayer from 'components/videos/video-player';
+import VideoPlayer from './video-player';
+import VideoDetails from './video-details';
 import VideoPreviewList from 'components/videos/video-preview-list';
-import VideoRatingSharing from 'components/videos/video-rating-sharing';
 
 class ViewVideo extends Component {
   componentDidMount() {
@@ -24,11 +24,9 @@ class ViewVideo extends Component {
     // TODO: record playback stats
     console.log('Playback started!');
   }
-  
-  render() {
-    const video = this.props.viewVideo.video;
-    const ratingEnabled = !!this.props.loggedInUser;
     
+  render() {
+    const video = this.props.viewVideo.video;   
     return (
       <div>
         <Row>
@@ -36,21 +34,7 @@ class ViewVideo extends Component {
             <VideoPlayer video={video} onPlaybackStarted={() => this.recordPlayback()} />
           </Col>
           <Col md={5} xs={12} id="view-video-details">
-            { /* TODO: Scrollable video details */ }
-            <div>
-              <Row>
-                <Col xs={8}>
-                  <h4 id="view-video-title">{video.name}</h4>
-                </Col>
-                <Col xs={4} className="text-red text-right">
-                  {video.views} <span className="small text-muted">views</span>
-                </Col>
-              </Row>
-              
-              { /* Star ratings and sharing */ }
-              <VideoRatingSharing video={video} ratingEnabled={ratingEnabled} />
-            </div>
-            
+            <VideoDetails video={video} />
           </Col>
         </Row>
         <VideoPreviewList title="More Videos Like This" list="recentVideos" />
@@ -63,13 +47,11 @@ ViewVideo.queries = {
   video(videoId) {
     const videoPath = ['videosById', videoId];
     const videoPlayerQueries = VideoPlayer.queries.video(videoPath);
-    const videoRatingQueries = VideoRatingSharing.queries.video(videoPath);
+    const videoDetailsQueries = VideoDetails.queries.video(videoPath);
     return [
       // The queries from other components
       ...videoPlayerQueries,
-      ...videoRatingQueries,
-      // The queries for the data we need in this view
-      [ ...videoPath, [ 'name', 'description', 'views' ] ]
+      ...videoDetailsQueries
     ];
   }
 };

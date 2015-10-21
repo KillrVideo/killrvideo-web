@@ -128,6 +128,10 @@
   margin-bottom: 1em;
 }
 
+#view-video-tags > a {
+  margin-left: 0.2em;
+}
+
 /* Video date description */
 #view-video-date {
   font-size: 86%;

@@ -151,9 +151,12 @@ const cache = {
       "locationType": 0,
       "name": "Bonus Footage: Calvin Klein Ads (Kate McKinnon)",
       "previewImageLocation": "//img.youtube.com/vi/lvVba51ZHlk/hqdefault.jpg",
-      "tags": [
-        "saturday night live"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "saturday night live"
+        ]
+      },
       "views": 8216,
       "author": {
         "$type": "ref",
@@ -178,10 +181,13 @@ const cache = {
       "locationType": 0,
       "name": "Getting started with Node.js and Azure SQL Database on your Mac",
       "previewImageLocation": "//img.youtube.com/vi/gULiU9dh0R0/hqdefault.jpg",
-      "tags": [
-        "azure",
-        "database"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "azure",
+          "database"
+        ]
+      },
       "views": 8626,
       "author": {
         "$type": "ref",
@@ -206,10 +212,13 @@ const cache = {
       "locationType": 0,
       "name": "Funny cat - Funny cats videos - Funny cats compilation 2015 - Funny Animals Videos (106 minute)",
       "previewImageLocation": "//img.youtube.com/vi/581qCBLrqJc/hqdefault.jpg",
-      "tags": [
-        "cat",
-        "funny"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "cat",
+          "funny"
+        ]
+      },
       "views": 364,
       "author": {
         "$type": "ref",
@@ -234,12 +243,15 @@ const cache = {
       "locationType": 0,
       "name": "Create a Node.js application with Azure SQL Databases",
       "previewImageLocation": "//img.youtube.com/vi/kQo_L-D_zk8/hqdefault.jpg",
-      "tags": [
-        "azure",
-        "cat",
-        "database",
-        "microsoft"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "azure",
+          "cat",
+          "database",
+          "microsoft"
+        ]
+      },
       "views": 9599,
       "author": {
         "$type": "ref",
@@ -264,9 +276,12 @@ const cache = {
       "locationType": 0,
       "name": "Workday integration with Azure Active Directory",
       "previewImageLocation": "//img.youtube.com/vi/VZmF7Rfe_3s/hqdefault.jpg",
-      "tags": [
-        "azure"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "azure"
+        ]
+      },
       "views": 617,
       "author": {
         "$type": "ref",
@@ -291,9 +306,12 @@ const cache = {
       "locationType": 0,
       "name": "Beck Bennett and Kyle Mooney's Most Memorable Season 40 Moments - SNL",
       "previewImageLocation": "//img.youtube.com/vi/siAjx3Syi6U/hqdefault.jpg",
-      "tags": [
-        "snl"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "snl"
+        ]
+      },
       "views": 2153,
       "author": {
         "$type": "ref",
@@ -318,10 +336,13 @@ const cache = {
       "locationType": 0,
       "name": "Sleepy Grumpy Cat",
       "previewImageLocation": "//img.youtube.com/vi/SSq1a2hDSh8/hqdefault.jpg",
-      "tags": [
-        "cat",
-        "grumpy cat"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "cat",
+          "grumpy cat"
+        ]
+      },
       "views": 7055,
       "author": {
         "$type": "ref",
@@ -346,10 +367,13 @@ const cache = {
       "locationType": 0,
       "name": "Xbox One Game Streaming to Windows 10 RTM! BUILD 10240!",
       "previewImageLocation": "//img.youtube.com/vi/Zx3W68XApXw/hqdefault.jpg",
-      "tags": [
-        "windows",
-        "windows 10"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "windows",
+          "windows 10"
+        ]
+      },
       "views": 7279,
       "author": {
         "$type": "ref",
@@ -374,10 +398,13 @@ const cache = {
       "locationType": 0,
       "name": "Enable IT Transformation",
       "previewImageLocation": "//img.youtube.com/vi/9BnrlTtj7NA/hqdefault.jpg",
-      "tags": [
-        "cloud",
-        "microsoft"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "cloud",
+          "microsoft"
+        ]
+      },
       "views": 8612,
       "author": {
         "$type": "ref",
@@ -402,11 +429,14 @@ const cache = {
       "locationType": 0,
       "name": "Getting Started with PHP and Azure SQL Databases",
       "previewImageLocation": "//img.youtube.com/vi/0oCjiRK_tUk/hqdefault.jpg",
-      "tags": [
-        "azure",
-        "database",
-        "microsoft"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "azure",
+          "database",
+          "microsoft"
+        ]
+      },
       "views": 1165,
       "author": {
         "$type": "ref",
@@ -431,10 +461,13 @@ const cache = {
       "locationType": 0,
       "name": "Funny Cat Videos - Funny Cats - Funny Cat - Funny Animals",
       "previewImageLocation": "//img.youtube.com/vi/ZX8YV92VG-M/hqdefault.jpg",
-      "tags": [
-        "cat",
-        "funny"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "cat",
+          "funny"
+        ]
+      },
       "views": 9125,
       "author": {
         "$type": "ref",
@@ -459,10 +492,13 @@ const cache = {
       "locationType": 0,
       "name": "DocuSign with Azure Active Directory",
       "previewImageLocation": "//img.youtube.com/vi/EN61NbawmbQ/hqdefault.jpg",
-      "tags": [
-        "azure",
-        "cat"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "azure",
+          "cat"
+        ]
+      },
       "views": 112,
       "author": {
         "$type": "ref",
@@ -487,11 +523,14 @@ const cache = {
       "locationType": 0,
       "name": "Webinar | Big Data Analytics with Cassandra and Spark",
       "previewImageLocation": "//img.youtube.com/vi/2-KgykC11rY/hqdefault.jpg",
-      "tags": [
-        "big data",
-        "cassandra",
-        "database"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "big data",
+          "cassandra",
+          "database"
+        ]
+      },
       "views": 578,
       "author": {
         "$type": "ref",
@@ -516,10 +555,13 @@ const cache = {
       "locationType": 0,
       "name": "Pay the Ghost Official Trailer #1 (2015) - Nicolas Cage Horror Movie HD",
       "previewImageLocation": "//img.youtube.com/vi/oVr5C4ysw3w/hqdefault.jpg",
-      "tags": [
-        "movie",
-        "trailer"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "movie",
+          "trailer"
+        ]
+      },
       "views": 787,
       "author": {
         "$type": "ref",
@@ -544,11 +586,14 @@ const cache = {
       "locationType": 0,
       "name": "Grumpy Cat Compilation!",
       "previewImageLocation": "//img.youtube.com/vi/gxmHOwWh-i4/hqdefault.jpg",
-      "tags": [
-        "cat",
-        "grumpy cat",
-        "movie"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "cat",
+          "grumpy cat",
+          "movie"
+        ]
+      },
       "views": 469,
       "author": {
         "$type": "ref",
@@ -573,9 +618,12 @@ const cache = {
       "locationType": 0,
       "name": "Kenan Thompson's  Most Memorable Season 40 Moment - SNL",
       "previewImageLocation": "//img.youtube.com/vi/Xo3AAoev68M/hqdefault.jpg",
-      "tags": [
-        "snl"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "snl"
+        ]
+      },
       "views": 9659,
       "author": {
         "$type": "ref",
@@ -600,10 +648,13 @@ const cache = {
       "locationType": 0,
       "name": "Cassandra: an open source distributed database - Part 2",
       "previewImageLocation": "//img.youtube.com/vi/2jlkmYtXXKQ/hqdefault.jpg",
-      "tags": [
-        "cassandra",
-        "database"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "cassandra",
+          "database"
+        ]
+      },
       "views": 7079,
       "author": {
         "$type": "ref",
@@ -628,10 +679,13 @@ const cache = {
       "locationType": 0,
       "name": "Getting started with Python and Azure SQL Database on your Mac",
       "previewImageLocation": "//img.youtube.com/vi/OMpugPTwnTI/hqdefault.jpg",
-      "tags": [
-        "azure",
-        "database"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "azure",
+          "database"
+        ]
+      },
       "views": 7051,
       "author": {
         "$type": "ref",
@@ -656,10 +710,13 @@ const cache = {
       "locationType": 0,
       "name": "Grumpy Cat taking a water break at Refinery 29 in NYC!",
       "previewImageLocation": "//img.youtube.com/vi/Tjt00VUt5HI/hqdefault.jpg",
-      "tags": [
-        "cat",
-        "grumpy cat"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "cat",
+          "grumpy cat"
+        ]
+      },
       "views": 1060,
       "author": {
         "$type": "ref",
@@ -684,10 +741,13 @@ const cache = {
       "locationType": 0,
       "name": "Cloud-consistent service delivery and cloud-optimized app platform",
       "previewImageLocation": "//img.youtube.com/vi/eg6G5lUCi3g/hqdefault.jpg",
-      "tags": [
-        "cloud",
-        "microsoft"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "cloud",
+          "microsoft"
+        ]
+      },
       "views": 3718,
       "author": {
         "$type": "ref",
@@ -712,10 +772,13 @@ const cache = {
       "locationType": 0,
       "name": "Haddad SMASH - A Short on how Cassandra is \\",
       "previewImageLocation": "//img.youtube.com/vi/rxIBOZd6RqM/hqdefault.jpg",
-      "tags": [
-        "cassandra",
-        "datastax"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "cassandra",
+          "datastax"
+        ]
+      },
       "views": 6580,
       "author": {
         "$type": "ref",
@@ -740,10 +803,13 @@ const cache = {
       "locationType": 1,
       "name": "Getting Started with Apache Cassandra and Java",
       "previewImageLocation": "https://killrvideomedia.blob.core.windows.net/asset-8ae9935e-da77-42a5-80d1-64ce4079da1a/IMG_1600._H264_2200kbps_AAC_und_ch2_128kbps_480x272_00.11.30.4639266_2_2-13-2015_7.26%20AM.jpg?sv=2012-02-12&sr=c&si=efee8110-30b1-440d-97e1-aa575cd264a8&sig=OlumfK1CrlYk3Ki8bcHVErM8696tcNR5lkn%2FsSKEiIg%3D&se=2042-07-01T07%3A26%3A36Z",
-      "tags": [
-        "cassandra",
-        "datastax"
-      ],
+      "tags": {
+        "$type": "atom",
+        "value": [
+          "cassandra",
+          "datastax"
+        ]
+      },
       "views": 1084,
       "author": {
         "$type": "ref",

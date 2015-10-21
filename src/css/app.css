@@ -45,6 +45,11 @@ a:hover {
     color: #da3610;
 }
 
+.user-gravatar {
+    width: 24px;
+    height: auto;
+}
+
 /**
  * Header Styles
  */

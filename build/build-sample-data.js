@@ -4,7 +4,9 @@ var path = require('path');
 var _ = require('lodash');
 var moment = require('moment');
 var EOL = require('os').EOL;
-var $ref = require('falcor').Model.ref;
+var falcorModel = require('falcor').Model;
+var $ref = falcorModel.ref;
+var $atom = falcorModel.atom;
 
 // Some constants
 var OUTPUT_FILE_NAME = 'sample-data-cache.js';
@@ -21,6 +23,11 @@ gulp.task('sample-data', function(cb) {
     usersById: _.indexBy(users, 'userId'), 
     videosById: _.indexBy(videos, 'videoId')
   };
+  
+  // Tags have to wrapped in an atom since they're meant to be retrieved all together
+  _.forEach(jsonGraph.videosById, function(video) {
+    video.tags = $atom(video.tags);
+  });
   
   // Give each video a number of views
   _.forEach(jsonGraph.videosById, function(video) {
