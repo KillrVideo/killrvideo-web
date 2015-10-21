@@ -4,6 +4,8 @@ import videojs from 'video.js';
 
 class VideoPlayerUpload extends Component {
   loadVideoJsPlayer(placeholder) {
+    if (placeholder === null) return;
+    
     // Since videoJS modifies the DOM in a destructive way, we have to manually do this so it will play nicely with React
     const div = placeholder.getDOMNode();
     div.innerHTML = `<video controls class="video-js vjs-default-skin">
