@@ -1,21 +1,22 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col } from 'react-bootstrap';
+import moment from 'moment';
 
 import UserProfileImage from 'components/users/user-profile-image';
 import UserProfileLink from 'components/users/user-profile-link';
 
 import VideoRatingSharing from './video-rating-sharing';
 import VideoTagLink from './video-tag-link';
+import VideoDescription from './video-description';
 
 class VideoDetails extends Component {
   render() {
     const ratingEnabled = !!this.props.loggedInUser;
     const video = this.props.video;
     
-    // TODO: Something for initial state when no video data yet
+    // If we're doing an initial load and the video data isn't available yet, just output a placeholder
     if (!video.author) {
-      video.author = {};
-      video.tags = [];
+      return <div></div>;
     }
     
     // TODO: make scrollable
@@ -49,6 +50,13 @@ class VideoDetails extends Component {
           </Col>
         </Row>
         
+        { /* Date and Description */ }
+        <p id="view-video-date">
+          <em>Added on {moment(video.addedDate).format('l')}</em>
+        </p>
+        
+        <VideoDescription video={video} />        
+        
       </div>
     );
   }
@@ -58,9 +66,11 @@ class VideoDetails extends Component {
 VideoDetails.queries = {
   video(videoPath) {
     const ratingSharingQueries = VideoRatingSharing.queries.video(videoPath);
+    const descriptionQueries = VideoDescription.queries.video(videoPath);
     return [
       ...ratingSharingQueries,
-      [ ...videoPath, [ 'name', 'views', 'tags', 'description' ] ],
+      ...descriptionQueries,
+      [ ...videoPath, [ 'name', 'views', 'tags', 'addedDate' ] ],
       [ ...videoPath, 'author', [ 'firstName', 'lastName', 'email', 'userId'] ]
     ];
   }

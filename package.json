@@ -21,6 +21,7 @@
     "express": "^4.13.3",
     "falcor": "^0.1.13",
     "font-awesome": "^4.4.0",
+    "get-size": "^1.2.2",
     "gulp": "^3.9.0",
     "gulp-concat": "^2.6.0",
     "gulp-if": "^2.0.0",

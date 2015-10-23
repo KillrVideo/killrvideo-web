@@ -12,8 +12,8 @@
 
 #view-video-details > div:first-child {
   position: relative;
-  height: 238px;
-  overflow: hidden;
+  /*height: 238px;
+  overflow: hidden; */
   padding-right: 15px;    /* Leave room for scrollbar */
   margin-bottom: 15px;
 }
@@ -138,12 +138,15 @@
   margin-bottom: 0.5em;
 }
 
-#view-video-description {
-  font-size: 86%;
+#view-video-description-wrapper {
+  overflow: hidden;
 }
 
-#view-video-description span.read-more,
-#view-video-description div.details > span.read-less {
+#view-video-description-wrapper.animate {
+  transition: height 0.25s ease-out;
+}
+
+#view-video-description-button {
   display: block;
   border-top: 1px solid #dedede;
   text-align: center;
@@ -151,8 +154,8 @@
   margin-top: 1em;
 }
 
-#view-video-description span.read-more > a,
-#view-video-description div.details > span.read-less > a {
+#view-video-description-button > a {
+  cursor: pointer;
   position: relative;
   display: inline-block;
   top: -1em;
@@ -162,8 +165,7 @@
   color: #888;
 }
 
-#view-video-description span.read-more > a:hover,
-#view-video-description div.details > span.read-less > a:hover {
+#view-video-description-button > a:hover {
   color: #666;
 }
 
