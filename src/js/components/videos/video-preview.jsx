@@ -30,11 +30,11 @@ class VideoPreview extends Component {
 
 // Static query definitions
 VideoPreview.queries = {
-  video(prefixPaths) {
+  video() {
     // recentVideos[0..4]['name', 'addedDate', ...]
-    let details = [ ...prefixPaths, [ 'name', 'previewImageLocation', 'addedDate' ] ];
+    let details = [ [ 'name', 'previewImageLocation', 'addedDate' ] ];
     // recentVideos[0..4]['author']['firstName', 'lastName']
-    let author = [ ...prefixPaths, 'author', [ 'firstName', 'lastName' ] ];
+    let author = [ 'author', [ 'firstName', 'lastName' ] ];
     return [
       details,
       author

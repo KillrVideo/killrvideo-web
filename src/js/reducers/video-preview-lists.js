@@ -1,83 +1,96 @@
 import * as ActionTypes from 'actions/video-preview-list';
+import { mapValues } from 'lodash';
 
-const defaultListState = { 
+const defaultPrivateState = {
+  startIndex: 0
+};
+
+// Reducer for the private state of an individual list
+function videoPreviewListPrivate(state = defaultPrivateState, action) {
+  switch(action.type) {
+    case ActionTypes.LOAD:
+      return {
+        videoQueries: action.payload.videoQueries,
+        ...state
+      };
+    case ActionTypes.RECEIVE_PREVIEWS:
+      let { startIndex, ...restOfState } = state;
+      return {
+        startIndex: action.payload.startIndex,
+        ...restOfState
+      };
+    case ActionTypes.UNLOAD:
+      return defaultPrivateState;
+  }
+  
+  return state;
+}
+
+const defaultPublicState = { 
   isLoading: false, 
   videos: [],
   nextPageDisabled: true,
   previousPageDisabled: true
 };
 
-// Reducer for the private state of an individual list
-function videoPreviewListPrivate(state, action) {
-  switch(action.type) {
-    case ActionTypes.VIDEO_PREVIEW_LIST_RECIEVE:
-      return {
-        modelRoot: state.modelRoot,
-        idx: action.payload.idx,
-        getFalcorQuery: action.payload.getFalcorQuery
-      };
-    default:
-      return state;
-  }
-}
-
 // Reducer for the public state of an individual list
-function videoPreviewList(state, action) {
+function videoPreviewList(state = defaultPublicState, action) {
   switch(action.type) {
-    case ActionTypes.VIDEO_PREVIEW_LIST_REQUEST:
-      let { isLoading, ...restOfState } = state;
+    case ActionTypes.REQUEST_PREVIEWS:
+      let { isLoading, nextPageDisabled, previousPageDisabled, ...restOfState } = state;
       return {
         isLoading: true,
+        nextPageDisabled: true,
+        previousPageDisabled: true,
         ...restOfState
       };
-    case ActionTypes.VIDEO_PREVIEW_LIST_RECIEVE:
+    case ActionTypes.RECEIVE_PREVIEWS:
       return {
         videos: action.payload.videos,
         isLoading: false,
         nextPageDisabled: action.payload.videos.length < 5,
-        previousPageDisabled: action.payload.idx === 0
+        previousPageDisabled: action.payload.startIndex === 0
       };
-    default:
-      return state;
+    case ActionTypes.UNLOAD:
+      return defaultPublicState;
   }
+  
+  return state;
 }
 
-const defaultState = {
-  recentVideos: {
-    ...defaultListState
-  },
+const defaultListsState = {
   // Private state for each list
-  _private: {
-    recentVideos: {
-      modelRoot: 'recentVideos'
-    }
-  }
+  _private: { },
+  // Populate some initial state for all available lists
+  ...mapValues(ActionTypes.AvailableLists, () => defaultPublicState)
 };
 
-function videoPreviewLists(state = defaultState, action) {
+function videoPreviewLists(state = defaultListsState, action) {
   switch(action.type) {
-    case ActionTypes.VIDEO_PREVIEW_LIST_REQUEST:
-    case ActionTypes.VIDEO_PREVIEW_LIST_RECIEVE:
-      let { 
-        [action.payload.list]: publicListState,
+    case ActionTypes.REQUEST_PREVIEWS:
+    case ActionTypes.RECEIVE_PREVIEWS:
+    case ActionTypes.LOAD:
+    case ActionTypes.UNLOAD:
+      let {
+        [action.payload.list]: publicState,
         _private: {
-          [action.payload.list]: privateListState,
-          ...restOfPrivateState
-        },
-        ...restOfPublicState 
-      } = state;
-      
-      return {
-        [action.payload.list]: videoPreviewList(publicListState, action),
-        _private: {
-          [action.payload.list]: videoPreviewListPrivate(privateListState, action),
+          [action.payload.list]: privateState,
           ...restOfPrivateState
         },
         ...restOfPublicState
+      } = state;
+      
+      return {
+        _private: {
+          [action.payload.list]: videoPreviewListPrivate(privateState, action),
+          ...restOfPrivateState
+        },
+        [action.payload.list]: videoPreviewList(publicState, action),
+        ...restOfPublicState
       };
-    default:
-      return state;
   }
+  
+  return state;
 }
 
 export default videoPreviewLists;

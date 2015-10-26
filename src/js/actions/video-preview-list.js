@@ -2,79 +2,106 @@ import createAction from 'redux-actions/lib/createAction';
 import model from 'stores/falcor-model';
 import { values } from 'lodash';
 
-export const VIDEO_PREVIEW_LIST_REQUEST = 'VIDEO_PREVIEW_LIST_REQUEST';
-export const VIDEO_PREVIEW_LIST_RECIEVE = 'VIDEO_PREVIEW_LIST_RECIEVE';
+// List definitions
+export const AvailableLists = {
+  recentVideos: {
+    videoQueryRoot: [ 'recentVideos' ],
+    responseSelector: response => response.json.recentVideos
+  }
+}
 
-const videoPreviewListRequest = createAction(VIDEO_PREVIEW_LIST_REQUEST, (list, query) => ({ list, query }));
-const videoPreviewListReceive = createAction(VIDEO_PREVIEW_LIST_RECIEVE, (list, idx, videos, getFalcorQuery) => ({ list, idx, videos, getFalcorQuery }));
 
+/**
+ * Public action constants
+ */
+export const LOAD = 'videoPreviewList/LOAD';
+export const UNLOAD = 'videoPreviewList/UNLOAD';
+export const REQUEST_PREVIEWS = 'videoPreviewList/REQUEST_PREVIEWS';
+export const RECEIVE_PREVIEWS = 'videoPreviewList/RECEIVE_PREVIEWS';
 
-// Async action for getting initial page
-export function getVideos(list, getFalcorQuery) {
+/**
+ * Public action creators
+ */
+export const unload = createAction(UNLOAD, list => ({ list }));
+export function load(list, videoQueries) {
   return (dispatch, getState) => {
-    // Query from whatever model root is in state with a starting index of 0
-    let { 
-      videoPreviewLists: { 
-        _private: { 
-          [list]: { modelRoot } 
-        } 
-      } 
-    } = getState();
-      
-    return dispatch(fetchPageOfVideos(list, modelRoot, 0, getFalcorQuery));
-  };
+    // Tell everyone we're loading
+    dispatch(_load(list, videoQueries));
+    
+    // Fetch the initial page of records
+    return dispatch(fetchVideos(list, 0));
+  }
 };
 
-// Async action for getting next page in a list
-export function nextPage(list) {
+export function nextPageClick(list) {
   return (dispatch, getState) => {
-    // Make sure there is a next page
+    // See if we're allowed to go to the next page and also pull the current start index
     let { 
-      videoPreviewLists: { 
-        _private: {
-          [list]: { modelRoot, getFalcorQuery, idx } 
+      videoPreviewLists: {
+        [list]: {
+          nextPageDisabled
         },
-        [list]: { nextPageDisabled }
+        _private: {
+          [list]: { 
+            startIndex
+          }
+        }
       }
     } = getState();
     
     if (nextPageDisabled) return;
     
-    let nextPageIdx = idx + 4;
-    return dispatch(fetchPageOfVideos(list, modelRoot, nextPageIdx, getFalcorQuery));
+    return dispatch(fetchVideos(list, startIndex + 4));
   };
-};
+}
 
-export function previousPage(list) {
+export function previousPageClick(list) {
   return (dispatch, getState) => {
-    // Make sure we're not trying to go back too far
+    // See if we're allowed to go to the previous page and also pull the current start index
     let { 
-      videoPreviewLists: { 
-        _private: {
-          [list]: { modelRoot, getFalcorQuery, idx } 
+      videoPreviewLists: {
+        [list]: {
+          previousPageDisabled
         },
-        [list]: { previousPageDisabled } 
+        _private: {
+          [list]: { 
+            startIndex
+          }
+        }
       }
     } = getState();
     
     if (previousPageDisabled) return;
     
-    let prevPageIdx = idx - 4;
-    return dispatch(fetchPageOfVideos(list, modelRoot, prevPageIdx, getFalcorQuery));
+    return dispatch(fetchVideos(list, startIndex - 4));
   };
-};
+}
 
-// Fetch a page of videos async action
-function fetchPageOfVideos(list, modelRoot, idx, getFalcorQuery) {
-  return dispatch => {
-    // Let the UI know we're loading
-    let query = getFalcorQuery(modelRoot, idx);
-    dispatch(videoPreviewListRequest(list, query));
+/**
+ * Private action creators
+ */
+const _load = createAction(LOAD, (list, videoQueries) => ({ list, videoQueries }));
+const requestPreviews = createAction(REQUEST_PREVIEWS, (list, videoQueries) => ({ list, videoQueries }));
+const receivePreviews = createAction(RECEIVE_PREVIEWS, (list, videos, startIndex) => ({ list, videos, startIndex }));
+function fetchVideos(list, startIndex) {
+  return (dispatch, getState) => {
+    // Get the queries from private state
+    let { 
+      videoPreviewLists: { 
+        _private: { 
+          [list]: { videoQueries }
+        } 
+      } 
+    } = getState();
     
-    // Query will be an array of queries to run, so destructure to pass as arguments
-    return model.get(...query).then(response => {
-      // Give UI the results
-      dispatch(videoPreviewListReceive(list, idx, values(response.json[modelRoot]), getFalcorQuery));
-    });
-  }
+    // Get the query root and the response selector from the list definition constant above
+    let { [list]: { videoQueryRoot, responseSelector } } = AvailableLists;
+    
+    // Add query root and range information to each query and then let the UI know we're querying
+    let queries = videoQueries.map(q => [ ...videoQueryRoot, { from: startIndex, length: 5 }, ...q ]);
+    dispatch(requestPreviews(list, queries));
+    
+    // Execute the queries and dispatch the response when complete
+    return model.get(...queries).then(response => dispatch(receivePreviews(list, values(responseSelector(response)), startIndex)));
+  };
 }

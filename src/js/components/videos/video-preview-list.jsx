@@ -5,26 +5,22 @@ import Icon from 'components/shared/icon';
 import { range } from 'lodash';
 import classNames from 'classnames';
 import VideoPreview from './video-preview';
-import { getVideos, nextPage, previousPage } from 'actions/video-preview-list';
+import { load, unload, nextPageClick, previousPageClick, previewClick } from 'actions/video-preview-list';
 import { pushState } from 'redux-router';
 
 class VideoPreviewList extends Component {
   componentDidMount() {
-    this.props.getVideos(this.props.list, VideoPreviewList.queries.videos);
+    this.props.load(this.props.list, VideoPreviewList.queries.video());
   }
   
-  nextPage() {
-    this.props.nextPage(this.props.list);
+  componentWillUnmount() {
+    this.props.unload(this.props.list);
   }
   
-  previousPage() {
-    this.props.previousPage(this.props.list);
-  }
-  
-  gotoVideo(videoId) {
+  goToVideo(videoId) {
     this.props.pushState(null, `/view/${videoId}`);
   }
-  
+    
   getTitle() {
     if (!this.props.title) {
       return;
@@ -68,7 +64,7 @@ class VideoPreviewList extends Component {
         
     return (
       <li className="popout-on-hover" key={video.videoId}>
-        <VideoPreview video={video} onClick={e => this.gotoVideo(video.videoId)} />
+        <VideoPreview video={video} onClick={e => this.goToVideo(video.videoId)} />
         {/* Shim for holding the width of the li when the video preview is "popped out" on hover in larger viewports */ }
         <div className="hidden-xs video-preview-shim"></div>
       </li>
@@ -83,7 +79,7 @@ class VideoPreviewList extends Component {
       <li className="hidden-xs" key={video.videoId}>
         <VideoPreview video={video} onClick={() => {}} />
         {/* Overlay for hover that allows navigation to next page */}
-        <div className="video-preview-list-nextpageoverlay" onClick={e => this.nextPage()}>
+        <div className="video-preview-list-nextpageoverlay" onClick={() => this.props.nextPageClick(this.props.list)}>
           <Icon name="chevron-circle-right" size="4x" />
         </div>
       </li>
@@ -101,11 +97,11 @@ class VideoPreviewList extends Component {
             {this.getFirstVideoOfNextPage()}
           </ul>
           <div className="video-preview-list-nav">
-            <Button bsStyle="primary" title="Next Page" disabled={this.props.nextPageDisabled} onClick={() => this.nextPage()}>
+            <Button bsStyle="primary" title="Next Page" disabled={this.props.nextPageDisabled} onClick={() => this.props.nextPageClick(this.props.list)}>
               <Icon name="caret-down" size="lg" className="visible-xs-inline" />
               <Icon name="caret-right" size="lg" className="hidden-xs" />
             </Button>
-            <Button bsStyle="default" title="Previous Page" disabled={this.props.previousPageDisabled} onClick={() => this.previousPage()}>
+            <Button bsStyle="default" title="Previous Page" disabled={this.props.previousPageDisabled} onClick={() => this.props.previousPageClick(this.props.list)}>
               <Icon name="caret-up" size="lg" className="visible-xs-inline" />
               <Icon name="caret-left" size="lg" className="hidden-xs" />
             </Button>
@@ -118,12 +114,10 @@ class VideoPreviewList extends Component {
 
 // Static query definitions
 VideoPreviewList.queries = {
-  // Queries for getting page of videos
-  videos(videosRoot, startIndex) {
-    let prefixPaths = [ videosRoot, { from: startIndex, length: 5 } ];
+  video() {
     return [
-      [ ...prefixPaths, [ 'videoId' ] ],
-      ...VideoPreview.queries.video(prefixPaths)
+      [ [ 'videoId' ] ],
+      ...VideoPreview.queries.video()
     ]
   }
 };
@@ -141,9 +135,10 @@ VideoPreviewList.propTypes = {
   previousPageDisabled: PropTypes.bool.isRequired,
   
   // Actions
-  getVideos: PropTypes.func.isRequired,
-  nextPage: PropTypes.func.isRequired,
-  previousPage: PropTypes.func.isRequired,
+  load: PropTypes.func.isRequired,
+  unload: PropTypes.func.isRequired,
+  nextPageClick: PropTypes.func.isRequired,
+  previousPageClick: PropTypes.func.isRequired,
   pushState: PropTypes.func.isRequired
 };
 
@@ -155,4 +150,4 @@ function mapStateToProps(state, ownProps) {
   };
 }
 
-export default connect(mapStateToProps, { getVideos, nextPage, previousPage, pushState })(VideoPreviewList);
+export default connect(mapStateToProps, { load, unload, nextPageClick, previousPageClick, pushState })(VideoPreviewList);
