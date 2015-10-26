@@ -85,9 +85,9 @@ class VideoDescription extends Component {
 
 // Falcor queries
 VideoDescription.queries = {
-  video(videoPath) {
+  video() {
     return [
-      [ ...videoPath, ['description'] ]
+      [ ['description'] ]
     ];
   }
 };

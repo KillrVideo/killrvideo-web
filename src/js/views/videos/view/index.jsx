@@ -10,13 +10,13 @@ import VideoPreviewList from 'components/videos/video-preview-list';
 class ViewVideo extends Component {
   componentDidMount() {
     // Get the video once mounted
-    this.props.getVideo(ViewVideo.queries.video(this.props.videoId));
+    this.props.getVideo(this.props.videoId, ViewVideo.queries.video());
   }
   
   componentWillReceiveProps(nextProps) {
     // If the video id changes, we need to get the video again
     if (this.props.videoId !== nextProps.videoId) {
-      this.props.getVideo(ViewVideo.queries.video(nextProps.videoId));
+      this.props.getVideo(nextProps.videoId, ViewVideo.queries.video());
     }
   }
   
@@ -44,10 +44,9 @@ class ViewVideo extends Component {
 }
 
 ViewVideo.queries = {
-  video(videoId) {
-    const videoPath = ['videosById', videoId];
-    const videoPlayerQueries = VideoPlayer.queries.video(videoPath);
-    const videoDetailsQueries = VideoDetails.queries.video(videoPath);
+  video() {
+    const videoPlayerQueries = VideoPlayer.queries.video();
+    const videoDetailsQueries = VideoDetails.queries.video();
     return [
       // The queries from other components
       ...videoPlayerQueries,

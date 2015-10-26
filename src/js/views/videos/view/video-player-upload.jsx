@@ -41,8 +41,10 @@ class VideoPlayerUpload extends Component {
 }
 
 VideoPlayerUpload.queries = {
-  video(videoPath) {
-    return [ ...videoPath, 'location' ];
+  video() {
+    return [ 
+      [ [ 'location' ] ] 
+    ];
   }
 };
 

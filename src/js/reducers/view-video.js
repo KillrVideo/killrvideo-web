@@ -1,20 +1,42 @@
 import * as ActionTypes from 'actions/view-video';
 
+const defaultState = {
+  video: {},
+  videoLoading: false,
+  commentsLoading: false,
+  moreCommentsAvailable: false
+};
+
 // Reducer for the view video screen data
-export default function viewVideo(state = { video: {}, isLoading: false }, action) {
+export default function viewVideo(state = defaultState, action) {
   switch(action.type) {
-    case ActionTypes.VIEW_VIDEO_REQUESTED:
-      let { isLoading, ...restOfState } = state;
+    case ActionTypes.VIDEO_REQUESTED:
+      let { videoLoading, commentsLoading, ...restOfState } = state;
       return {
-        isLoading: true,
+        videoLoading: true,
+        commentsLoading: true,
         ...restOfState
       };
-    case ActionTypes.VIEW_VIDEO_RECEIVED:
+    case ActionTypes.VIDEO_RECEIVED:
+      let { videoLoading, commentsLoading, moreCommentsAvailable, video, ...restOfState } = state;
       return {
-        isLoading: false,
-        video: action.payload.video
+        videoLoading: false,
+        commentsLoading: false,
+        moreCommentsAvailable: true,
+        video: action.payload.video,
+        ...restOfState
+      };
+    case ActionTypes.COMMENTS_REQUESTED:
+      return {
+        
+      };
+    case ActionTypes.COMMENTS_RECEIVED:
+      return {
+        
       };
     default:
-      return state;
+      
   }
+  
+  return state;
 }

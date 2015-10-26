@@ -64,14 +64,12 @@ class VideoDetails extends Component {
 
 // Falcor queries used by the component
 VideoDetails.queries = {
-  video(videoPath) {
-    const ratingSharingQueries = VideoRatingSharing.queries.video(videoPath);
-    const descriptionQueries = VideoDescription.queries.video(videoPath);
+  video() {
     return [
-      ...ratingSharingQueries,
-      ...descriptionQueries,
-      [ ...videoPath, [ 'name', 'views', 'tags', 'addedDate' ] ],
-      [ ...videoPath, 'author', [ 'firstName', 'lastName', 'email', 'userId'] ]
+      ...VideoRatingSharing.queries.video(),
+      ...VideoDescription.queries.video(),
+      [ [ 'name', 'views', 'tags', 'addedDate' ] ],
+      [ 'author', [ 'firstName', 'lastName', 'email', 'userId'] ]
     ];
   }
 };

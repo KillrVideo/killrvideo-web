@@ -2,13 +2,10 @@ import React, { Component, PropTypes } from 'react';
 import youTubeApiLoaded from 'lib/youtube-api-loaded';
 
 class VideoPlayerYouTube extends Component {
-  gotIframe(iframe) {
-    if (iframe === null) return;
-    
-    // We've got the iframe reference, so create a YT player once the API is loaded
+  createYouTubePlayer() {
     youTubeApiLoaded.then(YT => {
       // Fire the playback started handler whenever the state changes appropriately
-      const youTubePlayer = new YT.Player(iframe.getDOMNode(), {
+      const youTubePlayer = new YT.Player(this.refs.youTubeIframe.getDOMNode(), {
         events: {
           'onStateChange': e => {
             if (e.data === YT.PlayerState.PLAYING) {
@@ -19,18 +16,31 @@ class VideoPlayerYouTube extends Component {
       });
     });
   }
+  
+  componentDidMount() {
+    this.createYouTubePlayer();
+  }
+  
+  componentDidUpdate(previousProps) {
+    // If the video changes, create the YT player again
+    if (this.props.video.location !== previousProps.video.location) {
+      this.createYouTubePlayer();
+    }
+  }
 
   render() {
     const youTubeUrl = `http://www.youtube.com/embed/${this.props.video.location}?enablejsapi=1`;
     return (
-      <iframe src={youTubeUrl} ref={c => this.gotIframe(c)}></iframe>
+      <iframe src={youTubeUrl} ref="youTubeIframe"></iframe>
     );
   }
 }
 
 VideoPlayerYouTube.queries = {
-  video(videoPath) {
-    return [ ...videoPath, 'location' ];
+  video() {
+    return [ 
+      [ ['location'] ] 
+    ];
   }
 };
 

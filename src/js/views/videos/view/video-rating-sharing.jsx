@@ -98,9 +98,9 @@ class VideoRatingSharing extends Component {
 
 // Falcor queries for the component
 VideoRatingSharing.queries = {
-  video(videoPath) {
+  video() {
     return [
-      [ ...videoPath, 'rating', [ 'count', 'total' ] ]
+      [ 'rating', [ 'count', 'total' ] ]
     ];
   }
 };
