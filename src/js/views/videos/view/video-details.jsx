@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col } from 'react-bootstrap';
+import GeminiScrollbar from 'react-gemini-scrollbar';
 import moment from 'moment';
 
 import UserProfileImage from 'components/users/user-profile-image';
@@ -8,6 +9,7 @@ import UserProfileLink from 'components/users/user-profile-link';
 import VideoRatingSharing from './video-rating-sharing';
 import VideoTagLink from './video-tag-link';
 import VideoDescription from './video-description';
+import VideoComments from './video-comments';
 
 class VideoDetails extends Component {
   render() {
@@ -21,7 +23,7 @@ class VideoDetails extends Component {
     
     // TODO: make scrollable
     return (
-      <div>
+      <GeminiScrollbar>
         <Row>
           <Col xs={8}>
             <h4 id="view-video-title">{video.name}</h4>
@@ -57,7 +59,8 @@ class VideoDetails extends Component {
         
         <VideoDescription video={video} />        
         
-      </div>
+        <VideoComments video={video} />
+      </GeminiScrollbar>
     );
   }
 }
@@ -68,6 +71,7 @@ VideoDetails.queries = {
     return [
       ...VideoRatingSharing.queries.video(),
       ...VideoDescription.queries.video(),
+      ...VideoComments.queries.video(),
       [ [ 'name', 'views', 'tags', 'addedDate' ] ],
       [ 'author', [ 'firstName', 'lastName', 'email', 'userId'] ]
     ];

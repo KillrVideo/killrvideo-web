@@ -9,16 +9,18 @@ const defaultState = {
 
 // Reducer for the view video screen data
 export default function viewVideo(state = defaultState, action) {
+  let videoLoading, commentsLoading, moreCommentsAvailable, video, restOfState;
+  
   switch(action.type) {
     case ActionTypes.VIDEO_REQUESTED:
-      let { videoLoading, commentsLoading, ...restOfState } = state;
+      ({ videoLoading, commentsLoading, ...restOfState } = state);
       return {
         videoLoading: true,
         commentsLoading: true,
         ...restOfState
       };
     case ActionTypes.VIDEO_RECEIVED:
-      let { videoLoading, commentsLoading, moreCommentsAvailable, video, ...restOfState } = state;
+      ({ videoLoading, commentsLoading, moreCommentsAvailable, video, ...restOfState } = state);
       return {
         videoLoading: false,
         commentsLoading: false,
@@ -34,8 +36,6 @@ export default function viewVideo(state = defaultState, action) {
       return {
         
       };
-    default:
-      
   }
   
   return state;
