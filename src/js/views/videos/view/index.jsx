@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { connect } from 'react-redux';
-import { getVideo } from 'actions/view-video';
+import { getVideo, loadMoreComments } from 'actions/view-video';
+import { isUndefined } from 'lodash';
 
 import VideoPlayer from './video-player';
 import VideoDetails from './video-details';
@@ -10,23 +11,28 @@ import VideoPreviewList from 'components/videos/video-preview-list';
 class ViewVideo extends Component {
   componentDidMount() {
     // Get the video once mounted
-    this.props.getVideo(this.props.videoId, ViewVideo.queries.video());
+    this.props.getVideo(this.props.videoId, ViewVideo.queries.video(), ViewVideo.queries.comments());
   }
   
   componentWillReceiveProps(nextProps) {
     // If the video id changes, we need to get the video again
     if (this.props.videoId !== nextProps.videoId) {
-      this.props.getVideo(nextProps.videoId, ViewVideo.queries.video());
+      this.props.getVideo(nextProps.videoId, ViewVideo.queries.video(), ViewVideo.queries.comments());
     }
   }
   
+  loadMoreComments() {
+    this.props.loadMoreComments(this.props.videoId, ViewVideo.queries.comments());
+  }
+    
   recordPlayback() {
     // TODO: record playback stats
     console.log('Playback started!');
   }
     
   render() {
-    const video = this.props.viewVideo.video;   
+    let { video, isLoading, commentsLoading, moreCommentsAvailable, comments } = this.props.viewVideo;
+    
     return (
       <div>
         <Row>
@@ -34,7 +40,8 @@ class ViewVideo extends Component {
             <VideoPlayer video={video} onPlaybackStarted={() => this.recordPlayback()} />
           </Col>
           <Col md={5} xs={12} id="view-video-details">
-            <VideoDetails video={video} />
+            <VideoDetails video={video} comments={comments} commentsLoading={commentsLoading} moreCommentsAvailable={moreCommentsAvailable} 
+                          loadMoreComments={() => this.loadMoreComments()} />
           </Col>
         </Row>
         <VideoPreviewList title="More Videos Like This" list="recentVideos" />
@@ -52,6 +59,10 @@ ViewVideo.queries = {
       ...videoPlayerQueries,
       ...videoDetailsQueries
     ];
+  },
+  
+  comments() {
+    return VideoDetails.queries.comments();
   }
 };
 
@@ -60,7 +71,10 @@ ViewVideo.propTypes = {
   // From the router parameter (based on URL)
   videoId: PropTypes.string.isRequired,
   // From redux
-  viewVideo: PropTypes.object.isRequired
+  viewVideo: PropTypes.object.isRequired,
+  // Actions
+  getVideo: PropTypes.func.isRequired,
+  loadMoreComments: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state) {
@@ -71,4 +85,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { getVideo })(ViewVideo);
+export default connect(mapStateToProps, { getVideo, loadMoreComments })(ViewVideo);

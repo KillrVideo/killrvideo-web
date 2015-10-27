@@ -14,7 +14,8 @@ import VideoComments from './video-comments';
 class VideoDetails extends Component {
   render() {
     const ratingEnabled = !!this.props.loggedInUser;
-    const video = this.props.video;
+    
+    let { video, comments, commentsLoading, moreCommentsAvailable, loadMoreComments } = this.props;
     
     // If we're doing an initial load and the video data isn't available yet, just output a placeholder
     if (!video.author) {
@@ -59,7 +60,8 @@ class VideoDetails extends Component {
         
         <VideoDescription video={video} />        
         
-        <VideoComments video={video} />
+        <VideoComments comments={comments} commentsLoading={commentsLoading} moreCommentsAvailable={moreCommentsAvailable} 
+                       loadMoreComments={loadMoreComments} />
       </GeminiScrollbar>
     );
   }
@@ -71,16 +73,25 @@ VideoDetails.queries = {
     return [
       ...VideoRatingSharing.queries.video(),
       ...VideoDescription.queries.video(),
-      ...VideoComments.queries.video(),
       [ [ 'name', 'views', 'tags', 'addedDate' ] ],
       [ 'author', [ 'firstName', 'lastName', 'email', 'userId'] ]
     ];
+  },
+  
+  comments() {
+    return VideoComments.queries.comments();
   }
 };
 
 // Prop validation
 VideoDetails.propTypes = {
-  video: PropTypes.object.isRequired
+  video: PropTypes.object.isRequired,
+  comments: PropTypes.object.isRequired,
+  commentsLoading: PropTypes.bool.isRequired,
+  moreCommentsAvailable: PropTypes.bool.isRequired,
+  
+  // Actions
+  loadMoreComments: PropTypes.func.isRequired
 };
 
 export default VideoDetails;

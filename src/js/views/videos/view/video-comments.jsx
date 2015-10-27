@@ -1,14 +1,16 @@
 import React, { Component, PropTypes } from 'react';
-import { isUndefined, map } from 'lodash';
+import { Button } from 'react-bootstrap';
 import moment from 'moment';
+import { isUndefined, map } from 'lodash';
 
+import Icon from 'components/shared/icon';
 import UserProfileLink from 'components/users/user-profile-link';
 import UserProfileImage from 'components/users/user-profile-image';
 
 // Displays the comments on a video
 class VideoComments extends Component {
   getComments() {
-    const comments = this.props.video.comments;
+    const comments = this.props.comments;
     if (isUndefined(comments)) return;
     
     return map(comments, (c, key) => {
@@ -28,12 +30,30 @@ class VideoComments extends Component {
   }
 
   render() {
+    // See if we need to show the "Load more comments" button
+    let loadMoreButton, icon;
+    if (this.props.moreCommentsAvailable) {
+      let icon;
+      if (this.props.commentsLoading) {
+        icon = <Icon name="cog" animate="spin" />
+      }
+      
+      loadMoreButton = (
+        <Button bsStyle="default" className="clearfix" block disabled={this.props.commentsLoading} 
+                onClick={() => this.props.loadMoreComments()}>
+          {icon} Load more comments
+        </Button>
+      );
+    }
+    
+    // Render the comments
     return (
       <div id="view-video-comments">
         <h5>Latest Comments</h5>
         <ul className="video-comments list-unstyled">
           {this.getComments()}
         </ul>
+        {loadMoreButton}
       </div>
     );
   }
@@ -41,17 +61,22 @@ class VideoComments extends Component {
 
 // Falcor queries
 VideoComments.queries = {
-  video() {
+  comments() {
     return [
-      [ 'comments', { from: 0, length: 5 }, [ 'comment', 'addedDate' ] ],
-      [ 'comments', { from: 0, length: 5 }, 'author', [ 'firstName', 'lastName', 'email', 'userId' ] ]
+      [ [ 'comment', 'addedDate' ] ],
+      [ 'author', [ 'firstName', 'lastName', 'email', 'userId' ] ]
     ];
   }
 };
 
 // Prop validation
 VideoComments.propTypes = {
-  video: PropTypes.object.isRequired
+  comments: PropTypes.object.isRequired,
+  commentsLoading: PropTypes.bool.isRequired,
+  moreCommentsAvailable: PropTypes.bool.isRequired,
+  
+  // Actions
+  loadMoreComments: PropTypes.func.isRequired
 };
 
 export default VideoComments;
