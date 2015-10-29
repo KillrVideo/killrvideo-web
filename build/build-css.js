@@ -6,6 +6,8 @@ var rename = require('gulp-rename');
 var watch = require('gulp-watch');
 var replace = require('gulp-replace');
 var gulpif = require('gulp-if');
+var remember = require('gulp-remember');
+var cache = require('gulp-cached');
 var del = require('del');
 var path = require('path');
 
@@ -21,7 +23,7 @@ var FILES = [
 ];
 var FILE_NAME = 'killrvideo.css';
 var MINIFIED_FILE_NAME = 'killrvideo.min.css';
-var BUILD_OUTPUT = path.join(cfg.BUILD_OUTPUT, 'css');
+var BUILD_OUTPUT = path.join(cfg.BUILD_OUTPUT, 'dist', 'css');
 
 function isVideoJs(file) {
   return file.relative === 'video-js.css';
@@ -33,25 +35,33 @@ gulp.task('clean.css', function() {
 });
 
 // Concat any css and put in output directory
-gulp.task('css', [ 'clean.css' ], function() {
+gulp.task('css', function() {
   return gulp.src(FILES)
+    .pipe(gulpif(cfg.WATCH, cache('cssfiles')))
     .pipe(gulpif(isVideoJs, replace('url(\'font/', 'url(\'fonts/')))  // Replace "font/" path with "fonts/" (for video.js CSS)
+    .pipe(gulpif(cfg.WATCH, remember('cssfiles')))   // Remember all files so on changes everything gets concated
     .pipe(concat(FILE_NAME))
     .pipe(gulp.dest(BUILD_OUTPUT))
     .pipe(livereload());
 });
 
+// Watch CSS for changes and rebuild
+gulp.task('watch.css', function() {
+  return watch(FILES, function(file) {
+    // If file is deleted, stop caching/remembering it
+    if (file.event === 'unlink') {
+      delete cache.caches['cssfiles'][file.path];
+      remember.forget('cssfiles', file.path);
+    }
+    gulp.start('css'); 
+  });
+});
+
 // Minify CSS
-gulp.task('minify', [ 'css' ], function() {
+gulp.task('minify', function() {
   var cssOutput = path.join(BUILD_OUTPUT, FILE_NAME);
   return gulp.src(cssOutput)
     .pipe(minifyCss())
     .pipe(rename(MINIFIED_FILE_NAME))
     .pipe(gulp.dest(BUILD_OUTPUT));
-});
-
-// Watch for CSS source file changes and rebuild
-gulp.task('watch.css', function(cb) {
-  watch(FILES, function() { gulp.start('css'); })
-    .on('end', function() { cb(); });
 });

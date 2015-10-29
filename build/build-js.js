@@ -33,45 +33,74 @@ var VENDOR_LIBS = [
 var VENDOR_FILE_NAME = 'vendor.js';
 var VENDOR_MINIFIED_FILE_NAME = 'vendor.min.js';
 
-var BUILD_OUTPUT = path.join(cfg.BUILD_OUTPUT, 'js');
+var BUILD_OUTPUT = path.join(cfg.BUILD_OUTPUT, 'dist', 'js');
 
 // Clean the JS output folder
 gulp.task('clean.js', function() {
   return del(BUILD_OUTPUT);
 });
 
-// Build for local development
-gulp.task('js.debug', [ 'clean.js' ], function() {
-  return build({
-    debug: true,
-    cache: {},
-    packageCache: {}
-  });
-});
-
-// Build for release and compress/uglify JavaScript
-gulp.task('js.release', [ 'clean.js' ], function() {
-  return build({ debug: false });
-});
-
-// Build vendor bundle
-gulp.task('js.vendor', [ 'clean.js' ], function() {
-  var b = browserify({ debug: false });
-  VENDOR_LIBS.forEach(function(lib) {
-    b.require(nodeResolve.sync(lib), { expose: lib });
-  });
+// Build JavaScript
+gulp.task('js', function() {
+  var browserifyOpts = _.assign({
+    extensions: [ '.jsx' ],
+    entries: [ ENTRY_POINT ],
+    paths: [ './src/js' ]
+  }, cfg.BROWSERIFY_OPTS);
   
-  return b.bundle()
+  // Create the browserify object for bundling and tell it about external vendor dependencies
+  // which are bundled separately
+  var app = browserify(browserifyOpts);
+  VENDOR_LIBS.forEach(function(lib) { app.external(lib); });
+  
+  // Use watchify to rebuild app on changes if we're watching JS files
+  if (cfg.WATCH) {
+    app = watchify(app);
+    app.on('update', function(ids) {
+        ids.forEach(function(id) {
+          gutil.log('Changes detected to', gutil.colors.magenta(id))
+        })
+        gutil.log('Rebundling...');
+      })
+      .on('update', bundleApp)
+      .on('log', function(msg) { gutil.log(msg); });
+  }
+  
+  function bundleApp() {
+    return app.transform(babelify)
+      .bundle()
+      .on('error', function(err) {
+        gutil.log(gutil.colors.red('Browserify error:'), err.message);
+        this.emit('end');
+      })
+      .pipe(source(FILE_NAME))
+      .pipe(gulp.dest(BUILD_OUTPUT))
+      .pipe(livereload());
+  }
+  
+  // Start initial app bundling
+  var appBundle = bundleApp();
+  
+  // Create vendor bundle
+  var vendor = browserify({ debug: false });
+  VENDOR_LIBS.forEach(function(lib) {
+    vendor.require(nodeResolve.sync(lib), { expose: lib });
+  });
+ 
+  // Start vendor bundling (no watching for changes here)
+  var vendorBundle = vendor.bundle()
     .on('error', function(err) {
       gutil.log(gutil.colors.red('Browserify error:'), err.message);
       this.emit('end');
     })
     .pipe(source(VENDOR_FILE_NAME))
     .pipe(gulp.dest(BUILD_OUTPUT));
+  
+  return merge(appBundle, vendorBundle);
 });
 
-// Uglify Javascript and output
-gulp.task('uglify', [ 'js.release', 'js.vendor' ], function() {
+// Uglify Javascript and output minified files
+gulp.task('uglify', function() {
   var jsOutput = path.join(BUILD_OUTPUT, FILE_NAME);
   var uglifyApp = gulp.src(jsOutput)
     .pipe(streamify(uglify()))
@@ -86,46 +115,3 @@ gulp.task('uglify', [ 'js.release', 'js.vendor' ], function() {
     
   return merge(uglifyApp, uglifyVendor);
 });
-
-// Builds JS and if debug is enabled, does incremental builds on updates to JSX
-function build(opts) {
-  // Setup browserify and have it transpile JSX with reactify
-  var browserifyOpts = _.assign({
-    extensions: [ '.jsx' ],
-    entries: [ ENTRY_POINT ],
-    paths: [ './src/js' ]
-  }, opts);
-  
-  // Create the appropriate browserify object (use watchify for dev to allow incremental builds)
-  var b = browserify(browserifyOpts);
-  
-  // Tell browserify about external vendor dependencies
-  VENDOR_LIBS.forEach(function(lib) { b.external(lib); });
-  
-  if (opts.debug) {
-    b = watchify(b);
-    b.on('update', function(ids) {
-        ids.forEach(function(id) {
-          gutil.log('Changes detected to', gutil.colors.magenta(id))
-        })
-        gutil.log('Rebundling...');
-      })
-      .on('update', bundle)
-      .on('log', function(msg) { gutil.log(msg); });
-  }
-  
-  function bundle() {
-    return b.transform(babelify)
-      .bundle()
-      .on('error', function(err) {
-        gutil.log(gutil.colors.red('Browserify error:'), err.message);
-        this.emit('end');
-      })
-      .pipe(source(FILE_NAME))
-      .pipe(gulp.dest(BUILD_OUTPUT))
-      .pipe(livereload());
-  }
-  
-  // Create the bundle initially (if dev, watchify will take care of building after changes)
-  return bundle();
-}
