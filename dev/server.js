@@ -1,6 +1,9 @@
 import express from 'express';
 import { dataSourceRoute } from 'falcor-express';
+import cookieParser from 'cookie-parser';
+
 import KillrVideoRouter from './router';
+import UserContext from './lib/user-context';
 
 // Create a server for use during development
 const app = express();
@@ -8,7 +11,11 @@ const app = express();
 // Serve up static build assets
 app.use('/static', express.static(`${__dirname}/../dist`));
 
-app.use('/model.json', dataSourceRoute((req, res) => new KillrVideoRouter()));
+// Model.json endpoint for Falcor requests
+app.use('/model.json', dataSourceRoute((req, res) => {
+  let userContext = new UserContext(req, res);
+  return new KillrVideoRouter(userContext);
+}));
 
 // All other requests serve up the server.html page 
 app.get('/*', function(req, res) {

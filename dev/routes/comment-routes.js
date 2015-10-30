@@ -50,7 +50,7 @@ const routes = [
           // Are there comments for the video?
           let comments = commentsByVideoIdStore[videoId];
           if (isUndefined(comments)) {
-            acc[videoId] = $atom();
+            acc[videoId] = $atom(null);
             return acc;
           }
           
@@ -60,11 +60,11 @@ const routes = [
               range(idxRange.from, idxRange.to + 1).forEach(idx => {
                 rangesAcc[idx] = idx < comments.length
                   ? pick(comments[idx], commentProps)
-                  : $atom();
+                  : $atom(null);
                   
                 // Replace author ids with references to users by id
                 if (rangesAcc[idx].author) 
-                  rangesAcc[idx].author = $ref(`usersById["${rangesAcc[idx].author}"]`);
+                  rangesAcc[idx].author = $ref([ 'usersById', rangesAcc[idx].author ]);
               });
               
               return rangesAcc;

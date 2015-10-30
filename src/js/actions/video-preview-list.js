@@ -1,6 +1,6 @@
 import createAction from 'redux-actions/lib/createAction';
 import model from 'stores/falcor-model';
-import { values } from 'lodash';
+import { _ } from 'lodash';
 
 // List definitions
 export const AvailableLists = {
@@ -44,7 +44,10 @@ function fetchVideos(list, startIndex) {
     dispatch(requestPreviews(list, queries));
     
     // Execute the queries and dispatch the response when complete
-    return model.get(...queries).then(response => dispatch(receivePreviews(list, values(responseSelector(response)), startIndex)));
+    return model.get(...queries).then(response => {
+      const nonNullVideos = _(responseSelector(response)).values().takeWhile(v => v !== null).value();
+      dispatch(receivePreviews(list, nonNullVideos, startIndex))
+    });
   };
 }
 

@@ -142,6 +142,13 @@ function users() {
       "email": "domenick.rogahn+sampleuser@killrvideo.com",
       "firstName": "Domenick",
       "lastName": "Rogahn"
+    },
+    {
+      "userId": "b3e7c3ef-7e60-4e34-b012-583b14da155d",
+      "createdDate": "2015-10-29 11:29:01-0600",
+      "email": "guidedtour@killrvideo.com",
+      "firstName": "Guided",
+      "lastName": "Tour"
     }
   ];
 }

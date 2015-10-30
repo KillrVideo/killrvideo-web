@@ -48,7 +48,7 @@ const routes = [
   },
   {
     // Recent videos projection
-    route: 'recentVideos[{ranges:indexRanges}]',
+    route: 'recentVideos[{integers:indicies}]',
     get(pathSet) {
       const MAX_RECENT_VIDEOS = 9;
       
@@ -58,20 +58,16 @@ const routes = [
         .pluck('videoId')
         .take(MAX_RECENT_VIDEOS)
         .value();
-        
-      // Return as references to the videos by id collection
-      const recentVideos = _(pathSet.indexRanges)
-        .reduce((acc, idxRange) => {
-          // Process each index in the range
-          range(idxRange.from, idxRange.to + 1).forEach(idx => {
-            acc[idx] = idx < MAX_RECENT_VIDEOS
-              ? $ref([ 'videosById', videoIdsByDate[idx] ])
-              : $atom();
-          });
-          return acc;
-        }, {});
       
-      return { jsonGraph: { recentVideos } };
+      let pathValues = [];
+      pathSet.indicies.forEach(idx => {
+        pathValues.push({
+          path: [ 'recentVideos', idx ],
+          value: idx < MAX_RECENT_VIDEOS ? $ref([ 'videosById', videoIdsByDate[idx] ]) : null
+        });
+      })
+      
+      return pathValues;
     }
   },
   {

@@ -1,5 +1,5 @@
 import * as Actions from 'actions/view-video';
-import { _, merge, keys, last } from 'lodash';
+import { _, merge, keys, last, isNull } from 'lodash';
 
 const defaultState = {
   video: {},
@@ -33,12 +33,13 @@ export default function viewVideo(state = defaultState, action) {
       };
     case Actions.VIDEO_RECEIVED:
       ({ video, videoLoading, comments, commentsLoading, moreCommentsAvailable, ...restOfState } = state);
+      let initialComments = _(action.payload.comments).omit(isNull).value(); 
       return {
         videoLoading: false,
         commentsLoading: false,
         video: action.payload.video,    // Replace any existing video data with payload's video,
-        comments: action.payload.comments,
-        moreCommentsAvailable: areMoreCommentsAvailable(action.payload.comments),
+        comments: initialComments,
+        moreCommentsAvailable: areMoreCommentsAvailable(initialComments),
         ...restOfState
       };
     case Actions.COMMENTS_REQUESTED:
@@ -49,10 +50,11 @@ export default function viewVideo(state = defaultState, action) {
       };
     case Actions.COMMENTS_RECEIVED:
       ({ comments, commentsLoading, moreCommentsAvailable, ...restOfState } = state);
+      let newComments = _(action.payload.comments).omit(isNull).value();
       return {
         commentsLoading: false,
-        comments: merge({}, comments, action.payload.comments), // Merge new comments into existing video state
-        moreCommentsAvailable: areMoreCommentsAvailable(action.payload.comments),
+        comments: merge({}, comments, newComments), // Merge new comments into existing video state
+        moreCommentsAvailable: areMoreCommentsAvailable(newComments),
         ...restOfState
       };
   }

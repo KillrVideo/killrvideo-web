@@ -34,7 +34,7 @@ const routes = [
       const ratingsByVideoId = _(pathSet.videoIds)
         .reduce((acc, videoId) => {
           let ratings = ratingsByVideoIdStore[videoId];
-          acc[videoId] = isUndefined(ratings) ? $atom() : pick(ratings, ratingsProps);
+          acc[videoId] = isUndefined(ratings) ? $atom(null) : pick(ratings, ratingsProps);
           return acc;
         }, {});
       return { jsonGraph: { ratingsByVideoId } };
