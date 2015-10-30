@@ -6,6 +6,7 @@ var watch = require('gulp-watch');
 var livereload = require('gulp-livereload');
 var gulpif = require('gulp-if');
 var cache = require('gulp-cached');
+var plumber = require('gulp-plumber');
 var nodemon = require('nodemon');
 var merge = require('merge-stream');
 
@@ -26,6 +27,7 @@ gulp.task('server', function() {
   // Compile JS with Babel
   var serverJs = gulp.src(FILES)
     .pipe(gulpif(cfg.WATCH, cache('server')))
+    .pipe(plumber())    // Don't break pipe if babel has compiler errors
     .pipe(babel())
     .pipe(gulp.dest(BUILD_OUTPUT));
   
@@ -53,24 +55,24 @@ gulp.task('watch.server', function() {
 });
 
 // Start a development server
-gulp.task('start-server', function(cb) {
-  // Use nodemon to start the development server and watch for changes
-  nodemon({
-    script: path.join(BUILD_OUTPUT, 'server.js'),
-    watch: BUILD_OUTPUT
-  });
-  
+gulp.task('start-server', function() {
   // Enable live reload for when client files change
   livereload.listen();
   
-  var firstStart = true;
-  nodemon.on('start', function() {
-    if (firstStart) {
-      firstStart = false;
-      cb();
-    }
+  // Use nodemon to start the development server and watch for changes
+  nodemon({
+    script: path.join(BUILD_OUTPUT, 'server.js'),
+    watch: BUILD_OUTPUT,
+    stdout: false
   }).on('restart', function() {
     console.log('Restarting development server...');
-    livereload.reload();
+  }).on('readable', function() {
+    this.stdout.on('data', function(chunk) {
+      if (/^Listening/.test(chunk)) {
+        livereload.reload();
+      }
+      process.stdout.write(chunk);
+    });
+    this.stderr.pipe(process.stderr);
   });
 });

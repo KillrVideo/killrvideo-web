@@ -73,7 +73,8 @@ VideoDetails.queries = {
     return [
       ...VideoRatingSharing.queries.video(),
       ...VideoDescription.queries.video(),
-      [ [ 'name', 'views', 'tags', 'addedDate' ] ],
+      [ [ 'name', 'tags', 'addedDate' ] ],
+      [ 'views', null ],  // Null is needed to force falcor to follow the reference that views returns (see https://github.com/Netflix/falcor-router/issues/132)
       [ 'author', [ 'firstName', 'lastName', 'email', 'userId'] ]
     ];
   },

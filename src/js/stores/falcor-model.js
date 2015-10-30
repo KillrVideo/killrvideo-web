@@ -1,7 +1,9 @@
 import { Model } from 'falcor';
-import cache from './sample-data-cache';
+import HttpDataSource from 'falcor-http-datasource';
 
-const model = new Model({cache});
+// Do queries via HTTP to model.json
+const source = new HttpDataSource('/model.json');
+const model = new Model({ source });
 
 // Export singleton instance of the Falcor Model
 export default model;
