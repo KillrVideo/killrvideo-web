@@ -72,6 +72,7 @@ ViewVideo.propTypes = {
   videoId: PropTypes.string.isRequired,
   // From redux
   viewVideo: PropTypes.object.isRequired,
+  currentUser: PropTypes.object.isRequired,
   // Actions
   getVideo: PropTypes.func.isRequired,
   loadMoreComments: PropTypes.func.isRequired
@@ -79,7 +80,7 @@ ViewVideo.propTypes = {
 
 function mapStateToProps(state) {
   return {
-    loggedInUser: state.loggedInUser,
+    currentUser: state.authentication.currentUser,
     videoId: state.router.params.videoId,
     viewVideo: state.viewVideo
   };

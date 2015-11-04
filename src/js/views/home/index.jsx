@@ -6,9 +6,9 @@ import VideoPreviewList from 'components/videos/video-preview-list';
 class Home extends Component {
   render() {
     let recommendedVideos, userVideos;
-    if (this.props.loggedInUser) {
-      recommendedVideos = <VideoPreviewList title="Recommended for You" list="recommended" />;
-      userVideos = <VideoPreviewList title="My Videos" list="mine" />;
+    if (this.props.currentUser.isLoggedIn) {
+      recommendedVideos = <VideoPreviewList title="Recommended for You" list="recentVideos" />;
+      userVideos = <VideoPreviewList title="My Videos" list="recentVideos" />;
     }
     
     return (
@@ -23,13 +23,13 @@ class Home extends Component {
 
 // Prop validation
 Home.propTypes = {
-  loggedInUser: PropTypes.object
+  currentUser: PropTypes.object.isRequired
 };
 
 function mapStateToProps(state) {
-  const { loginState: { loggedInUser } } = state;
+  const { authentication: { currentUser } } = state;
   return {
-    loggedInUser
+    currentUser
   };
 }
 

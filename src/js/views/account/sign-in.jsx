@@ -3,14 +3,10 @@ import { connect } from 'react-redux';
 
 import { Row, Col, Panel, Alert } from 'react-bootstrap';
 import SignInForm from 'components/account/sign-in-form';
+import ErrorAlert from 'components/shared/error-alert';
+import { login } from 'actions/authentication';
 
 class SignIn extends Component {
-  signIn(vals) {
-    // TODO: Sign the user in
-    console.log('Signing in!');
-    console.log(vals);
-  }
-  
   render() {
     return (
       <Row>
@@ -20,9 +16,9 @@ class SignIn extends Component {
               If you've already got an account, sign in with your username and password below.
             </Alert>
             
-            { /* TODO: <uimessages params="queues: signInUrl"></uimessages> */ }
-              
-            <SignInForm onSubmit={vals => this.signIn(vals)} />
+            <ErrorAlert errors={this.props.loginState.errors} />
+            
+            <SignInForm onSubmit={vals => this.props.login(vals.email, vals.password)} />
           </Panel>
         </Col>
       </Row>
@@ -36,8 +32,8 @@ SignIn.propTypes = {
 };
 
 function mapStateToProps(state) {
-  // TODO: Select the pieces of state we need in props
-  return {};
+  let { authentication: { login: loginState } } = state;
+  return { loginState };
 }
 
-export default connect(mapStateToProps)(SignIn);
+export default connect(mapStateToProps, { login })(SignIn);

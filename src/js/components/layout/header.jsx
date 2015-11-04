@@ -5,6 +5,7 @@ import { pushState } from 'redux-router';
 
 import { toggleWhatIsThis } from 'actions';
 import Image from 'components/shared/image';
+import UserProfileImage from 'components/users/user-profile-image';
 import WhatIsThis from 'components/layout/what-is-this';
 import SearchBox from 'components/layout/search-box';
 
@@ -19,13 +20,13 @@ class Header extends Component {
     
   render() {
     let loggedInMenu, signIn, register;
-    if (this.props.loggedInUser) {
+    if (this.props.currentUser.isLoggedIn) {
       // Menu for logged in users
       loggedInMenu = (
         <li className="dropdown">
           <a id="loggedin-user" href="#" className="dropdown-toggle" data-toggle="dropdown">
-            {this.props.loggedInUser.firstName + ' ' + this.props.loggedInUser.lastName}
-            <img src={this.props.loggedInUser.profileImageUrl} alt="Profile image" className="img-circle user-gravatar"/>
+            {this.props.currentUser.info.firstName + ' ' + this.props.currentUser.info.lastName}
+            <UserProfileImage email={this.props.currentUser.info.email} className="img-circle" />
             <span className="caret"></span>
           </a>
           <ul className="dropdown-menu" role="menu">
@@ -90,7 +91,7 @@ class Header extends Component {
 
 Header.propTypes = {
   // Mapped from state
-  loggedInUser: PropTypes.object,
+  currentUser: PropTypes.object.isRequired,
   showWhatIsThis: PropTypes.bool.isRequired,
   searchSuggestions: PropTypes.arrayOf(PropTypes.string).isRequired,
   // Actions
@@ -98,9 +99,9 @@ Header.propTypes = {
 };
 
 function mapStateToProps(state) {
-  const { loginState, whatIsThis, search } = state;
+  const { authentication: { currentUser }, whatIsThis, search } = state;
   return {
-    loggedInUser: loginState.loggedInUser,
+    currentUser: currentUser,
     showWhatIsThis: whatIsThis.visible,
     searchSuggestions: search.suggestions
   };

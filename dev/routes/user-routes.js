@@ -32,7 +32,7 @@ const routes = [
   },
   {
     // The currently logged in user
-    route: 'currentUser',
+    route: 'authentication.currentUser',
     get(pathSet) {
       const userId = this.userContext.getCurrentUserId();
       const currentUser = isUndefined(userId)
@@ -44,16 +44,33 @@ const routes = [
   },
   {
     // User login
-    route: 'currentUser.login',
+    route: 'authentication.login',
     call(callPath, args) {
-      
+      // Try to find user with that username/password
+      let [ email, password ] = args;
+      let u = userCredentialsStore[email];
+      let currentUser;
+      if (!isUndefined(u) && u.password === password) {
+        this.userContext.setCurrentUserId(u.userId);
+        currentUser = [
+          { path: [ 'authentication', 'currentUser' ], value: $ref([ 'usersById', u.userId ]) }
+        ];
+      } else {
+        currentUser = [
+          { path: [ 'authentication', 'loginErrors' ], value: $error('Invalid email address or password') }
+        ];
+      }
+      return currentUser;
     }
   },
   {
     // User logout
-    route: 'currentUser.logout',
+    route: 'authentication.logout',
     call(callPath, args) {
-      
+      this.userContext.clearCurrentUserId();
+      return [
+        { path: [ 'authentication', 'currentUser' ], value: $atom(null) }
+      ];
     }
   }
   

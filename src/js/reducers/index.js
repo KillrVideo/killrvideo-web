@@ -6,6 +6,7 @@ import * as ActionTypes from 'actions';
 // Reducers in other files
 import videoPreviewLists from './video-preview-lists';
 import viewVideo from './view-video';
+import auth from './authentication';
 
 // Handle what is this UI state
 function whatIsThis(state = { visible: false }, action) {
@@ -13,14 +14,6 @@ function whatIsThis(state = { visible: false }, action) {
     return { visible: !state.visible };
   }
   
-  return state;
-}
-
-// Login state
-const defaultLoginState = {
-  loggedInUser: null
-};
-function loginState(state = defaultLoginState, action) {
   return state;
 }
 
@@ -45,7 +38,7 @@ const rootReducer = combineReducers({
   router: routerStateReducer,
   form: formReducer,
   whatIsThis: whatIsThis,
-  loginState: loginState,
+  authentication: auth,
   search: search,
   videoPreviewLists: videoPreviewLists,
   viewVideo: viewVideo

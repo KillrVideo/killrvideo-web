@@ -50,6 +50,16 @@ a:hover {
     height: auto;
 }
 
+ul.uimessage {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 0 10px 0;
+}
+
+ul.uimessage > li {
+    padding: 1em;
+}
+
 /**
  * Header Styles
  */
