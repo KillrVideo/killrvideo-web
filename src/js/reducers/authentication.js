@@ -1,5 +1,6 @@
 import * as Actions from 'actions/authentication';
 import { combineReducers } from 'redux';
+import { merge } from 'lodash';
 
 const defaultLoginState = {
   isLoading: false,
@@ -29,6 +30,7 @@ function loginReducer(state = defaultLoginState, action) {
 }
 
 const defaultCurrentUserState = {
+  isFromServer: false,
   isLoggedIn: false,
   info: null
 };
@@ -37,11 +39,22 @@ function currentUserReducer(state = defaultCurrentUserState, action) {
   switch (action.type) {
     case Actions.LOGIN_SUCCESS:
       return {
+        isFromServer: true,
         isLoggedIn: true,
         info: action.payload.currentUser
       };
     case Actions.LOGOUT_SUCCESS:
-      return defaultCurrentUserState;
+      return {
+        isFromServer: true,
+        isLoggedIn: false,
+        info: null
+      };
+    case Actions.RECEIVE_CURRENT_USER:
+      return {
+        isFromServer: true,
+        isLoggedIn: action.payload.currentUser !== null,
+        info: action.payload.currentUser === null ? null : merge({}, state.info, action.payload.currentUser)
+      };
   }
   return state;
 }

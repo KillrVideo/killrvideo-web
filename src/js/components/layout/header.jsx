@@ -4,12 +4,20 @@ import { connect } from 'react-redux';
 import { pushState } from 'redux-router';
 
 import { toggleWhatIsThis } from 'actions';
+import { getCurrentUser, logout } from 'actions/authentication';
 import Image from 'components/shared/image';
 import UserProfileImage from 'components/users/user-profile-image';
 import WhatIsThis from 'components/layout/what-is-this';
 import SearchBox from 'components/layout/search-box';
 
 class Header extends Component {
+  componentWillMount() {
+    // Refresh current user information from server if necessary
+    if (this.props.currentUser.isFromServer === false) {
+      this.props.getCurrentUser(Header.queries.currentUser());
+    }
+  }
+  
   logoutUser() {
     // TODO: Logout user
   }
@@ -19,36 +27,40 @@ class Header extends Component {
   }
     
   render() {
+    // Leave these undefined if we haven't gotten the current user information from the server yet
     let loggedInMenu, signIn, register;
-    if (this.props.currentUser.isLoggedIn) {
-      // Menu for logged in users
-      loggedInMenu = (
-        <li className="dropdown">
-          <a id="loggedin-user" href="#" className="dropdown-toggle" data-toggle="dropdown">
-            {this.props.currentUser.info.firstName + ' ' + this.props.currentUser.info.lastName}
-            <UserProfileImage email={this.props.currentUser.info.email} className="img-circle" />
-            <span className="caret"></span>
-          </a>
-          <ul className="dropdown-menu" role="menu">
-            <li><a id="my-account" href="/account/info"><i className="fa fa-cog fa-fw"></i> My Account</a></li>
-            <li><a id="add-video-link" href="/videos/add"><i className="fa fa-video-camera fa-fw"></i> Add a Video</a></li>
-            <li className="divider"></li>
-            <li><a href="#" onClick={e => this.logoutUser()}><i className="fa fa-sign-out fa-fw"></i> Sign Out</a></li>
-          </ul>
-        </li>
-      );
-    } else {
-      // Buttons for logging in or registering the site
-      signIn = (
-        <li>
-          <Link id="sign-in" to="/account/signin" className="text-uppercase">Sign in</Link>
-        </li>
-      );
-      register = (
-        <li>
-          <Link id="register" to="/account/register" className="bg-success text-uppercase">Register</Link>
-        </li>
-      );
+    
+    if (this.props.currentUser.isFromServer) {
+      if (this.props.currentUser.isLoggedIn) {
+        // Menu for logged in users
+        loggedInMenu = (
+          <li className="dropdown">
+            <a id="loggedin-user" href="#" className="dropdown-toggle" data-toggle="dropdown">
+              {this.props.currentUser.info.firstName + ' ' + this.props.currentUser.info.lastName}
+              <UserProfileImage email={this.props.currentUser.info.email} className="img-circle" />
+              <span className="caret"></span>
+            </a>
+            <ul className="dropdown-menu" role="menu">
+              <li><a id="my-account" href="/account/info"><i className="fa fa-cog fa-fw"></i> My Account</a></li>
+              <li><a id="add-video-link" href="/videos/add"><i className="fa fa-video-camera fa-fw"></i> Add a Video</a></li>
+              <li className="divider"></li>
+              <li><a href="#" onClick={e => this.logoutUser()}><i className="fa fa-sign-out fa-fw"></i> Sign Out</a></li>
+            </ul>
+          </li>
+        );
+      } else {
+        // Buttons for logging in or registering the site
+        signIn = (
+          <li>
+            <Link id="sign-in" to="/account/signin" className="text-uppercase">Sign in</Link>
+          </li>
+        );
+        register = (
+          <li>
+            <Link id="register" to="/account/register" className="bg-success text-uppercase">Register</Link>
+          </li>
+        );
+      }
     }
   
     // TODO: Switch to react-bootstrap navbar once brand/header with collapse is implemented
@@ -89,13 +101,25 @@ class Header extends Component {
   }
 }
 
+// Prop validation
 Header.propTypes = {
   // Mapped from state
   currentUser: PropTypes.object.isRequired,
   showWhatIsThis: PropTypes.bool.isRequired,
   searchSuggestions: PropTypes.arrayOf(PropTypes.string).isRequired,
   // Actions
-  toggleWhatIsThis: PropTypes.func.isRequired
+  toggleWhatIsThis: PropTypes.func.isRequired,
+  getCurrentUser: PropTypes.func.isRequired,
+  logout: PropTypes.func.isRequired
+};
+
+// Falcor queries
+Header.queries = {
+  currentUser() {
+    return [
+      [ [ 'firstName', 'lastName', 'email' ] ]
+    ];
+  }
 };
 
 function mapStateToProps(state) {
@@ -107,4 +131,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { toggleWhatIsThis })(Header);
+export default connect(mapStateToProps, { toggleWhatIsThis, getCurrentUser, logout })(Header);

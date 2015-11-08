@@ -39,7 +39,9 @@ const routes = [
         ? $atom(null)
         : $ref([ 'usersById', userId ]);
       
-      return { jsonGraph: { currentUser } };
+      return [
+        { path: [ 'authentication', 'currentUser' ], value: currentUser }
+      ];
     }
   },
   {

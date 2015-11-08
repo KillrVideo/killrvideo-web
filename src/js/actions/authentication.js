@@ -12,6 +12,8 @@ export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGOUT_REQUEST = 'LOGOUT_REQUEST';
 export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS';
 export const LOGOUT_FAILURE = 'LOGOUT_FAILURE';
+export const REQUEST_CURRENT_USER = 'REQUEST_CURRENT_USER';
+export const RECEIVE_CURRENT_USER = 'RECEIVE_CURRENT_USER';
 
 /**
  * Private action creators
@@ -22,6 +24,8 @@ const loginFailure = createAction(LOGIN_FAILURE, errors => ({ errors }));
 const logoutRequest = createAction(LOGOUT_REQUEST);
 const logoutSuccess = createAction(LOGOUT_SUCCESS);
 const logoutFailure = createAction(LOGOUT_FAILURE, errors => ({ errors }));
+const requestCurrentUser = createAction(REQUEST_CURRENT_USER, queries => ({ queries }));
+const receiveCurrentUser = createAction(RECEIVE_CURRENT_USER, currentUser => ({ currentUser }));
 
 /**
  * Public action creators
@@ -48,5 +52,17 @@ export function logout() {
     
     // Make the falcor request
     return model.call('authentication.logout').then(response => dispatch(logoutSuccess()), errors => dispatch(logoutFailure(pluck(errors, 'value'))));
+  };
+};
+
+export function getCurrentUser(queries) {
+  return dispatch => {
+    const falcorQueries = queries.map(q => [ 'authentication', 'currentUser', ...q ]);
+    
+    // Tell UI we're getting the current user
+    dispatch(requestCurrentUser(falcorQueries));
+    
+    // Do the request and dispatch the response
+    return model.get(...falcorQueries).then(response => dispatch(receiveCurrentUser(response.json.authentication.currentUser)));
   };
 };
