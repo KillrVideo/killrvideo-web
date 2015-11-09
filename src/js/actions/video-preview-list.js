@@ -7,6 +7,14 @@ export const AvailableLists = {
   recentVideos: {
     videoQueryRoot: [ 'recentVideos' ],
     responseSelector: response => response.json.recentVideos
+  },
+  myVideos: {
+    videoQueryRoot: [ 'currentUser', 'myVideos' ],
+    responseSelector: response => response.json.currentUser.myVideos
+  },
+  suggestedVideos: {
+    videoQueryRoot: [ 'currentUser', 'suggestedVideos' ],
+    responseSelector: response => response.json.currentUser.suggestedVideos
   }
 }
 

@@ -31,22 +31,23 @@ const routes = [
     }
   },
   {
-    // The currently logged in user
-    route: 'authentication.currentUser',
+    // The currently logged in user info
+    route: 'currentUser.info',
     get(pathSet) {
       const userId = this.userContext.getCurrentUserId();
-      const currentUser = isUndefined(userId)
-        ? $atom(null)
-        : $ref([ 'usersById', userId ]);
-      
+      if (isUndefined(userId)) {
+        return [
+          { path: [ 'currentUser' ], value: $atom(null) }
+        ];
+      }
       return [
-        { path: [ 'authentication', 'currentUser' ], value: currentUser }
+        { path: [ 'currentUser', 'info' ], value: $ref([ 'usersById', userId ]) }
       ];
     }
   },
   {
     // User login
-    route: 'authentication.login',
+    route: 'currentUser.login',
     call(callPath, args) {
       // Try to find user with that username/password
       let [ email, password ] = args;
@@ -55,11 +56,11 @@ const routes = [
       if (!isUndefined(u) && u.password === password) {
         this.userContext.setCurrentUserId(u.userId);
         currentUser = [
-          { path: [ 'authentication', 'currentUser' ], value: $ref([ 'usersById', u.userId ]) }
+          { path: [ 'currentUser', 'info' ], value: $ref([ 'usersById', u.userId ]) }
         ];
       } else {
         currentUser = [
-          { path: [ 'authentication', 'loginErrors' ], value: $error('Invalid email address or password') }
+          { path: [ 'currentUser', 'loginErrors' ], value: $error('Invalid email address or password') }
         ];
       }
       return currentUser;
@@ -67,11 +68,11 @@ const routes = [
   },
   {
     // User logout
-    route: 'authentication.logout',
+    route: 'currentUser.logout',
     call(callPath, args) {
       this.userContext.clearCurrentUserId();
       return [
-        { path: [ 'authentication', 'currentUser' ], value: $atom(null) }
+        { path: [ 'currentUser' ], value: $atom(null) }
       ];
     }
   }

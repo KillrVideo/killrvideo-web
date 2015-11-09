@@ -104,16 +104,6 @@ function videos() {
       "tags": ["azure", "database", "microsoft"]
     },
     {
-      "videoId": "4a4fa5d8-1fc2-4d08-b6f8-0bcfd7648954",
-      "addedDate": "2015-08-30 20:28:38-0600",
-      "description": "Funny Cat Videos 2015 - Funny Cats - Funny Cat 2015 - Funny Animals Videos Best Funny Cats Videos Compilation 2015 Try Not To Laugh ! Like & Subscribe ...",
-      "location": "ZX8YV92VG-M",
-      "locationType": 0,
-      "name": "Funny Cat Videos - Funny Cats - Funny Cat - Funny Animals",
-      "previewImageLocation": "//img.youtube.com/vi/ZX8YV92VG-M/hqdefault.jpg",
-      "tags": ["cat", "funny"]
-    },
-    {
       "videoId": "0e13e7ae-5810-4b71-91b5-fb8a49a54b01",
       "addedDate": "2015-08-27 08:06:09-0600",
       "description": "Watch how DocuSign is using Azure Active Directory to provide authenticated logon for users Learn more here: ...",
@@ -192,16 +182,6 @@ function videos() {
       "name": "Grumpy Cat taking a water break at Refinery 29 in NYC!",
       "previewImageLocation": "//img.youtube.com/vi/Tjt00VUt5HI/hqdefault.jpg",
       "tags": ["cat", "grumpy cat"]
-    },
-    {
-      "videoId": "bcc1bc70-01e3-41d6-bbd5-410d803a2f6f",
-      "addedDate": "2015-08-13 09:56:39-0600",
-      "description": "Microsoft introduces cloud-consistent service delivery and cloud-optimized app platform.",
-      "location": "eg6G5lUCi3g",
-      "locationType": 0,
-      "name": "Cloud-consistent service delivery and cloud-optimized app platform",
-      "previewImageLocation": "//img.youtube.com/vi/eg6G5lUCi3g/hqdefault.jpg",
-      "tags": ["cloud", "microsoft"]
     },
     {
       "videoId": "1da49baf-fe2f-430a-b78b-8d529a3ad140",

@@ -7,8 +7,8 @@ class Home extends Component {
   render() {
     let recommendedVideos, userVideos;
     if (this.props.currentUser.isLoggedIn) {
-      recommendedVideos = <VideoPreviewList title="Recommended for You" list="recentVideos" />;
-      userVideos = <VideoPreviewList title="My Videos" list="recentVideos" />;
+      recommendedVideos = <VideoPreviewList title="Recommended for You" list="suggestedVideos" />;
+      userVideos = <VideoPreviewList title="My Videos" list="myVideos" />;
     }
     
     return (

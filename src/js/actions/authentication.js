@@ -37,8 +37,8 @@ export function login(email, password) {
     dispatch(loginRequest());
     
     // Make the request
-    return model.call('authentication.login', [ email, password ], [ 'userId', 'firstName', 'lastName', 'email' ]).then(response => {
-      return dispatch(loginSuccess(response.json.authentication.currentUser));
+    return model.call('currentUser.login', [ email, password ], [ 'userId', 'firstName', 'lastName', 'email' ]).then(response => {
+      return dispatch(loginSuccess(response.json.currentUser.info));
     }, errors => {
       return dispatch(loginFailure(pluck(errors, 'value')));
     });
@@ -51,18 +51,18 @@ export function logout() {
     dispatch(logoutRequest());
     
     // Make the falcor request
-    return model.call('authentication.logout').then(response => dispatch(logoutSuccess()), errors => dispatch(logoutFailure(pluck(errors, 'value'))));
+    return model.call('currentUser.logout').then(response => dispatch(logoutSuccess()), errors => dispatch(logoutFailure(pluck(errors, 'value'))));
   };
 };
 
 export function getCurrentUser(queries) {
   return dispatch => {
-    const falcorQueries = queries.map(q => [ 'authentication', 'currentUser', ...q ]);
+    const falcorQueries = queries.map(q => [ 'currentUser', 'info', ...q ]);
     
     // Tell UI we're getting the current user
     dispatch(requestCurrentUser(falcorQueries));
     
     // Do the request and dispatch the response
-    return model.get(...falcorQueries).then(response => dispatch(receiveCurrentUser(response.json.authentication.currentUser)));
+    return model.get(...falcorQueries).then(response => dispatch(receiveCurrentUser(response.json.currentUser ? response.json.currentUser.info : null)));
   };
 };

@@ -12,12 +12,15 @@ import getUsers from '../data/users';
 const userIds = _(getUsers()).pluck('userId').value();
 
 // Create an index of the data
-const videosIndexById = _(getVideos()).indexBy('videoId').mapValues(video => {
+const videosByIdStore = _(getVideos()).indexBy('videoId').mapValues(video => {
   // Use the video id to generate an index in the collection of sample users and add to the video
-  var authorIdx = getIntFromPartOfUuid(video.videoId, 0, 1, userIds.length);
+  var authorIdx = getIntFromPartOfUuid(video.videoId, 0, 2, userIds.length);
   video.author = userIds[authorIdx];
   return video;
 }).value();
+
+// Index also by user (author) id
+const videosByUserIdStore = _(videosByIdStore).groupBy(v => v.author).value();
 
 /**
  * Route definitions for videos
@@ -30,7 +33,7 @@ const routes = [
       const videoProps = pathSet[2];
       const videosById = _(pathSet.videoIds)
         .reduce((acc, videoId) => {
-          let v = videosIndexById[videoId];
+          let v = videosByIdStore[videoId];
           if (isUndefined(v)) {
             v = $error('Video not found');
           } else {
@@ -66,6 +69,76 @@ const routes = [
           value: idx < MAX_RECENT_VIDEOS ? $ref([ 'videosById', videoIdsByDate[idx] ]) : null
         });
       })
+      
+      return pathValues;
+    }
+  },
+  {
+    // Suggested videos projection
+    route: 'currentUser.suggestedVideos[{integers:indicies}]',
+    get(pathSet) {
+      const MAX_SUGGESTED_VIDEOS = 5;
+      
+      // Make sure a user is logged in
+      const userId = this.userContext.getCurrentUserId();
+      if (isUndefined(userId)) {
+        return [ 
+          { path: ['currentUser', 'suggestedVideos'], value: $error('No user currently logged in.') }
+        ];
+      }
+      
+      // Use the user id to generate a start index in the videos array
+      const videos = getVideos();
+      const startIdx = getIntFromPartOfUuid(userId, 0, 2, videos.length);
+      const suggestedVideos = _(videos).pluck('videoId').slice(startIdx).take(MAX_SUGGESTED_VIDEOS).value();
+      
+      let pathValues = [];
+      pathSet.indicies.forEach(idx => {
+        pathValues.push({
+          path: [ 'currentUser', 'suggestedVideos', idx ],
+          value: idx < suggestedVideos.length ? $ref([ 'videosById', suggestedVideos[idx] ]) : $atom(null)
+        });
+      });
+      
+      return pathValues;
+    }
+  },
+  {
+    // My videos video projection
+    route: 'currentUser.myVideos',
+    get(pathSet) {
+      // Make sure a user is logged in
+      const userId = this.userContext.getCurrentUserId();
+      if (isUndefined(userId)) {
+        return [ 
+          { path: [ 'currentUser', 'myVideos' ], value: $error('No user currently logged in.') }
+        ];
+      }
+      
+      return [
+        { path: [ 'currentUser', 'myVideos' ], value: $ref([ 'videosByUserId', userId ]) }
+      ];
+    }
+  },
+  {
+    // Videos by user id projection
+    route: 'videosByUserId[{keys:userIds}][{integers:indicies}]',
+    get(pathSet) {
+      let pathValues = [];
+      
+      pathSet.userIds.forEach(userId => {
+        let videosForUser = videosByUserIdStore[userId]; 
+        if (isUndefined(videosForUser)) {
+          pathValues.push({ path: [ 'videosByUserId', userId ], value: $atom(null) })
+        } else {
+          pathSet.indicies.forEach(idx => {
+            pathValues.push({
+              path: [ 'videosByUserId', userId, idx ],
+              value: idx >= videosForUser.length ? $atom(null) : $ref([ 'videosById', videosForUser[idx].videoId ])
+            })
+          });
+        }
+      });
       
       return pathValues;
     }
