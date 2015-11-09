@@ -1,9 +1,10 @@
 import React, { Component, PropTypes } from 'react';
-import { ButtonInput } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { connectReduxForm } from 'redux-form';
 import validate from 'validate.js';
 
 import Input from 'components/shared/input';
+import Icon from 'components/shared/icon';
 
 class SignInForm extends Component {
   componentWillMount() {
@@ -11,13 +12,15 @@ class SignInForm extends Component {
   }
   
   render() {
-    const { fields: { email, password }, handleSubmit } = this.props;
+    const { fields: { email, password }, handleSubmit, submitting } = this.props;
     
     return (
       <form role="form" onSubmit={handleSubmit}>
         <Input {...email} id="signin-email" type="email" placeholder="Enter email address" label="Email address" focusOnMount />
         <Input {...password} id="signin-password" type="password" placeholder="Password" label="Password" />
-        <ButtonInput type="submit" value="Sign In" bsStyle="primary" />
+        <Button type="submit" bsStyle="primary" disabled={submitting}>
+          <Icon name="cog" animate="spin" className={submitting ? undefined : 'hidden'} /> Sign In
+        </Button>
       </form>
     );
   }

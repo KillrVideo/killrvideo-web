@@ -92,6 +92,10 @@ ul.uimessage > li {
   background-color: #2f8912;
 }
 
+#navbar-main img.user-gravatar {
+  margin-top: -6px;
+}
+
 #what-is-this {
   padding-top: 60px;
   padding-bottom: 20px;

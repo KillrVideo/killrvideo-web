@@ -51,7 +51,7 @@
     "moment": "^2.10.6",
     "nodemon": "^1.7.1",
     "react": "^0.13.3",
-    "react-bootstrap": "^0.26.1",
+    "react-bootstrap": "^0.26.4",
     "react-gemini-scrollbar": "^1.1.1",
     "react-redux": "^3.1.0",
     "react-router": "^1.0.0-rc1",

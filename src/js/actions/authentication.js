@@ -38,7 +38,7 @@ export function login(email, password) {
     
     // Make the request
     return model.call('authentication.login', [ email, password ], [ 'userId', 'firstName', 'lastName', 'email' ]).then(response => {
-      return dispatch(loginSuccess(response.json.authenticaiton.currentUser));
+      return dispatch(loginSuccess(response.json.authentication.currentUser));
     }, errors => {
       return dispatch(loginFailure(pluck(errors, 'value')));
     });
