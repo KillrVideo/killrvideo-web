@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
-import { Row, Col, ButtonInput } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 import { connectReduxForm } from 'redux-form';
 import validate from 'validate.js';
 
+import Icon from 'components/shared/icon';
 import Input from 'components/shared/input';
 
 class RegistrationForm extends Component {
@@ -11,10 +12,10 @@ class RegistrationForm extends Component {
   }
   
   render() {
-    const { fields: { firstName, lastName, email, password, retypePassword }, handleSubmit } = this.props;
+    const { fields: { firstName, lastName, email, password, retypePassword }, handleSubmit, submitting, hideForm } = this.props;
     
     return (
-      <form role="form" onSubmit={handleSubmit}>
+      <form role="form" onSubmit={handleSubmit} className={this.props.hideForm ? 'hidden' : undefined}>
         <Row>
           <Col md={5}>
             <Input {...firstName} type="text" placeholder="First name" label="First name" focusOnMount />
@@ -27,7 +28,9 @@ class RegistrationForm extends Component {
         <Input {...password} type="password" placeholder="Choose a password" label="Password" />
         <Input {...retypePassword} type="password" placeholder="Retype your password" label="Retype password" />
         
-        <ButtonInput type="submit" value="Register" bsStyle="primary" />
+        <Button type="submit" bsStyle="primary" disabled={submitting}>
+          <Icon name="cog" animate="spin" className={submitting ? undefined : 'hidden'} /> Register
+        </Button>
       </form>
     );
   }
@@ -37,7 +40,10 @@ class RegistrationForm extends Component {
 RegistrationForm.propTypes = {
   // Provided by redux-form
   fields: PropTypes.object.isRequired,
-  handleSubmit: PropTypes.func.isRequired
+  handleSubmit: PropTypes.func.isRequired,
+  submitting: PropTypes.bool.isRequired,
+  // Provided by screen
+  hideForm: PropTypes.bool.isRequired
 };
 
 // Validation constraints

@@ -24,16 +24,6 @@ function videos() {
       "tags": ["azure", "database"]
     },
     {
-      "videoId": "23150684-9c3f-4bf7-b841-5fac538d60c8",
-      "addedDate": "2015-08-30 20:28:38-0600",
-      "description": "Funny cat 2015 :https://youtu.be/581qCBLrqJc ? FOLLOW LHN PRODUCTION : ? Facebook: https://www.facebook.com/catpicture ? Google+: ...",
-      "location": "581qCBLrqJc",
-      "locationType": 0,
-      "name": "Funny cat - Funny cats videos - Funny cats compilation 2015 - Funny Animals Videos (106 minute)",
-      "previewImageLocation": "//img.youtube.com/vi/581qCBLrqJc/hqdefault.jpg",
-      "tags": ["cat", "funny"]
-    },
-    {
       "videoId": "29160f69-2d5c-4c21-8ec6-9e5b5ab8cdff",
       "addedDate": "2015-06-02 10:06:09-0600",
       "description": "This video helps your create a sample Node.js application with SQL Databases using Microsoft's Node.js SQL Server driver.",

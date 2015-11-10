@@ -42,7 +42,7 @@ class Register extends Component {
         <Col md={6} mdOffset={3}>
           <h2>Register</h2>
           
-          <Alert bsStyle="info">
+          <Alert bsStyle="info" className={this.props.registerState.wasSuccessful ? 'hidden' : undefined}>
             Register for an account to upload and comment on videos.
           </Alert>
           
@@ -52,7 +52,8 @@ class Register extends Component {
             Your account has been created successfully. <Link to="/" className="alert-link">Click here</Link> to return to the home page.
           </Alert>
           
-          <RegistrationForm onSubmit={vals => this.props.register(vals.firstName, vals.lastName, vals.email, vals.password)} />
+          <RegistrationForm onSubmit={vals => this.props.register(vals.firstName, vals.lastName, vals.email, vals.password)}
+                            hideForm={this.props.registerState.wasSuccessful} />
         </Col>
       </Row>
     );
