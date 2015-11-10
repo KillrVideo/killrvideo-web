@@ -1,5 +1,7 @@
 import { _, isUndefined, pick } from 'lodash';
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
+import uuid from 'uuid';
+import moment from 'moment';
 
 import getUsers from '../data/users';
 
@@ -73,6 +75,37 @@ const routes = [
       this.userContext.clearCurrentUserId();
       return [
         { path: [ 'currentUser' ], value: $atom(null) }
+      ];
+    }
+  },
+  {
+    // User registration
+    route: 'currentUser.register',
+    call(callPath, args) {
+      let [ firstName, lastName, email, password ] = args;
+      
+      // See if user already exists w/ email
+      let u = userCredentialsStore[email];
+      if (isUndefined(u)) {
+        // Store user and log them in
+        let userId = uuid.v4();
+        usersByIdStore[userId] = {
+          userId,
+          createdDate: moment().toISOString(),
+          firstName,
+          lastName,
+          email
+        };
+        userCredentialsStore[email] = { userId, password };
+        
+        this.userContext.setCurrentUserId(userId);
+        return [
+          { path: [ 'currentUser', 'info' ], value: $ref([ 'usersById', userId ]) }
+        ];
+      }
+      
+      return [
+        { path: [ 'currentUser', 'registerErrors' ], value: $error('A user with that email address already exists.') }
       ];
     }
   }

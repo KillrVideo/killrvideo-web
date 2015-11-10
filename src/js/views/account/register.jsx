@@ -1,14 +1,39 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { pushState } from 'redux-router';
 
+import { Link } from 'react-router';
 import { Row, Col, Alert } from 'react-bootstrap';
 import RegistrationForm from 'components/account/registration-form';
+import ErrorAlert from 'components/shared/error-alert';
+import { register, registerReset, getCurrentUser } from 'actions/authentication';
 
 class Register extends Component {
-  register(vals) {
-    // TODO: Register the user
-    console.log('Registering user!');
-    console.log(vals);
+  componentWillMount() {
+    // If already logged in when first loaded, just redirect to home page
+    if (this.props.currentUser.isLoggedIn) {
+      this.redirectToHomePage();
+      return;
+    }
+    
+    // If we don't know yet if the user is logged in, ask the server
+    if (this.props.currentUser.isFromServer === false) {
+      this.props.getCurrentUser(Register.queries.currentUser());
+    }
+    
+    // Reset page validation when loading
+    this.props.registerReset();
+  }
+  
+  componentWillReceiveProps(nextProps) {
+    // If we're just now finding out the user was already logged in, send them to the home page
+    if (nextProps.registerState.wasSuccessful === false && nextProps.currentUser.isLoggedIn) {
+      this.redirectToHomePage();
+    }
+  }
+  
+  redirectToHomePage() {
+    this.props.pushState(null, '/');
   }
   
   render() {
@@ -21,15 +46,13 @@ class Register extends Component {
             Register for an account to upload and comment on videos.
           </Alert>
           
-          { /* TODO: Success/fail messages
-            <uimessages params="queues: registerUrl"></uimessages>
+          <ErrorAlert errors={this.props.registerState.errors} />
           
-            <p class="alert alert-success" style="display: none" data-bind="visible: registeredUserId()">
-              Your account has been created successfully.  <a class="alert-link" href="/">Click here</a> to return to the home page.
-            </p>
-          */}
+          <Alert bsStyle="success" className={this.props.registerState.wasSuccessful ? undefined : 'hidden'}>
+            Your account has been created successfully. <Link to="/" className="alert-link">Click here</Link> to return to the home page.
+          </Alert>
           
-          <RegistrationForm onSubmit={vals => this.register(vals)} />
+          <RegistrationForm onSubmit={vals => this.props.register(vals.firstName, vals.lastName, vals.email, vals.password)} />
         </Col>
       </Row>
     );
@@ -38,12 +61,29 @@ class Register extends Component {
 
 // Prop validation
 Register.propTypes = {
+  // State from redux
+  registerState: PropTypes.object.isRequired,
+  currentUser: PropTypes.object.isRequired,
   
+  // Actions
+  register: PropTypes.func.isRequired,
+  registerReset: PropTypes.func.isRequired,
+  getCurrentUser: PropTypes.func.isRequired,
+  pushState: PropTypes.func.isRequired
+};
+
+// Falcor queries
+Register.queries = {
+  currentUser() {
+    return [
+      [ 'userId' ]
+    ];
+  }
 };
 
 function mapStateToProps(state) {
-  // TODO: Select the pieces of state we need in props
-  return {};
+  let { authentication: { register: registerState, currentUser } } = state;
+  return { registerState, currentUser };
 }
 
-export default connect(mapStateToProps)(Register);
+export default connect(mapStateToProps, { register, registerReset, getCurrentUser, pushState })(Register);

@@ -9,17 +9,19 @@ import { login, loginReset, getCurrentUser } from 'actions/authentication';
 
 class SignIn extends Component {
   componentWillMount() {
+    // If already logged in when first loaded, just redirect to home page
     if (this.props.currentUser.isFromServer && this.props.currentUser.isLoggedIn) {
       this.redirectToHomePage();
     } else {
       this.props.getCurrentUser(SignIn.queries.currentUser());
     }
     
-    // Reset login page when loading
+    // Reset page when loading
     this.props.loginReset();
   }
   
   componentWillReceiveProps(nextProps) {
+    // Redirect to home page once logged in
     if (nextProps.currentUser.isLoggedIn) {
       this.redirectToHomePage();
     }
