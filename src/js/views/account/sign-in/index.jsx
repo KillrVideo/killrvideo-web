@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { pushState } from 'redux-router';
 
 import { Row, Col, Panel, Alert } from 'react-bootstrap';
-import SignInForm from 'components/account/sign-in-form';
+import SignInForm from './sign-in-form';
 import ErrorAlert from 'components/shared/error-alert';
 import { login, loginReset, getCurrentUser } from 'actions/authentication';
 

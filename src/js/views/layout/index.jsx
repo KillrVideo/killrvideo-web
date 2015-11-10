@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import Header from 'components/layout/header';
-import Footer from 'components/layout/footer';
+import Header from './header';
+import Footer from './footer';
 
 class Layout extends Component {
   render() {

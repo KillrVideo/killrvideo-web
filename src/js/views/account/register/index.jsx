@@ -4,7 +4,7 @@ import { pushState } from 'redux-router';
 
 import { Link } from 'react-router';
 import { Row, Col, Alert } from 'react-bootstrap';
-import RegistrationForm from 'components/account/registration-form';
+import RegistrationForm from './registration-form';
 import ErrorAlert from 'components/shared/error-alert';
 import { register, registerReset, getCurrentUser } from 'actions/authentication';
 

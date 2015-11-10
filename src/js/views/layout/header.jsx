@@ -9,8 +9,8 @@ import { getCurrentUser, logout } from 'actions/authentication';
 import Image from 'components/shared/image';
 import Icon from 'components/shared/icon';
 import UserProfileImage from 'components/users/user-profile-image';
-import WhatIsThis from 'components/layout/what-is-this';
-import SearchBox from 'components/layout/search-box';
+import WhatIsThis from './what-is-this';
+import SearchBox from './search-box';
 
 class Header extends Component {
   componentWillMount() {
