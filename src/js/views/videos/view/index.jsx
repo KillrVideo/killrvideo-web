@@ -6,6 +6,7 @@ import { isUndefined } from 'lodash';
 
 import VideoPlayer from './video-player';
 import VideoDetails from './video-details';
+import VideoAddComment from './video-add-comment';
 import VideoPreviewList from 'components/videos/video-preview-list';
 
 class ViewVideo extends Component {
@@ -31,7 +32,7 @@ class ViewVideo extends Component {
   }
     
   render() {
-    let { video, isLoading, commentsLoading, moreCommentsAvailable, comments } = this.props.viewVideo;
+    let { video, isLoading, commentsLoading, moreCommentsAvailable, comments, commentAdded } = this.props.viewVideo;
     
     return (
       <div>
@@ -42,6 +43,7 @@ class ViewVideo extends Component {
           <Col md={5} xs={12} id="view-video-details">
             <VideoDetails video={video} comments={comments} commentsLoading={commentsLoading} moreCommentsAvailable={moreCommentsAvailable} 
                           loadMoreComments={() => this.loadMoreComments()} />
+            <VideoAddComment isLoggedIn={this.props.currentUser.isLoggedIn} commentAdded={commentAdded} />
           </Col>
         </Row>
         <VideoPreviewList title="More Videos Like This" list="recentVideos" />

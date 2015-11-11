@@ -6,7 +6,8 @@ const defaultState = {
   videoLoading: false,
   comments: {},
   commentsLoading: false,
-  moreCommentsAvailable: false
+  moreCommentsAvailable: false,
+  commentAdded: false
 };
 
 // Helper function to determine if more comments are available

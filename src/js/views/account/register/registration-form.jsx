@@ -42,6 +42,7 @@ RegistrationForm.propTypes = {
   fields: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   submitting: PropTypes.bool.isRequired,
+  resetForm: PropTypes.func.isRequired,
   // Provided by screen
   hideForm: PropTypes.bool.isRequired
 };
