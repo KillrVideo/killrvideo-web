@@ -13,9 +13,9 @@ class VideoComments extends Component {
     const comments = this.props.comments;
     if (isUndefined(comments)) return;
     
-    return map(comments, (c, key) => {
+    return map(comments, c => {
       return (
-        <li className="clearfix" key={key}>
+        <li className="clearfix" key={c.commentId}>
           <UserProfileLink userId={c.author.userId} className="pull-left">
             <UserProfileImage email={c.author.email} className="img-circle" />
           </UserProfileLink>
@@ -63,7 +63,7 @@ class VideoComments extends Component {
 VideoComments.queries = {
   comments() {
     return [
-      [ [ 'comment', 'addedDate' ] ],
+      [ [ 'commentId', 'comment', 'addedDate' ] ],
       [ 'author', [ 'firstName', 'lastName', 'email', 'userId' ] ]
     ];
   }

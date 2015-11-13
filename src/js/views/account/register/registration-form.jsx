@@ -44,7 +44,8 @@ RegistrationForm.propTypes = {
   submitting: PropTypes.bool.isRequired,
   resetForm: PropTypes.func.isRequired,
   // Provided by screen
-  hideForm: PropTypes.bool.isRequired
+  hideForm: PropTypes.bool.isRequired,
+  onSubmit: PropTypes.func.isRequired
 };
 
 // Validation constraints

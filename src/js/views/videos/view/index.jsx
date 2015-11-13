@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { connect } from 'react-redux';
-import { getVideo, loadMoreComments } from 'actions/view-video';
+import { getVideo, loadMoreComments, addComment } from 'actions/view-video';
 import { isUndefined } from 'lodash';
 
 import VideoPlayer from './video-player';
@@ -43,7 +43,8 @@ class ViewVideo extends Component {
           <Col md={5} xs={12} id="view-video-details">
             <VideoDetails video={video} comments={comments} commentsLoading={commentsLoading} moreCommentsAvailable={moreCommentsAvailable} 
                           loadMoreComments={() => this.loadMoreComments()} />
-            <VideoAddComment isLoggedIn={this.props.currentUser.isLoggedIn} commentAdded={commentAdded} />
+            <VideoAddComment isLoggedIn={this.props.currentUser.isLoggedIn} commentAdded={commentAdded}
+                             onSubmit={vals => this.props.addComment(this.props.videoId, vals.comment) } />
           </Col>
         </Row>
         <VideoPreviewList title="More Videos Like This" list="recentVideos" />
@@ -77,7 +78,8 @@ ViewVideo.propTypes = {
   currentUser: PropTypes.object.isRequired,
   // Actions
   getVideo: PropTypes.func.isRequired,
-  loadMoreComments: PropTypes.func.isRequired
+  loadMoreComments: PropTypes.func.isRequired,
+  addComment: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state) {
@@ -88,4 +90,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { getVideo, loadMoreComments })(ViewVideo);
+export default connect(mapStateToProps, { getVideo, loadMoreComments, addComment })(ViewVideo);

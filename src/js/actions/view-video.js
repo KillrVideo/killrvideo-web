@@ -11,7 +11,8 @@ export const VIDEO_REQUESTED = 'viewVideo/VIDEO_REQUESTED';
 export const VIDEO_RECEIVED = 'viewVideo/VIDEO_RECEIVED';
 export const COMMENTS_REQUESTED = 'viewVideo/COMMENTS_REQUESTED';
 export const COMMENTS_RECEIVED = 'viewVideo/COMMENTS_RECEIVED';
-
+export const ADD_COMMENT_REQUESTED = 'viewVideo/ADD_COMMENT_REQUESTED';
+export const ADD_COMMENT_RECEIVED = 'viewVideo/ADD_COMMENT_RECEIVED';
 
 /**
  * Private action creators
@@ -20,7 +21,8 @@ const requestVideo = createAction(VIDEO_REQUESTED, falcorQueries => ({ falcorQue
 const receiveVideo = createAction(VIDEO_RECEIVED, (video, comments) => ({ video, comments }));
 const requestComments = createAction(COMMENTS_REQUESTED, falcorQueries => ({ falcorQueries }));
 const receiveComments = createAction(COMMENTS_RECEIVED, comments => ({ comments }));
-
+const requestAddComment = createAction(ADD_COMMENT_REQUESTED, falcorQueries => ({ falcorQueries }));
+const receiveAddComment = createAction(ADD_COMMENT_RECEIVED, comment => ({ comment }));
 
 /**
  * Public action creators.
@@ -74,4 +76,14 @@ export function loadMoreComments(videoId, commentQueries) {
     });
   };
 }
+
+export function addComment(videoId, comment) {
+  return dispatch => {
+    return model.call([ 'videosById', videoId, 'comments', 'add' ], [ comment ]).then(response => {
+      console.log(response);
+    }, errors => {
+      console.log(errors);
+    });
+  };
+};
 

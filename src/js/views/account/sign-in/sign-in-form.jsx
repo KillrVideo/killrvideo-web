@@ -30,7 +30,9 @@ class SignInForm extends Component {
 SignInForm.propTypes = {
   // Provided by redux-form
   fields: PropTypes.object.isRequired,
-  handleSubmit: PropTypes.func.isRequired
+  handleSubmit: PropTypes.func.isRequired,
+  // Provided by screen
+  onSubmit: PropTypes.func.isRequired
 };
 
 // Validation constraints

@@ -1,6 +1,7 @@
 import { _, isUndefined, range, pick } from 'lodash';
 import moment from 'moment';
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
+import uuid from 'uuid';
 
 import { getIntFromPartOfUuid } from './util';
 import getUsers from '../data/users';
@@ -28,6 +29,7 @@ const commentsByVideoIdStore = _(getVideos())
       let idxInCommentsList = (commentIdx + i) % commentText.length;
       let idxInUsersList = (userIdx + i) % userIds.length;
       return {
+        commentId: uuid.v4(),
         comment: commentText[idxInCommentsList],
         addedDate: moment(v.addedDate).add(i, 'days').toISOString(),
         author: userIds[idxInUsersList]
@@ -42,7 +44,8 @@ const commentsByVideoIdStore = _(getVideos())
  */
 const routes = [
   {
-    route: 'commentsByVideoId[{keys:videoIds}][{ranges:indexRanges}]["comment", "addedDate", "author"]',
+    // Comments for a given video Id
+    route: 'commentsByVideoId[{keys:videoIds}][{ranges:indexRanges}]["commentId", "comment", "addedDate", "author"]',
     get(pathSet) {
       const commentProps = pathSet[3];
       const commentsByVideoId = _(pathSet.videoIds)
@@ -73,6 +76,14 @@ const routes = [
           return acc;
         }, {});
       return { jsonGraph: { commentsByVideoId } };
+    }
+  },
+  {
+    // Adding a comment to a video
+    route: 'commentsByVideoId[{keys:videoIds}].add',
+    call(callPath, args) {
+      console.log('Adding comment!');
+      return [];
     }
   }
 ];
