@@ -1,64 +1,94 @@
 import * as Actions from 'actions/view-video';
-import { _, merge, keys, last, isNull } from 'lodash';
+import { _, isNull, isUndefined } from 'lodash';
+import { combineReducers } from 'redux';
 
-const defaultState = {
-  video: {},
-  videoLoading: false,
-  comments: {},
-  commentsLoading: false,
-  moreCommentsAvailable: false,
-  commentAdded: false
+
+// Default state for the video's details
+const defaultVideoDetails = {
+  isLoading: false,
+  video: null
 };
 
-// Helper function to determine if more comments are available
-function areMoreCommentsAvailable(comments) {
-  const lastCommentIdx = parseInt(_(comments).keys().last());
-  if (isNaN(lastCommentIdx)) 
-    return false;
-    
-  // There are possibly more comments left if we got a full page of comments
-  return (lastCommentIdx + 1) % Actions.COMMENTS_PER_REQUEST === 0;
-}
-
-// Reducer for the view video screen data
-export default function viewVideo(state = defaultState, action) {
-  let video, videoLoading, comments, commentsLoading, moreCommentsAvailable, restOfState;
-  
+// Reducer for the video's details
+function videoDetails(state = defaultVideoDetails, action) {
   switch(action.type) {
+    case Actions.UNLOAD:
+      return defaultVideoDetails;
+      
     case Actions.VIDEO_REQUESTED:
-      ({ videoLoading, commentsLoading, ...restOfState } = state);
       return {
-        videoLoading: true,
-        commentsLoading: true,
-        ...restOfState
+        isLoading: true,
+        video: null
       };
+      
     case Actions.VIDEO_RECEIVED:
-      ({ video, videoLoading, comments, commentsLoading, moreCommentsAvailable, ...restOfState } = state);
-      let initialComments = _(action.payload.comments).omit(isNull).value(); 
       return {
-        videoLoading: false,
-        commentsLoading: false,
-        video: action.payload.video,    // Replace any existing video data with payload's video,
-        comments: initialComments,
-        moreCommentsAvailable: areMoreCommentsAvailable(initialComments),
-        ...restOfState
-      };
-    case Actions.COMMENTS_REQUESTED:
-      ({ commentsLoading, ...restOfState } = state);
-      return {
-        commentsLoading: true,
-        ...restOfState
-      };
-    case Actions.COMMENTS_RECEIVED:
-      ({ comments, commentsLoading, moreCommentsAvailable, ...restOfState } = state);
-      let newComments = _(action.payload.comments).omit(isNull).value();
-      return {
-        commentsLoading: false,
-        comments: merge({}, comments, newComments), // Merge new comments into existing video state
-        moreCommentsAvailable: areMoreCommentsAvailable(newComments),
-        ...restOfState
+        isLoading: false,
+        video: action.payload.video
       };
   }
   
   return state;
 }
+
+// Default state for the video's comments
+const defaultVideoComments = {
+  _model: null,
+  _startIdx: 0,
+  
+  isLoading: false,
+  comments: [],
+  moreCommentsAvailable: false,
+  commentAdded: false
+};
+
+// Reducer for the video's comments state
+function videoComments(state = defaultVideoComments, action) {
+  let _model, _startIdx, isLoading, comments, moreCommentsAvailable, commentAdded, restOfState;
+  
+  switch (action.type) {
+    case Actions.UNLOAD:
+      return defaultVideoComments;
+      
+    case Actions.COMMENTS_REQUESTED:
+      ({ isLoading, ...restOfState } = state);
+      return {
+        isLoading: true,
+        ...restOfState
+      };
+      
+    case Actions.COMMENTS_MODEL_RECEIVED:
+      ({ _model, _startIdx, comments, ...restOfState } = state);
+      return {
+        _startIdx: 0,
+        _model: action.payload.model,
+        comments: [],
+        ...restOfState
+      };
+      
+    case Actions.COMMENTS_RECEIVED:
+      ({ _startIdx, isLoading, comments, moreCommentsAvailable, ...restOfState } = state);
+      
+      // More comments are available only if we got a full page of comments
+      moreCommentsAvailable = action.payload.comments.length === Actions.COMMENTS_PER_REQUEST;
+      
+      return {
+        _startIdx: _startIdx + Actions.COMMENTS_PER_REQUEST,
+        isLoading: false,
+        comments: [ ...comments, ...action.payload.comments ],
+        moreCommentsAvailable,
+        ...restOfState
+      };
+    
+  }
+  
+  return state;
+}
+
+const viewVideo = combineReducers({
+  videoDetails,
+  videoComments
+});
+
+export default viewVideo;
+

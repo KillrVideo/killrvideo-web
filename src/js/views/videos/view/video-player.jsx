@@ -12,16 +12,20 @@ class VideoPlayer extends Component {
   render() {
     // Figure out which player to show
     let videoPlayer;
-    switch(this.props.video.locationType) {
-      case VideoLocationTypes.YOUTUBE:
-        videoPlayer = <VideoPlayerYouTube video={this.props.video} onPlaybackStarted={this.props.onPlaybackStarted} />;
-        break;
-      case VideoLocationTypes.UPLOAD:
-        videoPlayer = <VideoPlayerUpload video={this.props.video} onPlaybackStarted={this.props.onPlaybackStarted} />;
-        break;
-      default:
-        videoPlayer = <div></div>;
-        break; 
+    if (this.props.videoDetails.isLoading || this.props.videoDetails.video === null) {
+      videoPlayer = <div></div>;
+    } else {
+      const video = this.props.videoDetails.video;
+      switch (video.locationType) {
+        case VideoLocationTypes.YOUTUBE:
+          videoPlayer = <VideoPlayerYouTube video={video} onPlaybackStarted={this.props.onPlaybackStarted} />;
+          break;
+        case VideoLocationTypes.UPLOAD:
+          videoPlayer = <VideoPlayerUpload video={video} onPlaybackStarted={this.props.onPlaybackStarted} />;
+          break;
+        default:
+          throw new Error(`Unknown or unsupported location type [${video.locationType}]`);
+      }
     }
     
     return (
@@ -45,7 +49,7 @@ VideoPlayer.queries = {
 
 // Prop types
 VideoPlayer.propTypes = {
-  video: PropTypes.object.isRequired,
+  videoDetails: PropTypes.object.isRequired,
   onPlaybackStarted: PropTypes.func.isRequired
 };
 

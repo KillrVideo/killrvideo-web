@@ -13,16 +13,13 @@ import VideoComments from './video-comments';
 
 class VideoDetails extends Component {
   render() {
-    const ratingEnabled = !!this.props.loggedInUser;
-    
-    let { video, comments, commentsLoading, moreCommentsAvailable, loadMoreComments } = this.props;
+    const { isLoading, video } = this.props.videoDetails;
     
     // If we're doing an initial load and the video data isn't available yet, just output a placeholder
-    if (!video.author) {
+    if (isLoading || video === null) {
       return <div></div>;
     }
     
-    // TODO: make scrollable
     return (
       <GeminiScrollbar>
         <Row>
@@ -35,7 +32,7 @@ class VideoDetails extends Component {
         </Row>
         
         { /* Star ratings and sharing */ }
-        <VideoRatingSharing video={video} ratingEnabled={ratingEnabled} />
+        <VideoRatingSharing video={video} ratingEnabled={this.props.isLoggedIn} />
         
         { /* Author and Tags */ }
         <Row>
@@ -60,8 +57,7 @@ class VideoDetails extends Component {
         
         <VideoDescription video={video} />        
         
-        <VideoComments comments={comments} commentsLoading={commentsLoading} moreCommentsAvailable={moreCommentsAvailable} 
-                       loadMoreComments={loadMoreComments} />
+        <VideoComments videoComments={this.props.videoComments} loadMoreComments={this.props.loadMoreComments} />
       </GeminiScrollbar>
     );
   }
@@ -86,10 +82,9 @@ VideoDetails.queries = {
 
 // Prop validation
 VideoDetails.propTypes = {
-  video: PropTypes.object.isRequired,
-  comments: PropTypes.object.isRequired,
-  commentsLoading: PropTypes.bool.isRequired,
-  moreCommentsAvailable: PropTypes.bool.isRequired,
+  videoDetails: PropTypes.object.isRequired,
+  videoComments: PropTypes.object.isRequired,
+  isLoggedIn: PropTypes.bool.isRequired,
   
   // Actions
   loadMoreComments: PropTypes.func.isRequired

@@ -52,18 +52,15 @@ const routes = [
         .reduce((acc, videoId) => {
           // Are there comments for the video?
           let comments = commentsByVideoIdStore[videoId];
-          if (isUndefined(comments)) {
-            acc[videoId] = $atom(null);
-            return acc;
-          }
+          let hasComments = !isUndefined(comments);
           
           acc[videoId] = _(pathSet.indexRanges)
             .reduce((rangesAcc, idxRange) => {
               // Loop through all indexes in range and pull comments for the video from the array
               range(idxRange.from, idxRange.to + 1).forEach(idx => {
-                rangesAcc[idx] = idx < comments.length
+                rangesAcc[idx] = hasComments && idx < comments.length
                   ? pick(comments[idx], commentProps)
-                  : $atom(null);
+                  : $atom();
                   
                 // Replace author ids with references to users by id
                 if (rangesAcc[idx].author) 
