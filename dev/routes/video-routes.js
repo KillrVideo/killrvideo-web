@@ -80,7 +80,7 @@ const routes = [
       const MAX_SUGGESTED_VIDEOS = 5;
       
       // Make sure a user is logged in
-      const userId = this.userContext.getCurrentUserId();
+      const userId = this.request.session.userId;
       if (isUndefined(userId)) {
         return [ 
           { path: ['currentUser', 'suggestedVideos'], value: $error('No user currently logged in.') }
@@ -108,7 +108,7 @@ const routes = [
     route: 'currentUser.myVideos',
     get(pathSet) {
       // Make sure a user is logged in
-      const userId = this.userContext.getCurrentUserId();
+      const userId = this.request.session.userId;
       if (isUndefined(userId)) {
         return [ 
           { path: [ 'currentUser', 'myVideos' ], value: $error('No user currently logged in.') }

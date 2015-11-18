@@ -33,8 +33,7 @@ function videoDetails(state = defaultVideoDetails, action) {
 
 // Default state for the video's comments
 const defaultVideoComments = {
-  _model: null,
-  _startIdx: 0,
+  _pagingToken: null,
   
   isLoading: false,
   comments: [],
