@@ -53,6 +53,7 @@
     "falcor": "^0.1.14",
     "falcor-http-datasource": "^0.1.2",
     "font-awesome": "^4.4.0",
+    "gemini-scrollbar": "^1.2.9",
     "get-size": "^1.2.2",
     "history": "^1.13.1",
     "load-script": "^1.0.0",
