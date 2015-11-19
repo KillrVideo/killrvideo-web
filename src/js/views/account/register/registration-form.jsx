@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
-import { connectReduxForm } from 'redux-form';
+import { reduxForm } from 'redux-form';
 import validate from 'validate.js';
 
 import Icon from 'components/shared/icon';
@@ -58,7 +58,7 @@ const constraints = {
 };
 
 // Connect the form to the store
-export default connectReduxForm({
+export default reduxForm({
   form: 'registration',
   fields: [ 'firstName', 'lastName', 'email', 'password', 'retypePassword' ],
   validate: vals => validate(vals, constraints) || {}

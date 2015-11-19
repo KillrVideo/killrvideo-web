@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { connectReduxForm } from 'redux-form';
+import { reduxForm } from 'redux-form';
 import validate from 'validate.js';
 import classNames from 'classnames';
 
@@ -67,7 +67,7 @@ const constraints = {
   comment: { presence: true }
 };
 
-export default connectReduxForm({
+export default reduxForm({
   form: 'addComment',
   fields: [ 'comment' ],
   validate: vals => validate(vals, constraints) || {}

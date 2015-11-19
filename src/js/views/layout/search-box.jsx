@@ -50,22 +50,13 @@ const searchConstraints = {
   query: { presence: true }
 };
 
+function mapStateToProps(state) {
+  return {};
+}
+
 // Apply form component
-SearchBox = reduxForm({
+export default reduxForm({
   form: 'search',
   fields: [ 'query' ],
   validate: vals => { return validate(vals, searchConstraints) || {}; }
-})(SearchBox);
-
-function mapStateToProps(state) {
-  return { form: state.form };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    ...bindActionCreators({ searchBoxChange }, dispatch),
-    dispatch    // Redux form needs dispatch
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(SearchBox);
+}, mapStateToProps, { searchBoxChange })(SearchBox);
