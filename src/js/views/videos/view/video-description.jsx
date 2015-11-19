@@ -32,20 +32,20 @@ class VideoDescription extends Component {
     // Listen for animation transition ending and update state
     this._transitionEnd = e => {
       this.setState({ animation: AnimationStates.COMPLETE });
-      this.refs.wrapper.getDOMNode().removeEventListener('transitionend', this._transitionEnd);
+      this.refs.wrapper.removeEventListener('transitionend', this._transitionEnd);
     };
   }
     
   componentDidUpdate() {
     if (this.state.animation === AnimationStates.QUEUED) {
-      this.refs.wrapper.getDOMNode().addEventListener('transitionend', this._transitionEnd);
+      this.refs.wrapper.addEventListener('transitionend', this._transitionEnd);
       setTimeout(() => this.setState({ animation: AnimationStates.RUNNING }), 0);
     }
   }
       
   toggleExpanded() {
     // Recalculate description size if we're about to animate
-    this._descriptionSize = getSize(this.refs.description.getDOMNode()).outerHeight;
+    this._descriptionSize = getSize(this.refs.description).outerHeight;
     this.setState({ expanded: !this.state.expanded, animation: AnimationStates.QUEUED });
   }
   

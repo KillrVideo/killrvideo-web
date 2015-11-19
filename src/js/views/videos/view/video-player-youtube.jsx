@@ -5,7 +5,7 @@ class VideoPlayerYouTube extends Component {
   createYouTubePlayer() {
     youTubeApiLoaded.then(YT => {
       // Fire the playback started handler whenever the state changes appropriately
-      const youTubePlayer = new YT.Player(this.refs.youTubeIframe.getDOMNode(), {
+      const youTubePlayer = new YT.Player(this.refs.youTubeIframe, {
         events: {
           'onStateChange': e => {
             if (e.data === YT.PlayerState.PLAYING) {
