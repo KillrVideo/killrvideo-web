@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import { pushState } from 'redux-router';
-import { Navbar, NavBrand, CollapsibleNav, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 
 import { toggleWhatIsThis } from 'actions';
 import { getCurrentUser, logout } from 'actions/authentication';
@@ -47,14 +47,14 @@ class Header extends Component {
         
         loggedInMenu = (
           <NavDropdown eventKey={4} title={menuTitle} id="loggedin-user">
-            <MenuItem eventKey="1" onSelect={e => this.props.pushState(null, '/account/info')}>
+            <MenuItem eventKey={4.1} onSelect={e => this.props.pushState(null, '/account/info')}>
               <Icon name="cog" fixedWidth /> My Account
             </MenuItem>
-            <MenuItem eventKey="2" onSelect={e => this.props.pushState(null, '/videos/add')}>
+            <MenuItem eventKey={4.2} onSelect={e => this.props.pushState(null, '/videos/add')}>
               <Icon name="video-camera" fixedWidth /> Add a Video
             </MenuItem>
             <MenuItem divider />
-            <MenuItem eventKey="3" onSelect={e => this.props.logout()}>
+            <MenuItem eventKey={4.3} onSelect={e => this.props.logout()}>
               <Icon name="sign-out" fixedWidth /> Sign Out
             </MenuItem>
           </NavDropdown>
@@ -79,15 +79,15 @@ class Header extends Component {
     // (see https://github.com/react-bootstrap/react-bootstrap/pull/1184)
     return (
       <div id="header">
-        <Navbar fixedTop toggleNavKey={0} id="navbar-main">
-          <NavBrand>
+        <Navbar fixedTop id="navbar-main">
+          <Navbar.Brand>
             <Link to="/" id="logo">
               <Image src="killrvideo.png" alt="KillrVideo.com Logo" />
             </Link>
-          </NavBrand>
-          <CollapsibleNav eventKey={0}>
+          </Navbar.Brand>
+          <Navbar.Collapse>
             <SearchBox suggestions={this.props.searchSuggestions} onSubmit={data => this.submitSearch(data)} />
-            <Nav navbar right>
+            <Nav navbar pullRight>
               <NavItem eventKey={1} href="#" onSelect={e => this.props.toggleWhatIsThis()} className={this.props.showWhatIsThis ? 'dropup' : ''}>
                 What is this? <span className="caret"></span>
               </NavItem>
@@ -95,7 +95,7 @@ class Header extends Component {
               {register}
               {loggedInMenu}
             </Nav>
-          </CollapsibleNav>
+          </Navbar.Collapse>
           
         </Navbar>
         
