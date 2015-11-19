@@ -1,7 +1,6 @@
 var gulp = require('gulp');
 var watch = require('gulp-watch');
 var livereload = require('gulp-livereload');
-var gulpif = require('gulp-if');
 var del = require('del');
 var merge = require('merge-stream');
 var path = require('path');

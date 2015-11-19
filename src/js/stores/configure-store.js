@@ -1,7 +1,6 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import { reduxReactRouter } from 'redux-router';
 import thunk from 'redux-thunk';
-import { devTools } from 'redux-devtools';
 import { createHistory } from 'history';
 import createLogger from 'redux-logger';
 
@@ -11,8 +10,7 @@ import rootReducer from 'reducers';
 const createTheStore = compose(
   applyMiddleware(thunk),
   reduxReactRouter({ routes: routes, createHistory: createHistory }),
-  applyMiddleware(createLogger()),
-  devTools()
+  applyMiddleware(createLogger())
 )(createStore);
 
 export default function configureStore(initialState) {
