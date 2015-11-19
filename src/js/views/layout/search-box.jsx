@@ -42,7 +42,6 @@ SearchBox.propTypes = {
   fields: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   // Other
-  onSubmit: PropTypes.func.isRequired,
   suggestions: PropTypes.arrayOf(PropTypes.string).isRequired
 };
 

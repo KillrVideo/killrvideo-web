@@ -27,8 +27,8 @@ class Header extends Component {
     }
   }
   
-  submitSearch(data) {
-    this.props.pushState(null, '/search/results', { query: data.query });
+  submitSearch(query) {
+    this.props.pushState(null, '/search/results', { query });
   }
     
   render() {
@@ -86,7 +86,7 @@ class Header extends Component {
             </Link>
           </Navbar.Brand>
           <Navbar.Collapse>
-            <SearchBox suggestions={this.props.searchSuggestions} onSubmit={data => this.submitSearch(data)} />
+            <SearchBox suggestions={this.props.searchSuggestions} onSubmit={vals => this.submitSearch(vals.query)} />
             <Nav navbar pullRight>
               <NavItem eventKey={1} href="#" onSelect={e => this.props.toggleWhatIsThis()} className={this.props.showWhatIsThis ? 'dropup' : ''}>
                 What is this? <span className="caret"></span>

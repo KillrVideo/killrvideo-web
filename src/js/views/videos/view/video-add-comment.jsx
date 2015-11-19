@@ -58,8 +58,7 @@ VideoAddComment.propTypes = {
   resetForm: PropTypes.func.isRequired,
   // Passed in
   isLoggedIn: PropTypes.bool.isRequired,
-  commentAdded: PropTypes.bool.isRequired,
-  onSubmit: PropTypes.func.isRequired
+  commentAdded: PropTypes.bool.isRequired
 };
 
 // Validation constraints
