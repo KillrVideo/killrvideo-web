@@ -18,7 +18,7 @@ var FILES = [
   './node_modules/bootswatch/cosmo/bootstrap.css',
   './node_modules/font-awesome/css/font-awesome.css',
   './node_modules/video.js/dist/video-js.css',
-  './node_modules/react-gemini-scrollbar/node_modules/gemini-scrollbar/gemini-scrollbar.css',
+  './node_modules/gemini-scrollbar/gemini-scrollbar.css',
   './src/css/*'
 ];
 var FILE_NAME = 'killrvideo.css';

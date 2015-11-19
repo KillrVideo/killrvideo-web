@@ -10,9 +10,10 @@
   margin-bottom: 2em;
 }
 
-#view-video-details .gm-scrollbar-container {
+#view-video-details > div:first-child {
   height: 238px;
   margin-bottom: 15px;
+  overflow: auto;
 }
 
 #view-video-details .gm-scroll-view {
@@ -21,7 +22,7 @@
 
 /* Large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
-  #view-video-details .gm-scrollbar-container {
+  #view-video-details > div:first-child {
     height: 304px;
   }
 }
