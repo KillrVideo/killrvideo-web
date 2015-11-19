@@ -6,8 +6,12 @@ import { Input as BootstrapInput } from 'react-bootstrap';
 class Input extends Component {
   componentDidMount() {
     if (this.props.focusOnMount) {
-      this._input.getInputDOMNode().focus();
+      this.focus();
     }
+  }
+  
+  focus() {
+    this._input.getInputDOMNode().focus();
   }
   
   getBootstrapProps(touched, error) {
@@ -21,9 +25,17 @@ class Input extends Component {
   }
   
   render() {
+    // React treats undefined differently for textarea inputs so we need to change undefined
+    // to an empty string here to prevent it from being uncontrolled (and thus not responding to a reset)
+    // (see: https://github.com/facebook/react/issues/2533)
+    let textAreaValue;
+    if (this.props.type === 'textarea') {
+      textAreaValue = this.props.value || '';
+    }
+    
     return (
       <BootstrapInput {...this.props} {...this.getBootstrapProps(this.props.touched, this.props.error)}
-                      ref={c => this._input = c} />
+                      value={textAreaValue} ref={c => this._input = c} />
     );
   }
 }

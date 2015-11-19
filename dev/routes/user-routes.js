@@ -36,7 +36,7 @@ const routes = [
     // The currently logged in user info
     route: 'currentUser.info',
     get(pathSet) {
-      const userId = this.request.session.userId;
+      const userId = this.requestContext.getUserId();;
       if (isUndefined(userId)) {
         return [
           { path: [ 'currentUser' ], value: $atom(null) }
@@ -56,7 +56,7 @@ const routes = [
       let u = userCredentialsStore[email];
       let currentUser;
       if (!isUndefined(u) && u.password === password) {
-        this.request.session.userId = u.userId;
+        this.requestContext.setUserId(u.userId);
         currentUser = [
           { path: [ 'currentUser', 'info' ], value: $ref([ 'usersById', u.userId ]) }
         ];
@@ -72,7 +72,7 @@ const routes = [
     // User logout
     route: 'currentUser.logout',
     call(callPath, args) {
-      delete this.request.session.userId;
+      this.requestContext.clearUserId();
       return [
         { path: [ 'currentUser' ], value: $atom(null) }
       ];
@@ -98,7 +98,7 @@ const routes = [
         };
         userCredentialsStore[email] = { userId, password };
         
-        this.request.session.userId = userId;
+        this.requestContext.setUserId(userId);
         return [
           { path: [ 'currentUser', 'info' ], value: $ref([ 'usersById', userId ]) }
         ];

@@ -80,7 +80,7 @@ const routes = [
       const MAX_SUGGESTED_VIDEOS = 5;
       
       // Make sure a user is logged in
-      const userId = this.request.session.userId;
+      const userId = this.requestContext.getUserId();
       if (isUndefined(userId)) {
         return [ 
           { path: ['currentUser', 'suggestedVideos'], value: $error('No user currently logged in.') }
@@ -108,7 +108,7 @@ const routes = [
     route: 'currentUser.myVideos',
     get(pathSet) {
       // Make sure a user is logged in
-      const userId = this.request.session.userId;
+      const userId = this.requestContext.getUserId();
       if (isUndefined(userId)) {
         return [ 
           { path: [ 'currentUser', 'myVideos' ], value: $error('No user currently logged in.') }
@@ -162,18 +162,6 @@ const routes = [
       const videosById = _(pathSet.videoIds)
         .reduce((acc, videoId) => {
           acc[videoId] = { rating: $ref([ 'ratingsByVideoId', videoId ]) };
-          return acc;
-        }, {});
-      return { jsonGraph: { videosById } };
-    }
-  },
-  {
-    // Comment data is handled by the comments routes
-    route: 'videosById[{keys:videoIds}].comments',
-    get(pathSet) {
-      const videosById = _(pathSet.videoIds)
-        .reduce((acc, videoId) => {
-          acc[videoId] = { comments: $ref(['commentsByVideoId', videoId ]) };
           return acc;
         }, {});
       return { jsonGraph: { videosById } };

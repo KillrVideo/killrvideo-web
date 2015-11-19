@@ -43,8 +43,7 @@ class ViewVideo extends Component {
           <Col md={5} xs={12} id="view-video-details">
             <VideoDetails videoDetails={videoDetails} videoComments={videoComments} isLoggedIn={isLoggedIn}
                           loadMoreComments={() => this.loadMoreComments()} />
-            <VideoAddComment isLoggedIn={isLoggedIn} commentAdded={videoComments.commentAdded}
-                             onSubmit={vals => this.props.addComment(vals.comment) } />
+            <VideoAddComment onSubmit={vals => this.props.addComment(vals.comment, ViewVideo.queries.comments())} />
           </Col>
         </Row>
         <VideoPreviewList title="More Videos Like This" list="recentVideos" />

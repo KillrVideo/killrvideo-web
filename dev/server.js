@@ -2,8 +2,10 @@ import express from 'express';
 import { dataSourceRoute } from 'falcor-express';
 import bodyParser from 'body-parser';
 import session from 'express-session';
+import cookieParser from 'cookie-parser';
 
 import KillrVideoRouter from './router';
+import RequestContext from './request-context';
 
 // Create a server for use during development
 const app = express();
@@ -14,12 +16,15 @@ app.use('/static', express.static(`${__dirname}/../dist`));
 // Parse POST body for requests to falcor endpoint
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// Session for simulating some server-side state (like auth for example)
+// Cookie parser for auth
+app.use(cookieParser());
+
+// Session for simulating some server-side state if necessary
 app.use(session({ secret: 'KillrVideo Web', saveUninitialized: false, resave: false }));
 
 // Model.json endpoint for Falcor requests
 app.use('/model.json', dataSourceRoute((req, res) => {
-  return new KillrVideoRouter(req);
+  return new KillrVideoRouter(new RequestContext(req, res));
 }));
 
 // All other requests serve up the server.html page 

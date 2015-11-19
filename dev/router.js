@@ -17,11 +17,11 @@ const routes = [
 
 // The actual router class
 class KillrVideoRouter extends Router.createClass(routes) {
-  constructor(request) {
+  constructor(requestContext) {
     super();
     
     // Save the request context for use by routes
-    this.request = request;
+    this.requestContext = requestContext;
   }
 }
 

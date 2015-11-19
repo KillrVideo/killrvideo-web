@@ -7,6 +7,7 @@ import { Alert, Button } from 'react-bootstrap';
 import { Link } from 'react-router';
 import Input from 'components/shared/input';
 import Icon from 'components/shared/icon';
+import { addAnotherComment } from 'actions/view-video';
 
 class VideoAddComment extends Component {
   componentWillReceiveProps(nextProps) {
@@ -14,6 +15,18 @@ class VideoAddComment extends Component {
     if (nextProps.fields.comment.touched && nextProps.fields.comment.value === '') {
       this.props.resetForm();
     }
+  }
+  
+  componentDidUpdate(prevProps) {
+    // If the form was just reset to add another comment, focus the comment input
+    if (this.props.commentAdded === false && prevProps.commentAdded === true) {
+      this.refs.commentInput.focus();
+    }
+  }
+  
+  addAnotherComment() {
+    this.props.resetForm();
+    this.props.addAnotherComment();
   }
   
   render() {
@@ -26,7 +39,7 @@ class VideoAddComment extends Component {
     return (
       <div className="video-add-comment">
         <Alert bsStyle="success" className={commentAdded ? 'small' : 'small hidden'}>
-          Comment added successfully. <a className="alert-link" href="#">Click here</a> to add another.
+          Comment added successfully. <a className="alert-link" href="#" onClick={() => this.addAnotherComment()}>Click here</a> to add another.
         </Alert>
         
         <Alert bsStyle="warning" className={isLoggedIn ? 'small hidden' : 'small'}>
@@ -35,7 +48,7 @@ class VideoAddComment extends Component {
         </Alert>
         
         <form role="form" onSubmit={handleSubmit} className={formClasses}>
-          <Input {...comment} type="textarea" className="small" placeholder="Leave a comment" />
+          <Input {...comment} ref="commentInput" type="textarea" className="small" placeholder="Leave a comment" />
           
           <div className="text-right">
             <Button type="submit" bsStyle="primary" disabled={submitting || invalid}>
@@ -58,7 +71,10 @@ VideoAddComment.propTypes = {
   resetForm: PropTypes.func.isRequired,
   // Passed in
   isLoggedIn: PropTypes.bool.isRequired,
-  commentAdded: PropTypes.bool.isRequired
+  addingComment: PropTypes.bool.isRequired,
+  commentAdded: PropTypes.bool.isRequired,
+  // Actions
+  addAnotherComment: PropTypes.func.isRequired
 };
 
 // Validation constraints
@@ -66,8 +82,24 @@ const constraints = {
   comment: { presence: true }
 };
 
+function mapStateToProps(state) {
+  const { 
+    viewVideo: { 
+      videoComments: { addingComment, commentAdded } 
+    },
+    authentication: {
+      currentUser: { isLoggedIn }
+    } 
+  } = state;
+  return {
+    addingComment,
+    commentAdded,
+    isLoggedIn
+  };
+}
+
 export default reduxForm({
   form: 'addComment',
   fields: [ 'comment' ],
   validate: vals => validate(vals, constraints) || {}
-})(VideoAddComment);
+}, mapStateToProps, { addAnotherComment })(VideoAddComment);

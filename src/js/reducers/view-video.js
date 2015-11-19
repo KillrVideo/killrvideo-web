@@ -38,12 +38,13 @@ const defaultVideoComments = {
   isLoading: false,
   comments: [],
   moreCommentsAvailable: false,
+  addingComment: false,
   commentAdded: false
 };
 
 // Reducer for the video's comments state
 function videoComments(state = defaultVideoComments, action) {
-  let _model, _startIdx, isLoading, comments, moreCommentsAvailable, commentAdded, restOfState;
+  let _model, _startIdx, isLoading, comments, moreCommentsAvailable, addingComment, commentAdded, restOfState;
   
   switch (action.type) {
     case Actions.UNLOAD:
@@ -78,11 +79,35 @@ function videoComments(state = defaultVideoComments, action) {
         moreCommentsAvailable,
         ...restOfState
       };
-    
+      
+    case Actions.ADD_COMMENT_REQUESTED:
+      ({ addingComment, ...restOfState } = state);
+      return {
+        addingComment: true,
+        ...restOfState
+      };
+      
+    case Actions.ADD_COMMENT_RECEIVED:
+      ({ addingComment, commentAdded, comments, ...restOfState } = state);
+      return {
+        addingComment: false,
+        commentAdded: true,
+        comments: [ action.payload.comment, ...comments ],
+        ...restOfState
+      };
+      
+    case Actions.ADD_ANOTHER_COMMENT:
+      ({ commentAdded, ...restOfState } = state);
+      return {
+        commentAdded: false,
+        ...restOfState
+      };
   }
   
   return state;
 }
+
+
 
 const viewVideo = combineReducers({
   videoDetails,

@@ -18,6 +18,7 @@ export const COMMENTS_RECEIVED = 'viewVideo/COMMENTS_RECEIVED';
 
 export const ADD_COMMENT_REQUESTED = 'viewVideo/ADD_COMMENT_REQUESTED';
 export const ADD_COMMENT_RECEIVED = 'viewVideo/ADD_COMMENT_RECEIVED';
+export const ADD_ANOTHER_COMMENT = 'viewVideo/ADD_ANOTHER_COMMENT';
 
 /**
  * Private action creators
@@ -73,6 +74,8 @@ function getInitialComments(videoId, commentQueries) {
     
     let queries = commentQueries.map(q => [ { from: 0, length: COMMENTS_PER_REQUEST }, ...q ]);
     
+    console.log(queries);
+    
     // Deref the comments (the server should return a stable view of comments for paging purposes)
     return model.deref([ 'videosById', videoId, 'comments' ], queries).toPromise().then(commentsModel => {
       dispatch(receiveCommentsModel(commentsModel));
@@ -110,19 +113,20 @@ export function loadMoreComments(commentQueries) {
   };
 }
 
-export function addComment(comment) {
+export function addComment(comment, commentQueries) {
   return (dispatch, getState) => {
     // Tell the UI we're trying to add the comment
     dispatch(requestAddComment());
     
-    // Get model from comment state
+    // Get the model observable from state
     let { viewVideo: { videoComments: { _model: commentsModel } } } = getState();
     
-    return commentsModel.call([ 'add' ], [ comment ]).then(response => {
-      console.log(response);
-    }, errors => {
-      console.log(errors);
+    const queries = commentQueries.map(q => [ 'addedComments', 0, ...q ]);
+    return commentsModel.call([ 'add' ], [ comment ], [], queries).then(response => {
+      return dispatch(receiveAddComment(response.json.addedComments[0]));
     });
   };
 };
+
+export const addAnotherComment = createAction(ADD_ANOTHER_COMMENT);
 
