@@ -74,7 +74,7 @@ const routes = [
     call(callPath, args) {
       this.requestContext.clearUserId();
       return [
-        { path: [ 'currentUser' ], value: $atom(null) }
+        { path: [ 'currentUser' ], invalidated: true }
       ];
     }
   },

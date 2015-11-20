@@ -17,6 +17,18 @@ const viewsByVideoIdStore = _(getVideos())
  */
 const routes = [
   {
+    // Views data is handled by stats routes
+    route: 'videosById[{keys:videoIds}].views',
+    get(pathSet) {
+      const videosById = _(pathSet.videoIds)
+        .reduce((acc, videoId) => { 
+          acc[videoId] = { views: $ref([ 'viewsByVideoId', videoId ]) };
+          return acc;
+        }, {});
+      return { jsonGraph: { videosById } };
+    }
+  },
+  {
     // Views by video
     route: 'viewsByVideoId[{keys:videoIds}]',
     get(pathSet) {

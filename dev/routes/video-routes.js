@@ -66,37 +66,7 @@ const routes = [
       pathSet.indicies.forEach(idx => {
         pathValues.push({
           path: [ 'recentVideos', idx ],
-          value: idx < MAX_RECENT_VIDEOS ? $ref([ 'videosById', videoIdsByDate[idx] ]) : null
-        });
-      })
-      
-      return pathValues;
-    }
-  },
-  {
-    // Suggested videos projection
-    route: 'currentUser.suggestedVideos[{integers:indicies}]',
-    get(pathSet) {
-      const MAX_SUGGESTED_VIDEOS = 5;
-      
-      // Make sure a user is logged in
-      const userId = this.requestContext.getUserId();
-      if (isUndefined(userId)) {
-        return [ 
-          { path: ['currentUser', 'suggestedVideos'], value: $error('No user currently logged in.') }
-        ];
-      }
-      
-      // Use the user id to generate a start index in the videos array
-      const videos = getVideos();
-      const startIdx = getIntFromPartOfUuid(userId, 0, 2, videos.length);
-      const suggestedVideos = _(videos).pluck('videoId').slice(startIdx).take(MAX_SUGGESTED_VIDEOS).value();
-      
-      let pathValues = [];
-      pathSet.indicies.forEach(idx => {
-        pathValues.push({
-          path: [ 'currentUser', 'suggestedVideos', idx ],
-          value: idx < suggestedVideos.length ? $ref([ 'videosById', suggestedVideos[idx] ]) : $atom(null)
+          value: idx < MAX_RECENT_VIDEOS ? $ref([ 'videosById', videoIdsByDate[idx] ]) : $atom()
         });
       });
       
@@ -129,42 +99,18 @@ const routes = [
       pathSet.userIds.forEach(userId => {
         let videosForUser = videosByUserIdStore[userId]; 
         if (isUndefined(videosForUser)) {
-          pathValues.push({ path: [ 'videosByUserId', userId ], value: $atom(null) })
-        } else {
-          pathSet.indicies.forEach(idx => {
-            pathValues.push({
-              path: [ 'videosByUserId', userId, idx ],
-              value: idx >= videosForUser.length ? $atom(null) : $ref([ 'videosById', videosForUser[idx].videoId ])
-            })
-          });
+          videosForUser = [];
         }
+        
+        pathSet.indicies.forEach(idx => {
+          pathValues.push({
+            path: [ 'videosByUserId', userId, idx ],
+            value: idx < videosForUser.length ? $ref([ 'videosById', videosForUser[idx].videoId ]) : $atom()
+          })
+        });
       });
       
       return pathValues;
-    }
-  },
-  {
-    // Views data is handled by stats routes
-    route: 'videosById[{keys:videoIds}].views',
-    get(pathSet) {
-      const videosById = _(pathSet.videoIds)
-        .reduce((acc, videoId) => { 
-          acc[videoId] = { views: $ref([ 'viewsByVideoId', videoId ]) };
-          return acc;
-        }, {});
-      return { jsonGraph: { videosById } };
-    }
-  },
-  {
-    // Ratings data is handled by ratings routes
-    route: 'videosById[{keys:videoIds}].rating',
-    get(pathSet) {
-      const videosById = _(pathSet.videoIds)
-        .reduce((acc, videoId) => {
-          acc[videoId] = { rating: $ref([ 'ratingsByVideoId', videoId ]) };
-          return acc;
-        }, {});
-      return { jsonGraph: { videosById } };
     }
   }
 ];
