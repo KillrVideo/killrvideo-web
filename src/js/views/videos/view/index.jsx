@@ -32,7 +32,7 @@ class ViewVideo extends Component {
   }
     
   render() {
-    const { viewVideo: { videoDetails, videoComments }, currentUser: { isLoggedIn } } = this.props;
+    const { viewVideo: { videoDetails, videoComments }, currentUser: { isLoggedIn }, videoId } = this.props;
     
     return (
       <div>
@@ -46,7 +46,7 @@ class ViewVideo extends Component {
             <VideoAddComment onSubmit={vals => this.props.addComment(vals.comment, ViewVideo.queries.comments())} />
           </Col>
         </Row>
-        <VideoPreviewList title="More Videos Like This" list="recentVideos" />
+        <VideoPreviewList title="More Videos Like This" list={VideoPreviewList.lists.relatedVideos(videoId)} />
       </div>
     );
   }

@@ -4,7 +4,7 @@ import moment from 'moment';
 // Component for rendering a video preview
 class VideoPreview extends Component {
   render() {
-    const v = this.props.video;
+    const v = this.props.preview;
     const imageStyle = { backgroundImage: `url(${v.previewImageLocation})` };
     return (
       <div className="video-preview" onClick={e => this.props.onClick()}>
@@ -30,7 +30,7 @@ class VideoPreview extends Component {
 
 // Static query definitions
 VideoPreview.queries = {
-  video() {
+  preview() {
     // recentVideos[0..4]['name', 'addedDate', ...]
     let details = [ [ 'name', 'previewImageLocation', 'addedDate' ] ];
     // recentVideos[0..4].views
@@ -47,7 +47,7 @@ VideoPreview.queries = {
 
 // Prop validation
 VideoPreview.propTypes = {
-  video: PropTypes.object.isRequired,
+  preview: PropTypes.object.isRequired,
   onClick: PropTypes.func.isRequired
 };
 

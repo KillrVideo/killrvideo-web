@@ -77,7 +77,7 @@ function getInitialComments(videoId, commentQueries) {
     console.log(queries);
     
     // Deref the comments (the server should return a stable view of comments for paging purposes)
-    return model.deref([ 'videosById', videoId, 'comments' ], queries).toPromise().then(commentsModel => {
+    return model.deref([ 'videosById', videoId, 'comments' ], ...queries).toPromise().then(commentsModel => {
       dispatch(receiveCommentsModel(commentsModel));
       return dispatch(getComments(queries));
     });

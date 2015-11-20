@@ -39,7 +39,7 @@ const routes = [
       const userId = this.requestContext.getUserId();;
       if (isUndefined(userId)) {
         return [
-          { path: [ 'currentUser' ], value: $atom(null) }
+          { path: [ 'currentUser', 'info' ], value: $atom() }
         ];
       }
       return [

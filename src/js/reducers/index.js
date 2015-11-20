@@ -4,7 +4,7 @@ import { routerStateReducer } from 'redux-router';
 import * as ActionTypes from 'actions';
 
 // Reducers in other files
-import videoPreviewLists from './video-preview-lists';
+import videoPreviews from './video-previews';
 import viewVideo from './view-video';
 import auth from './authentication';
 
@@ -40,7 +40,7 @@ const rootReducer = combineReducers({
   whatIsThis: whatIsThis,
   authentication: auth,
   search: search,
-  videoPreviewLists: videoPreviewLists,
+  videoPreviews: videoPreviews,
   viewVideo: viewVideo
 });
 
