@@ -18,27 +18,35 @@ const viewsByVideoIdStore = _(getVideos())
 const routes = [
   {
     // Views data is handled by stats routes
-    route: 'videosById[{keys:videoIds}].views',
+    route: 'videosById[{keys:videoIds}].stats',
     get(pathSet) {
-      const videosById = _(pathSet.videoIds)
-        .reduce((acc, videoId) => { 
-          acc[videoId] = { views: $ref([ 'viewsByVideoId', videoId ]) };
-          return acc;
-        }, {});
-      return { jsonGraph: { videosById } };
+      let pathValues = [];
+      
+      pathSet.videoIds.forEach(videoId => {
+        pathValues.push({
+          path: [ 'videosById', videoId, 'stats' ],
+          value: $ref([ 'statsByVideoId', videoId ])
+        });
+      });
+      
+      return pathValues;
     }
   },
   {
     // Views by video
-    route: 'viewsByVideoId[{keys:videoIds}]',
+    route: 'statsByVideoId[{keys:videoIds}]["views"]',
     get(pathSet) {
-      const viewsByVideoId = _(pathSet.videoIds)
-        .reduce((acc, videoId) => {
-          let views = viewsByVideoIdStore[videoId];
-          acc[videoId] = isUndefined(views) ? $atom(null) : views;
-          return acc;
-        }, {});
-      return { jsonGraph: { viewsByVideoId } };
+      let pathValues = [];
+      
+      pathSet.videoIds.forEach(videoId => {
+        const views = viewsByVideoIdStore[videoId];
+        pathValues.push({
+          path: [ 'statsByVideoId', videoId, 'views' ],
+          value: isUndefined(views) ? $atom() : views
+        });
+      });
+      
+      return pathValues;
     }
   }
 ];

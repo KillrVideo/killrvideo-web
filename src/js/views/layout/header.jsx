@@ -86,7 +86,7 @@ class Header extends Component {
             </Link>
           </Navbar.Brand>
           <Navbar.Collapse>
-            <SearchBox suggestions={this.props.searchSuggestions} onSubmit={vals => this.submitSearch(vals.query)} />
+            <SearchBox onSubmit={vals => this.submitSearch(vals.query)} />
             <Nav navbar pullRight>
               <NavItem eventKey={1} href="#" onSelect={e => this.props.toggleWhatIsThis()} className={this.props.showWhatIsThis ? 'dropup' : ''}>
                 What is this? <span className="caret"></span>
@@ -110,7 +110,6 @@ Header.propTypes = {
   // Mapped from state
   currentUser: PropTypes.object.isRequired,
   showWhatIsThis: PropTypes.bool.isRequired,
-  searchSuggestions: PropTypes.arrayOf(PropTypes.string).isRequired,
   // Actions
   toggleWhatIsThis: PropTypes.func.isRequired,
   getCurrentUser: PropTypes.func.isRequired,

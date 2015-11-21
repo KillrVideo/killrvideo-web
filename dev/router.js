@@ -6,6 +6,7 @@ import commentRoutes from './routes/comment-routes';
 import ratingRoutes from './routes/rating-routes';
 import statsRoutes from './routes/stats-routes';
 import suggestionsRoutes from './routes/suggestions-routes';
+import searchRoutes from './routes/search-routes';
 
 // Route definitions
 const routes = [
@@ -14,7 +15,8 @@ const routes = [
   ...commentRoutes,
   ...ratingRoutes,
   ...statsRoutes,
-  ...suggestionsRoutes
+  ...suggestionsRoutes,
+  ...searchRoutes
 ];
 
 // The actual router class

@@ -27,7 +27,7 @@ class VideoDetails extends Component {
             <h4 id="view-video-title">{video.name}</h4>
           </Col>
           <Col xs={4} className="text-red text-right">
-            {video.views} <span className="small text-muted">views</span>
+            {video.stats.views} <span className="small text-muted">views</span>
           </Col>
         </Row>
         
@@ -70,7 +70,7 @@ VideoDetails.queries = {
       ...VideoRatingSharing.queries.video(),
       ...VideoDescription.queries.video(),
       [ [ 'name', 'tags', 'addedDate' ] ],
-      [ 'views', null ],  // Null is needed to force falcor to follow the reference that views returns (see https://github.com/Netflix/falcor-router/issues/132)
+      [ 'stats', 'views' ],
       [ 'author', [ 'firstName', 'lastName', 'email', 'userId'] ]
     ];
   },

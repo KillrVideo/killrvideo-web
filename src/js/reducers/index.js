@@ -7,6 +7,7 @@ import * as ActionTypes from 'actions';
 import videoPreviews from './video-previews';
 import viewVideo from './view-video';
 import auth from './authentication';
+import search from './search';
 
 // Handle what is this UI state
 function whatIsThis(state = { visible: false }, action) {
@@ -16,23 +17,6 @@ function whatIsThis(state = { visible: false }, action) {
   
   return state;
 }
-
-// Search
-function search(state = { suggestions: [] }, action) {
-  switch(action.type) {
-    case ActionTypes.SEARCH_BOX_CHANGE:
-      // TODO: async query suggestions fetch
-      if (action.payload === 'asdf')
-        return { suggestions: [ 'Suggestions are working' ] };
-      return { suggestions: [] };
-    case ActionTypes.SEARCH_BOX_SUBMIT:
-      return state;
-    default:
-      return state;
-  }
-}
-
-
 
 const rootReducer = combineReducers({
   router: routerStateReducer,

@@ -7,15 +7,8 @@ import validate from 'validate.js';
 import { searchBoxChange } from 'actions';
 
 class SearchBox extends Component { 
-  handleQueryChange(e) {
-    // Let form state update
-    this.props.fields.query.handleChange(e);
-    // Dispatch action
-    this.props.searchBoxChange(e.target.value);
-  }
-    
   render() {
-    const { fields: { query: { onChange, ...queryOther } }, suggestions, handleSubmit } = this.props;
+    const { fields: { query }, suggestions, handleSubmit } = this.props;
     
     return (
       <form id="search-box" autoComplete="off" className="navbar-form navbar-left" role="search" method="GET" action="/search/results" 
@@ -26,7 +19,7 @@ class SearchBox extends Component {
               <span className="glyphicon glyphicon-search" title="Search"></span><span className="hidden">Search</span>
             </button>
           </span>
-          <input type="text" {...queryOther} onChange={e => this.handleQueryChange(e)} className="form-control" name="query" 
+          <input type="text" {...query} className="form-control" name="query" 
                  placeholder="Search" list="navbar-search-suggestions" />
           <datalist id="navbar-search-suggestions">
             {suggestions.map((s, idx) => <option value={s} key={s}></option>)}
@@ -50,7 +43,7 @@ const searchConstraints = {
 };
 
 function mapStateToProps(state) {
-  return {};
+  return { suggestions: state.search.searchBox.suggestions };
 }
 
 // Apply form component

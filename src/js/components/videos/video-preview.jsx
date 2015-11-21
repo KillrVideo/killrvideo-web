@@ -18,7 +18,7 @@ class VideoPreview extends Component {
             by {v.author.firstName} {v.author.lastName}
           </div>
           <div>
-            { v.views } views <strong>&#8226;</strong> {moment(v.addedDate).fromNow()}
+            { v.stats.views } views <strong>&#8226;</strong> {moment(v.addedDate).fromNow()}
           </div>
         </div>
 
@@ -33,8 +33,8 @@ VideoPreview.queries = {
   preview() {
     // recentVideos[0..4]['name', 'addedDate', ...]
     let details = [ [ 'name', 'previewImageLocation', 'addedDate' ] ];
-    // recentVideos[0..4].views
-    let views = [ 'views', null ];  // Null is needed to force falcor to follow the reference that views returns (see https://github.com/Netflix/falcor-router/issues/132)
+    // recentVideos[0..4].stats.views
+    let views = [ 'stats', 'views' ];
     // recentVideos[0..4].author['firstName', 'lastName']
     let author = [ 'author', [ 'firstName', 'lastName' ] ];
     return [
