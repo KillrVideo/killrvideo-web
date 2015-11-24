@@ -1,6 +1,6 @@
 import createAction from 'redux-actions/lib/createAction';
 import model from 'stores/falcor-model';
-import { pluck } from 'lodash';
+import { pluck, isUndefined } from 'lodash';
 
 /**
  * Public action constants
@@ -85,7 +85,9 @@ export function getCurrentUser(queries) {
     dispatch(requestCurrentUser(falcorQueries));
     
     // Do the request and dispatch the response
-    return model.get(...falcorQueries).then(response => dispatch(receiveCurrentUser(response.json.currentUser ? response.json.currentUser.info : null)));
+    return model.get(...falcorQueries).then(response => {
+      return dispatch(receiveCurrentUser(isUndefined(response) ? null : response.json.currentUser.info));
+    });
   };
 };
 
