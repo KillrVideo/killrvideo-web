@@ -1,5 +1,5 @@
 import * as Actions from 'actions/video-previews';
-import { mapValues } from 'lodash';
+import { mapValues, isUndefined } from 'lodash';
 import { combineReducers } from 'redux';
 
 // Reducer for the private state of all lists
@@ -8,7 +8,6 @@ function privateAllLists(state = {}, action) {
   switch (action.type) {
     case Actions.LOAD:
     case Actions.UNLOAD:
-    case Actions.RECEIVE_PREVIEWS_MODEL:
     case Actions.RECEIVE_PREVIEWS:
       let { [ action.payload.list ]: privateState, ...restOfState } = state;
       return {
@@ -39,17 +38,11 @@ function privateOneList(state = defaultPrivateOneList, action) {
         ...restOfState
       };
       
-    case Actions.RECEIVE_PREVIEWS_MODEL:
-      ({ previewsModel, ...restOfState } = state);
-      return {
-        previewsModel: action.payload.previewsModel,
-        ...restOfState
-      };
-      
     case Actions.RECEIVE_PREVIEWS:
-      ({ startIndex, morePreviewsAvailable, ...restOfState } = state);
+      ({ startIndex, previewsModel, morePreviewsAvailable, ...restOfState } = state);
       return {
         startIndex: startIndex + action.payload.previews.length,
+        previewsModel: isUndefined(action.payload.previewsModel) ? previewsModel : action.payload.previewsModel,
         morePreviewsAvailable: action.payload.morePreviewsAvailable,
         ...restOfState
       };

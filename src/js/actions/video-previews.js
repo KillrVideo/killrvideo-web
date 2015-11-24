@@ -19,7 +19,6 @@ export const LOAD = 'videoPreviewList/LOAD';
 export const UNLOAD = 'videoPreviewList/UNLOAD';
 
 export const REQUEST_PREVIEWS = 'videoPreviewList/REQUEST_PREVIEWS';
-export const RECEIVE_PREVIEWS_MODEL = 'videoPreviewList/RECEIVE_PREVIEWS_MODEL';
 export const RECEIVE_PREVIEWS = 'videoPreviewList/RECEIVE_PREVIEWS';
 
 export const NEXT_PAGE = 'videoPreviewList/NEXT_PAGE';
@@ -29,33 +28,9 @@ export const PREVIOUS_PAGE = 'videoPreviewList/PREVIOUS_PAGE';
  * Private action creators
  */
 const requestPreviews = createAction(REQUEST_PREVIEWS, list => ({ list }));
-const receivePreviewsModel = createAction(RECEIVE_PREVIEWS_MODEL, (list, previewsModel) => ({ list, previewsModel }));
-const receivePreviews = createAction(RECEIVE_PREVIEWS, (list, previews, morePreviewsAvailable) => ({ list, previews, morePreviewsAvailable }));
+const receivePreviews = createAction(RECEIVE_PREVIEWS, (list, previews, morePreviewsAvailable, previewsModel) => ({ list, previews, morePreviewsAvailable, previewsModel }));
 const nextPage = createAction(NEXT_PAGE, list => ({ list }));
 const previousPage = createAction(PREVIOUS_PAGE, list => ({ list }));
-
-function fetchPreviews(list, previewsQueries, numberToFetch) {
-  return (dispatch, getState) => {
-    // Get the queries from private state
-    let { 
-      videoPreviews: {
-        _private: { 
-          [ list ]: { previewsModel, startIndex }
-        } 
-      } 
-    } = getState();
-    
-    // Add paging information and get the data from the server
-    const queries = previewsQueries.map(q => [ { from: startIndex, length: numberToFetch }, ...q ]);
-    
-    // After fetching, dispatch the results to the UI
-    return previewsModel.get(...queries).then(response => {
-      const previews = isUndefined(response) ? [] : values(response.json);
-      const morePreviewsAvailable = previews.length === numberToFetch;
-      return dispatch(receivePreviews(list, previews, morePreviewsAvailable));
-    });
-  };
-}
 
 /**
  * Public action creators
@@ -80,13 +55,23 @@ export function getPreviews(list, previewsQueries) {
     const queries = previewsQueries.map(q => [ { from: 0, length: PREVIEWS_VISIBLE_PER_PAGE }, ...q ]);
     
     // Use deref to load a model bound to the query root for the list
-    return model.deref(previewsQueryRoot, ...queries).toPromise().then(previewsModel => {
-      // Save the derefed model for future queries
-      dispatch(receivePreviewsModel(list, previewsModel));
-      
-      // Do the actual queries (data should already be there from deref queries)
-      return dispatch(fetchPreviews(list, previewsQueries, PREVIEWS_VISIBLE_PER_PAGE));
-    });
+    let previewsModel = null;
+    return model.deref(previewsQueryRoot, ...queries).subscribe(
+      m => { previewsModel = m; },
+      null,     // TODO: Error handler?
+      () => {
+        // We might not have a model if there were no results
+        if (previewsModel === null) {
+          dispatch(receivePreviews(list, [], false));
+          return;
+        }
+        
+        previewsModel.get(...queries).then(response => {
+          const previews = isUndefined(response) ? [] : values(response.json);
+          const morePreviewsAvailable = previews.length === PREVIEWS_VISIBLE_PER_PAGE;
+          dispatch(receivePreviews(list, previews, morePreviewsAvailable, previewsModel));
+        });
+      });
   };
 };
 
@@ -99,7 +84,7 @@ export function nextPageClick(list, previewsQueries) {
           [ list ]: { previews, currentPageIndex }
         },
         _private: {
-          [ list ]: { morePreviewsAvailable }
+          [ list ]: { previewsModel, startIndex, morePreviewsAvailable }
         }
       }
     } = getState();
@@ -118,7 +103,16 @@ export function nextPageClick(list, previewsQueries) {
     
     // There are more pages available on the server and we need them, so go get them then go to the next page
     dispatch(requestPreviews(list));
-    return dispatch(fetchPreviews(list, previewsQueries, PREVIEWS_TO_FETCH)).then(fetchDone => dispatch(nextPage(list)));
+    
+    // Add paging information and get the data from the server
+    const queries = previewsQueries.map(q => [ { from: startIndex, length: PREVIEWS_TO_FETCH }, ...q ]);
+    
+    return previewsModel.get(...queries).then(response => {
+      const previews = isUndefined(response) ? [] : values(response.json);
+      const morePreviewsAvailable = previews.length === PREVIEWS_TO_FETCH;
+      dispatch(receivePreviews(list, previews, morePreviewsAvailable));
+      dispatch(nextPage(list));
+    });
   };
 };
 
