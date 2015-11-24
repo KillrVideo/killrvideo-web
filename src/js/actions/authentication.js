@@ -72,7 +72,11 @@ export function logout() {
     dispatch(logoutRequest());
     
     // Make the falcor request
-    return model.call('currentUser.logout').then(response => dispatch(logoutSuccess()), errors => dispatch(logoutFailure(pluck(errors, 'value'))));
+    return model.call('currentUser.logout').then(response => {
+      dispatch(logoutSuccess())
+    }, errors => {
+      console.error(errors)
+    });
   };
 };
 

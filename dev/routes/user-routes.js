@@ -74,7 +74,8 @@ const routes = [
     call(callPath, args) {
       this.requestContext.clearUserId();
       return [
-        { path: [ 'currentUser' ], invalidated: true }
+        { path: [ 'currentUser' ], invalidated: true },
+        { path: [ 'currentUser', 'info' ], value: $atom() } // Temporarily return an extra path until https://github.com/Netflix/falcor/pull/600
       ];
     }
   },
