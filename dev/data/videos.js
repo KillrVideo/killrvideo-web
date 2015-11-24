@@ -11,7 +11,7 @@ function videos() {
       "locationType": 0,
       "name": "Bonus Footage: Calvin Klein Ads (Kate McKinnon)",
       "previewImageLocation": "//img.youtube.com/vi/lvVba51ZHlk/hqdefault.jpg",
-      "tags": ["saturday night live"]
+      "tags": ["saturday night live", "funny"]
     },
     {
       "videoId": "9edb9d5b-3d87-4404-bff9-2ab43b5fff24",
@@ -51,7 +51,7 @@ function videos() {
       "locationType": 0,
       "name": "Beck Bennett and Kyle Mooney's Most Memorable Season 40 Moments - SNL",
       "previewImageLocation": "//img.youtube.com/vi/siAjx3Syi6U/hqdefault.jpg",
-      "tags": ["snl"]
+      "tags": ["snl", "funny"]
     },
     {
       "videoId": "8cbed57c-f1b8-4c7d-9e6a-8cb57fa375f5",
@@ -61,7 +61,7 @@ function videos() {
       "locationType": 0,
       "name": "Sleepy Grumpy Cat",
       "previewImageLocation": "//img.youtube.com/vi/SSq1a2hDSh8/hqdefault.jpg",
-      "tags": ["cat", "grumpy cat"]
+      "tags": ["cat", "grumpy cat", "funny"]
     },
     {
       "videoId": "af7e2503-90ac-4400-a3c7-66f7180345f5",
@@ -71,7 +71,7 @@ function videos() {
       "locationType": 0,
       "name": "Xbox One Game Streaming to Windows 10 RTM! BUILD 10240!",
       "previewImageLocation": "//img.youtube.com/vi/Zx3W68XApXw/hqdefault.jpg",
-      "tags": ["windows", "windows 10"]
+      "tags": ["windows", "windows 10", "azure"]
     },
     {
       "videoId": "e7ff43b8-f7f7-41a4-bd7d-1ee93111c845",
@@ -81,7 +81,7 @@ function videos() {
       "locationType": 0,
       "name": "Enable IT Transformation",
       "previewImageLocation": "//img.youtube.com/vi/9BnrlTtj7NA/hqdefault.jpg",
-      "tags": ["cloud", "microsoft"]
+      "tags": ["cloud", "microsoft", "azure"]
     },
     {
       "videoId": "544727d6-e1b1-44f9-a591-aee10b0d68d4",
@@ -101,7 +101,7 @@ function videos() {
       "locationType": 0,
       "name": "DocuSign with Azure Active Directory",
       "previewImageLocation": "//img.youtube.com/vi/EN61NbawmbQ/hqdefault.jpg",
-      "tags": ["azure", "cat"]
+      "tags": ["azure", "cat", "funny"]
     },
     {
       "videoId": "23a0b22b-198b-4ae4-8274-c32758c19426",
@@ -131,7 +131,7 @@ function videos() {
       "locationType": 0,
       "name": "Grumpy Cat Compilation!",
       "previewImageLocation": "//img.youtube.com/vi/gxmHOwWh-i4/hqdefault.jpg",
-      "tags": ["cat", "grumpy cat", "movie"]
+      "tags": ["cat", "grumpy cat", "movie", "funny"]
     },
     {
       "videoId": "9613d865-cf16-4cb3-b7fc-f17350750ab6",
@@ -141,7 +141,7 @@ function videos() {
       "locationType": 0,
       "name": "Kenan Thompson's  Most Memorable Season 40 Moment - SNL",
       "previewImageLocation": "//img.youtube.com/vi/Xo3AAoev68M/hqdefault.jpg",
-      "tags": ["snl"]
+      "tags": ["snl", "funny"]
     },
     {
       "videoId": "dbbd95cb-23bb-406a-a5bd-095c90380b74",
@@ -151,7 +151,7 @@ function videos() {
       "locationType": 0,
       "name": "Cassandra: an open source distributed database - Part 2",
       "previewImageLocation": "//img.youtube.com/vi/2jlkmYtXXKQ/hqdefault.jpg",
-      "tags": ["cassandra", "database"]
+      "tags": ["cassandra", "database", "azure"]
     },
     {
       "videoId": "eb108e32-ac9e-43cd-bcbf-66f25fd4c8bf",
@@ -171,7 +171,7 @@ function videos() {
       "locationType": 0,
       "name": "Grumpy Cat taking a water break at Refinery 29 in NYC!",
       "previewImageLocation": "//img.youtube.com/vi/Tjt00VUt5HI/hqdefault.jpg",
-      "tags": ["cat", "grumpy cat"]
+      "tags": ["cat", "grumpy cat", "funny"]
     },
     {
       "videoId": "1da49baf-fe2f-430a-b78b-8d529a3ad140",
@@ -181,7 +181,7 @@ function videos() {
       "locationType": 0,
       "name": "Haddad SMASH - A Short on how Cassandra is \\",
       "previewImageLocation": "//img.youtube.com/vi/rxIBOZd6RqM/hqdefault.jpg",
-      "tags": ["cassandra", "datastax"]
+      "tags": ["cassandra", "datastax", "funny"]
     },
     {
       "videoId": "4d67c2de-bc1b-4bfd-8dea-9e3ffa5a19c6",

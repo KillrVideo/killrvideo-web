@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { range } from 'lodash';
 import { pushState } from 'redux-router';
 
-import { Alert, Row, Col } from 'react-bootstrap';
+import { Alert, Row, Col, Button } from 'react-bootstrap';
 import { Link } from 'react-router';
 
 import { searchFor, nextPageClick, previousPageClick, unload } from 'actions/search';
@@ -39,7 +39,9 @@ class SearchResults extends Component {
   }
   
   render() {
-    const { query, isLoading, previews, currentPageIndex } = this.props;
+    const { query, isLoading, previews, currentPageIndex, morePreviewsAvailable } = this.props;
+    const previousPageDisabled = isLoading || currentPageIndex === 0;
+    const nextPageDisabled = isLoading || (morePreviewsAvailable === false && currentPageIndex + 8 >= previews.length);
     
     return (
       <div>
@@ -70,6 +72,18 @@ class SearchResults extends Component {
               );
             })}
           </Row>
+          <Row>
+            <Col xs={6} sm={3}>
+              <Button bsStyle="default" block disabled={previousPageDisabled} onClick={() => this.previousPage()}>
+                <Icon name="chevron-circle-left" /> Previous Page
+              </Button>
+            </Col>
+            <Col xs={6} sm={3} smOffset={6}>
+              <Button bsStyle="default" block disabled={nextPageDisabled} onClick={() => this.nextPage()}>
+                <Icon name="chevron-circle-right" /> Next Page
+              </Button>
+            </Col>
+          </Row>
         </div>
       </div>
     );
@@ -95,6 +109,7 @@ SearchResults.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   previews: PropTypes.arrayOf(PropTypes.object).isRequired,
   currentPageIndex: PropTypes.number.isRequired,
+  morePreviewsAvailable: PropTypes.bool.isRequired,
   
   // Actions
   searchFor: PropTypes.func.isRequired,

@@ -60,7 +60,7 @@ export function searchFor(term, previewsQueries) {
           
           previewsModel.get(...queries).then(response => {
             const previews = isUndefined(response) ? [] : values(response.json);
-            const morePreviewsAvailable = previews.length !== 0;
+            const morePreviewsAvailable = previews.length === RESULTS_PER_PAGE;
             dispatch(receiveResults(previews, morePreviewsAvailable, previewsModel));
           });
         });
@@ -73,7 +73,7 @@ export function nextPageClick(previewsQueries) {
     // Grab some of the current state
     let {
       search: { 
-        results: { _previewsModel: previewsModel, _morePreviewsAvailable: morePreviewsAvailable, previews, currentPageIndex }
+        results: { _previewsModel: previewsModel, morePreviewsAvailable, previews, currentPageIndex }
       }
     } = getState();
     
@@ -98,7 +98,7 @@ export function nextPageClick(previewsQueries) {
     return previewsModel.get(...queries).then(response => {
       // Dispatch any previews we received
       const newPreviews = isUndefined(response) ? [] : values(response.json);
-      const morePreviewsAvailable = newPreviews.length !== 0;
+      const morePreviewsAvailable = newPreviews.length === PREVIEWS_TO_FETCH;
       dispatch(receiveResults(newPreviews, morePreviewsAvailable));
       
       // If we got an empty page of previews, make sure we actually have records on the next page to show

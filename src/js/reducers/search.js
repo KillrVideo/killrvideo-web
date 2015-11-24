@@ -15,7 +15,7 @@ function searchBox(state = defaultSearchBoxState, action) {
 // Default state for search results
 const defaultResultsState = {
   _previewsModel: null,
-  _morePreviewsAvailable: false,
+  morePreviewsAvailable: false,
   
   isLoading: false,
   previews: [],
@@ -24,7 +24,7 @@ const defaultResultsState = {
 
 // Reducer for the search results state
 function results(state = defaultResultsState, action) {
-  let _previewsModel, _morePreviewsAvailable, isLoading, previews, currentPageIndex, restOfState;
+  let _previewsModel, morePreviewsAvailable, isLoading, previews, currentPageIndex, restOfState;
   
   switch (action.type) {
     case Actions.REQUEST_RESULTS:
@@ -35,10 +35,10 @@ function results(state = defaultResultsState, action) {
       };
       
     case Actions.RECEIVE_RESULTS:
-      ({ isLoading, previews, _previewsModel, _morePreviewsAvailable, ...restOfState } = state);
+      ({ isLoading, previews, _previewsModel, morePreviewsAvailable, ...restOfState } = state);
       return {
         _previewsModel: isUndefined(action.payload.previewsModel) ? _previewsModel : action.payload.previewsModel,
-        _morePreviewsAvailable: action.payload.morePreviewsAvailable,
+        morePreviewsAvailable: action.payload.morePreviewsAvailable,
         
         isLoading: false,
         previews: [ ...previews, ...action.payload.previews ],
