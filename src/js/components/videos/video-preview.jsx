@@ -5,11 +5,10 @@ import moment from 'moment';
 class VideoPreview extends Component {
   render() {
     const v = this.props.preview;
-    const imageStyle = { backgroundImage: `url(${v.previewImageLocation})` };
+    const imageStyle = { backgroundImage: `url("${v.previewImageLocation}")` };
     return (
-      <div className="video-preview" onClick={e => this.props.onClick()}>
-        <div className="video-preview-image" style={imageStyle}>
-        </div>
+      <div className="video-preview" onClick={() => this.props.onClick()}>
+        <div className="video-preview-image" style={imageStyle}></div>
 
         <div className="video-preview-info">
           <h6>{v.name}</h6>

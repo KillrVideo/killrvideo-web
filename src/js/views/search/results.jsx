@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { range } from 'lodash';
+import { pushState } from 'redux-router';
 
 import { Alert, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router';
@@ -10,19 +11,23 @@ import Icon from 'components/shared/icon';
 import VideoPreview from 'components/videos/video-preview';
 
 class SearchResults extends Component {
-  componentWillMount() {
+  componentDidMount() {
     this.props.searchFor(this.props.query, SearchResults.queries.preview());
   }
   
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate(prevProps) {
     // If the search query changes, do a new search
-    if (this.props.query !== nextProps.query) {
-      this.props.searchFor(nextProps.query, SearchResults.queries.preview());
+    if (this.props.query !== prevProps.query) {
+      this.props.searchFor(this.props.query, SearchResults.queries.preview());
     }
   }
   
   componentWillUnmount() {
     this.props.unload();
+  }
+  
+  gotoVideo(videoId) {
+    this.props.pushState(null, `/view/${videoId}`);
   }
   
   nextPage() {
@@ -60,7 +65,7 @@ class SearchResults extends Component {
               const preview = previews[previewIdx];
               return (
                 <Col sm={3} key={preview.videoId}>
-                  <VideoPreview preview={preview} />
+                  <VideoPreview preview={preview} onClick={() => this.gotoVideo(preview.videoId)} />
                 </Col>
               );
             })}
@@ -95,7 +100,8 @@ SearchResults.propTypes = {
   searchFor: PropTypes.func.isRequired,
   nextPageClick: PropTypes.func.isRequired,
   previousPageClick: PropTypes.func.isRequired,
-  unload: PropTypes.func.isRequired
+  unload: PropTypes.func.isRequired,
+  pushState: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state) {
@@ -106,4 +112,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { searchFor, nextPageClick, previousPageClick, unload })(SearchResults);
+export default connect(mapStateToProps, { searchFor, nextPageClick, previousPageClick, unload, pushState })(SearchResults);

@@ -74,8 +74,6 @@ function getInitialComments(videoId, commentQueries) {
     
     let queries = commentQueries.map(q => [ { from: 0, length: COMMENTS_PER_REQUEST }, ...q ]);
     
-    console.log(queries);
-    
     // Deref the comments (the server should return a stable view of comments for paging purposes)
     return model.deref([ 'videosById', videoId, 'comments' ], ...queries).toPromise().then(commentsModel => {
       dispatch(receiveCommentsModel(commentsModel));
