@@ -13,10 +13,6 @@ const PREVIEWS_TO_FETCH = 20;
 /**
  * Action constants
  */
-
-export const SEARCH_BOX_SUBMIT = 'search/SEARCH_BOX_SUBMIT';
-export const SEARCH_BOX_CHANGE = 'search/SEARCH_BOX_CHANGE';
-
 export const REQUEST_RESULTS = 'search/REQUEST_RESULTS';
 export const RECEIVE_RESULTS = 'search/RECEIVE_RESULTS';
 export const NEXT_PAGE = 'search/NEXT_PAGE';
@@ -96,7 +92,7 @@ export function nextPageClick(previewsQueries) {
     }
     
     // There are more pages available on the server and we need them, so go get them then go to the next page
-    dispatch(requestPreviews());
+    dispatch(requestResults());
     
     const queries = previewsQueries.map(q => [ { from: previews.length, length: PREVIEWS_TO_FETCH }, ...q ]);
     return previewsModel.get(...queries).then(response => {
@@ -131,6 +127,3 @@ export function previousPageClick() {
 
 // Just reset search results state when unloaded
 export const unload = resetResults;
-
-export const searchBoxSubmit = createAction(SEARCH_BOX_SUBMIT, data => data);
-export const searchBoxChange = createAction(SEARCH_BOX_CHANGE, query => query);

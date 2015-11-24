@@ -1,12 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { reduxForm } from 'redux-form';
-import { bindActionCreators } from 'redux';
 import validate from 'validate.js';
 
-import { searchBoxChange } from 'actions';
-
-class SearchBox extends Component { 
+class SearchBox extends Component {
   render() {
     const { fields: { query }, suggestions, handleSubmit } = this.props;
     
@@ -51,4 +48,4 @@ export default reduxForm({
   form: 'search',
   fields: [ 'query' ],
   validate: vals => { return validate(vals, searchConstraints) || {}; }
-}, mapStateToProps, { searchBoxChange })(SearchBox);
+}, mapStateToProps)(SearchBox);
