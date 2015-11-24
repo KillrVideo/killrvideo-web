@@ -1,7 +1,7 @@
 import createAction from 'redux-actions/lib/createAction';
 import model from 'stores/falcor-model';
 import { join } from 'bluebird';
-import { _, isUndefined } from 'lodash';
+import { values, isUndefined } from 'lodash';
 
 export const COMMENTS_PER_REQUEST = 5;
 
@@ -13,7 +13,6 @@ export const VIDEO_REQUESTED = 'viewVideo/VIDEO_REQUESTED';
 export const VIDEO_RECEIVED = 'viewVideo/VIDEO_RECEIVED';
 
 export const COMMENTS_REQUESTED = 'viewVideo/COMMENTS_REQUESTED';
-export const COMMENTS_MODEL_RECEIVED = 'viewVideo/COMMENTS_MODEL_RECEIVED';
 export const COMMENTS_RECEIVED = 'viewVideo/COMMENTS_RECEIVED';
 
 export const ADD_COMMENT_REQUESTED = 'viewVideo/ADD_COMMENT_REQUESTED';
@@ -26,8 +25,7 @@ export const ADD_ANOTHER_COMMENT = 'viewVideo/ADD_ANOTHER_COMMENT';
 const requestVideo = createAction(VIDEO_REQUESTED);
 const receiveVideo = createAction(VIDEO_RECEIVED, (video) => ({ video }));
 const requestComments = createAction(COMMENTS_REQUESTED);
-const receiveCommentsModel = createAction(COMMENTS_MODEL_RECEIVED, model => ({ model }));
-const receiveComments = createAction(COMMENTS_RECEIVED, comments => ({ comments }));
+const receiveComments = createAction(COMMENTS_RECEIVED, (comments, commentsModel) => ({ comments, commentsModel }));
 const requestAddComment = createAction(ADD_COMMENT_REQUESTED);
 const receiveAddComment = createAction(ADD_COMMENT_RECEIVED, comment => ({ comment }));
 
@@ -51,21 +49,6 @@ function getVideoDetails(videoId, videoQueries) {
   };
 }
 
-// Gets a page of comments from the server
-function getComments(commentQueries) {
-  return (dispatch, getState) => {
-    // Get the model observable from state
-    let { viewVideo: { videoComments: { _model: commentsModel } } } = getState();
-    
-    // Use the model to execute the queries and dispatch the results
-    return commentsModel.get(...commentQueries).then(response => {
-      // Possible to get undefined for response if there were no comments
-      const comments = isUndefined(response) ? [] : _(response.json).values().value();
-      return dispatch(receiveComments(comments));
-    });
-  };
-}
-
 // Get the initial page of comments for the video (and save the model for future requests to load more)
 function getInitialComments(videoId, commentQueries) {
   return dispatch => {
@@ -74,11 +57,24 @@ function getInitialComments(videoId, commentQueries) {
     
     let queries = commentQueries.map(q => [ { from: 0, length: COMMENTS_PER_REQUEST }, ...q ]);
     
-    // Deref the comments (the server should return a stable view of comments for paging purposes)
-    return model.deref([ 'videosById', videoId, 'comments' ], ...queries).toPromise().then(commentsModel => {
-      dispatch(receiveCommentsModel(commentsModel));
-      return dispatch(getComments(queries));
-    });
+    let commentsModel = null;
+    return model.deref([ 'videosById', videoId, 'comments' ], ...queries).subscribe(
+      m => { commentsModel = m; },
+      null, // TODO: Error handler?
+      () => {
+        // Possible to have a null model if there are no comments for the video
+        if (commentsModel === null) {
+          dispatch(receiveComments([]));
+          return;
+        }
+        
+        commentsModel.get(...queries).then(response => {
+          // Possible to get undefined for response if there were no comments
+          const comments = isUndefined(response) ? [] : values(response.json);
+          dispatch(receiveComments(comments, commentsModel));
+        });
+      }
+    );
   };
 }
 
@@ -100,14 +96,18 @@ export const unload = createAction(UNLOAD);
 export function loadMoreComments(commentQueries) {
   return (dispatch, getState) => {
     // Sanity check
-    let { viewVideo: { videoComments: { _startIdx: startIdx, moreCommentsAvailable } } } = getState();
+    let { viewVideo: { videoComments: { _startIdx: startIdx, _model: commentsModel, moreCommentsAvailable } } } = getState();
     if (moreCommentsAvailable === false) return;
     
     // Tell the UI we're loading
     dispatch(requestComments());
     
     let queries = commentQueries.map(q => [ { from: startIdx, length: COMMENTS_PER_REQUEST }, ...q ]);
-    return dispatch(getComments(queries));
+    return commentsModel.get(...queries).then(response => {
+      // Possible to get undefined for response if there were no comments
+      const comments = isUndefined(response) ? [] : values(response.json);
+      dispatch(receiveComments(comments));
+    });
   };
 }
 

@@ -58,23 +58,15 @@ function videoComments(state = defaultVideoComments, action) {
         ...restOfState
       };
       
-    case Actions.COMMENTS_MODEL_RECEIVED:
-      ({ _model, _startIdx, comments, ...restOfState } = state);
-      return {
-        _startIdx: 0,
-        _model: action.payload.model,
-        comments: [],
-        ...restOfState
-      };
-      
     case Actions.COMMENTS_RECEIVED:
-      ({ _startIdx, isLoading, comments, moreCommentsAvailable, ...restOfState } = state);
+      ({ _startIdx, _model, isLoading, comments, moreCommentsAvailable, ...restOfState } = state);
       
       // More comments are available only if we got a full page of comments
       moreCommentsAvailable = action.payload.comments.length === Actions.COMMENTS_PER_REQUEST;
       
       return {
         _startIdx: _startIdx + Actions.COMMENTS_PER_REQUEST,
+        _model: isUndefined(action.payload.commentsModel) ? _model : action.payload.commentsModel,
         isLoading: false,
         comments: [ ...comments, ...action.payload.comments ],
         moreCommentsAvailable,

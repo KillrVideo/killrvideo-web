@@ -15,10 +15,15 @@ class ViewVideo extends Component {
     this.props.load(this.props.videoId, ViewVideo.queries.video(), ViewVideo.queries.comments());
   }
   
-  componentWillReceiveProps(nextProps) {
+  componentWillUnmount() {
+    this.props.unload();
+  }
+  
+  componentDidUpdate(prevProps) {
     // If the video id changes, we need to get the video again
-    if (this.props.videoId !== nextProps.videoId) {
-      this.props.load(nextProps.videoId, ViewVideo.queries.video(), ViewVideo.queries.comments());
+    if (this.props.videoId !== prevProps.videoId) {
+      this.props.unload();
+      this.props.load(this.props.videoId, ViewVideo.queries.video(), ViewVideo.queries.comments());
     }
   }
   

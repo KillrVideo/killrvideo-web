@@ -24,18 +24,12 @@ class VideoPreviewList extends Component {
     // Tell the app we're going to unload
     this.props.unload(this.props.list.id);
   }
-  
-  componentWillReceiveProps(nextProps) {
-    // If the list changes, we need to reload
-    if (this.props.list.id !== nextProps.list.id) {
-      this.props.unload(this.props.list.id);
-      this.props.load(this.props.list.id, this.props.list.previewsQueryRoot);
-    }
-  }
-  
+    
   componentDidUpdate(prevProps) {
     // If the list changed, we need to get the initial previews again
     if (this.props.list.id !== prevProps.list.id) {
+      this.props.unload(prevProps.list.id);
+      this.props.load(this.props.list.id, this.props.list.previewsQueryRoot);
       this.props.getPreviews(this.props.list.id, VideoPreviewList.queries.preview());
     }
   }
