@@ -35,7 +35,7 @@ class VideoComments extends Component {
             return (
               <li className="clearfix" key={c.commentId}>
                 <UserProfileLink userId={c.author.userId} className="pull-left">
-                  <UserProfileImage email={c.author.email} className="img-circle" />
+                  <UserProfileImage email={c.author.email} className="small img-circle" />
                 </UserProfileLink>
                 <UserProfileLink userId={c.author.userId}>
                   {c.author.firstName + ' ' + c.author.lastName}

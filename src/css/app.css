@@ -45,7 +45,7 @@ a:hover {
     color: #da3610;
 }
 
-.user-gravatar {
+.user-gravatar.small {
     width: 24px;
     height: auto;
 }

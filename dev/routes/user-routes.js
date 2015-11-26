@@ -34,16 +34,16 @@ const routes = [
   },
   {
     // The currently logged in user info
-    route: 'currentUser.info',
+    route: 'currentUser',
     get(pathSet) {
       const userId = this.requestContext.getUserId();;
       if (isUndefined(userId)) {
         return [
-          { path: [ 'currentUser', 'info' ], value: $atom() }
+          { path: [ 'currentUser' ], value: $atom() }
         ];
       }
       return [
-        { path: [ 'currentUser', 'info' ], value: $ref([ 'usersById', userId ]) }
+        { path: [ 'currentUser' ], value: $ref([ 'usersById', userId ]) }
       ];
     }
   },
@@ -58,7 +58,7 @@ const routes = [
       if (!isUndefined(u) && u.password === password) {
         this.requestContext.setUserId(u.userId);
         currentUser = [
-          { path: [ 'currentUser', 'info' ], value: $ref([ 'usersById', u.userId ]) }
+          { path: [ 'currentUser' ], value: $ref([ 'usersById', u.userId ]) }
         ];
       } else {
         currentUser = [
@@ -75,7 +75,7 @@ const routes = [
       this.requestContext.clearUserId();
       return [
         { path: [ 'currentUser' ], invalidated: true },
-        { path: [ 'currentUser', 'info' ], value: $atom() } // Temporarily return an extra path until https://github.com/Netflix/falcor/pull/600
+        { path: [ 'currentUser', 'loginErrors' ], value: $atom() } // Temporarily return an extra path until https://github.com/Netflix/falcor/pull/600
       ];
     }
   },
@@ -101,7 +101,7 @@ const routes = [
         
         this.requestContext.setUserId(userId);
         return [
-          { path: [ 'currentUser', 'info' ], value: $ref([ 'usersById', userId ]) }
+          { path: [ 'currentUser' ], value: $ref([ 'usersById', userId ]) }
         ];
       }
       

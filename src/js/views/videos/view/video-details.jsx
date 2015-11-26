@@ -38,7 +38,7 @@ class VideoDetails extends Component {
         <Row>
           <Col xs={5} id="view-video-author">
             <UserProfileLink userId={video.author.userId}>
-              <UserProfileImage email={video.author.email} />
+              <UserProfileImage email={video.author.email} className="small" />
             </UserProfileLink>
             by:<br />
             <UserProfileLink userId={video.author.userId}>

@@ -83,14 +83,14 @@ export function logout() {
 // Get information about the currently logged in user
 export function getCurrentUser(queries) {
   return dispatch => {
-    const falcorQueries = queries.map(q => [ 'currentUser', 'info', ...q ]);
+    const falcorQueries = queries.map(q => [ 'currentUser', ...q ]);
     
     // Tell UI we're getting the current user
     dispatch(requestCurrentUser(falcorQueries));
     
     // Do the request and dispatch the response
     return model.get(...falcorQueries).then(response => {
-      return dispatch(receiveCurrentUser(isUndefined(response) ? null : response.json.currentUser.info));
+      return dispatch(receiveCurrentUser(isUndefined(response) ? null : response.json.currentUser));
     });
   };
 };

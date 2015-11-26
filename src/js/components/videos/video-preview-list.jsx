@@ -188,7 +188,7 @@ VideoPreviewList.lists = {
   /**
    * Videos added to the site by the currently logged in user.
    */
-  myVideos: { id: 'myVideos', previewsQueryRoot: [ 'currentUser', 'myVideos' ] },
+  myVideos: { id: 'myVideos', previewsQueryRoot: [ 'currentUser', 'videos' ] },
   
   /**
    * Personalized suggestions for the currently logged in user.

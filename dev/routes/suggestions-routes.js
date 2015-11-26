@@ -34,28 +34,31 @@ const routes = [
   },
   {
     // Personalized recommendations for a user
-    route: 'currentUser.suggestedVideos[{integers:indicies}]',
+    route: 'usersById[{keys:userIds}].suggestedVideos[{integers:indicies}]',
     get(pathSet) {
       const MAX_SUGGESTED_VIDEOS = 5;
       
-      // Make sure a user is logged in
-      const userId = this.requestContext.getUserId();
-      if (isUndefined(userId)) {
-        return [ 
-          { path: [ 'currentUser', 'suggestedVideos' ], value: $error('No user currently logged in.') }
-        ];
-      }
-      
-      // Use the user id to generate a start index in the videos array
-      const videos = getVideos();
-      const startIdx = getIntFromPartOfUuid(userId, 0, 2, videos.length);
-      const suggestedVideos = _(videos).pluck('videoId').slice(startIdx).take(MAX_SUGGESTED_VIDEOS).value();
-      
       let pathValues = [];
-      pathSet.indicies.forEach(idx => {
-        pathValues.push({
-          path: [ 'currentUser', 'suggestedVideos', idx ],
-          value: idx < suggestedVideos.length ? $ref([ 'videosById', suggestedVideos[idx] ]) : $atom()
+      pathSet.userIds.forEach(userId => {
+        // Only authorized to retrieve suggested videos for the logged in user
+        if (this.requestContext.getUserId() !== userId) {
+          pathValues.push({
+            path: [ 'usersById', userId, 'suggestedVideos' ],
+            value: $error('Not authorized')
+          });
+          return;
+        }
+        
+        // Use the user id to generate a start index in the videos array
+        const videos = getVideos();
+        const startIdx = getIntFromPartOfUuid(userId, 0, 2, videos.length);
+        const suggestedVideos = _(videos).pluck('videoId').slice(startIdx).take(MAX_SUGGESTED_VIDEOS).value();
+        
+        pathSet.indicies.forEach(idx => {
+          pathValues.push({
+            path: [ 'usersById', userId, 'suggestedVideos', idx ],
+            value: idx < suggestedVideos.length ? $ref([ 'videosById', suggestedVideos[idx] ]) : $atom()
+          });
         });
       });
       

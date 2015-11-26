@@ -32,7 +32,8 @@ const commentsByVideoIdStore = _(getVideos())
         commentId: uuid.v4(),
         comment: commentText[idxInCommentsList],
         addedDate: moment(v.addedDate).add(i, 'days').toISOString(),
-        author: userIds[idxInUsersList]
+        author: userIds[idxInUsersList],
+        video: v.videoId
       }
     });
     
@@ -161,7 +162,8 @@ const routes = [
         commentId: uuid.v4(),
         comment: comment,
         addedDate: moment().toISOString(),
-        author: userId
+        author: userId,
+        video: videoId
       };
       commentsForVideo.splice(0, 0, newComment);
       
@@ -179,6 +181,57 @@ const routes = [
         { path: [ 'videosById', videoId, 'comments' ], invalidated: true }, 
         { path: [ 'usersById', userId, 'comments' ], invalidated: true }
       );
+      
+      return pathValues;
+    }
+  },
+  {
+    route: 'usersById[{keys:userIds}].comments[{ranges:indexRanges}]["commentId", "comment", "addedDate", "author", "video"]',
+    get(pathSet) {
+      const commentProps = pathSet[4];
+      
+      let pathValues = [];
+      
+      pathSet.userIds.forEach(userId => {
+        // Slow to scan all comments by id, but will get the job done
+        const commentsByUser = _(commentsByVideoIdStore).values().flatten()
+          .where(c => c.author === userId)
+          .sortByOrder(c => moment(c.addedDate).toDate(), 'desc')
+          .value();
+        
+        getIndexesFromRanges(pathSet.indexRanges).forEach(idx => {
+          // Does comment exist at that index?
+          if (idx >= commentsByUser.length) {
+            pathValues.push({
+              path: [ 'usersById', userId, 'comments', idx ],
+              value: $atom()
+            });
+            return;
+          }
+          
+          // Get properties requested
+          const comment = commentsByUser[idx];
+          commentProps.forEach(prop => {
+            let val;
+            switch(prop) {
+              case 'author':
+                val = $ref([ 'usersById', comment.author ]);
+                break;
+              case 'video':
+                val = $ref([ 'videosById', comment.video ]);
+                break;
+              default:
+                val = comment[prop];
+                break;
+            }
+            
+            pathValues.push({
+              path: [ 'usersById', userId, 'comments', idx, prop ],
+              value: val
+            });
+          });
+        });
+      });
       
       return pathValues;
     }

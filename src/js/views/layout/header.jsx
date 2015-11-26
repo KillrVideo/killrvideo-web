@@ -41,7 +41,7 @@ class Header extends Component {
         const menuTitle = (
           <span>
             {this.props.currentUser.info.firstName + ' ' + this.props.currentUser.info.lastName + ' '}
-            <UserProfileImage email={this.props.currentUser.info.email} className="img-circle" />
+            <UserProfileImage email={this.props.currentUser.info.email} className="small img-circle" />
           </span>
         );
         

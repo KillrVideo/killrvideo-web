@@ -74,25 +74,8 @@ const routes = [
     }
   },
   {
-    // My videos video projection
-    route: 'currentUser.myVideos',
-    get(pathSet) {
-      // Make sure a user is logged in
-      const userId = this.requestContext.getUserId();
-      if (isUndefined(userId)) {
-        return [ 
-          { path: [ 'currentUser', 'myVideos' ], value: $error('No user currently logged in.') }
-        ];
-      }
-      
-      return [
-        { path: [ 'currentUser', 'myVideos' ], value: $ref([ 'videosByUserId', userId ]) }
-      ];
-    }
-  },
-  {
     // Videos by user id projection
-    route: 'videosByUserId[{keys:userIds}][{integers:indicies}]',
+    route: 'usersById[{keys:userIds}].videos[{integers:indicies}]',
     get(pathSet) {
       let pathValues = [];
       
@@ -104,7 +87,7 @@ const routes = [
         
         pathSet.indicies.forEach(idx => {
           pathValues.push({
-            path: [ 'videosByUserId', userId, idx ],
+            path: [ 'usersById', userId, 'videos', idx ],
             value: idx < videosForUser.length ? $ref([ 'videosById', videosForUser[idx].videoId ]) : $atom()
           })
         });
