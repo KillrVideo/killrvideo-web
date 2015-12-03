@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col, Table, Button } from 'react-bootstrap';
 import moment from 'moment';
+import { range } from 'lodash';
 
 import LoadingSpinner from 'components/shared/loading-spinner';
 import ViewVideoLink from 'components/videos/view-video-link';
@@ -8,14 +9,14 @@ import Icon from 'components/shared/icon';
 
 class UserVideos extends Component {
   render() {
-    const { isLoading, previews } = this.props.videos;
+    const { isLoading, previews, morePreviewsAvailable, currentPageIndex } = this.props.videos;
     
     if (isLoading) {
       return <LoadingSpinner />;
     }
     
-    const nextPageDisabled = false;
-    const previousPageDisabled = false;
+    const previousPageDisabled = isLoading || currentPageIndex === 0;
+    const nextPageDisabled = isLoading || currentPageIndex + 10 > previews.length && morePreviewsAvailable === false;
     
     return (
       <div>

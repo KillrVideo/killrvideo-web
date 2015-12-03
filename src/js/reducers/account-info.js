@@ -72,7 +72,7 @@ const defaultUserVideos = {
   morePreviewsAvailable: false,
   currentPageIndex: 0,
   isLoading: false,
-  previews: []
+  previews: [] 
 };
 
 // Reducer for user videos
@@ -100,6 +100,19 @@ function videos(state = defaultUserVideos, action) {
         ...restOfState
       };
     
+    case Actions.NEXT_PAGE_USER_VIDEOS:
+      ({ currentPageIndex, ...restOfState } = state);
+      return {
+        currentPageIndex: currentPageIndex + Actions.PREVIEWS_PER_PAGE,
+        ...restOfState
+      };
+      
+    case Actions.PREVIOUS_PAGE_USER_VIDEOS:
+      ({ currentPageIndex, ...restOfState } = state);
+      return {
+        currentPageIndex: currentPageIndex - Actions.PREVIEWS_PER_PAGE,
+        ...restOfState
+      };
   }
   
   return state;
