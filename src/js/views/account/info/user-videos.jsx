@@ -9,14 +9,15 @@ import Icon from 'components/shared/icon';
 
 class UserVideos extends Component {
   render() {
-    const { isLoading, previews, morePreviewsAvailable, currentPageIndex } = this.props.videos;
+    const { isLoading, data, moreDataOnServer, currentPageIndex, pagingConfig } = this.props.videos;
     
-    if (isLoading) {
+    if (isLoading && data.length === 0) {
       return <LoadingSpinner />;
     }
     
     const previousPageDisabled = isLoading || currentPageIndex === 0;
-    const nextPageDisabled = isLoading || currentPageIndex + 10 > previews.length && morePreviewsAvailable === false;
+    const firstIdxOnNextPage = currentPageIndex + pagingConfig.recordsPerPage;
+    const nextPageDisabled = isLoading || (firstIdxOnNextPage >= data.length && moreDataOnServer === false);
     
     return (
       <div>
@@ -28,7 +29,13 @@ class UserVideos extends Component {
             </tr>
           </thead>
           <tbody>
-            {previews.map(p => {
+            {range(0, pagingConfig.recordsPerPage).map(idx => {
+              let dataIdx = idx + currentPageIndex;
+              if (dataIdx >= data.length) {
+                return;
+              }
+              
+              let p = data[dataIdx];
               return (
                 <tr key={p.videoId}>
                   <td><ViewVideoLink videoId={p.videoId}>{p.name}</ViewVideoLink></td>
@@ -41,12 +48,12 @@ class UserVideos extends Component {
         
         <Row>
           <Col xs={6} sm={4}>
-            <Button bsStyle="default" block disabled={previousPageDisabled} onClick={() => this.props.previousPageClick()}>
+            <Button bsStyle="default" block disabled={previousPageDisabled} onClick={() => this.props.previousPage()}>
               <Icon name="chevron-circle-left" /> Previous Page
             </Button>
           </Col>
           <Col xs={6} sm={4} smOffset={4}>
-            <Button bsStyle="default" block disabled={nextPageDisabled} onClick={() => this.props.nextPageClick()}>
+            <Button bsStyle="default" block disabled={nextPageDisabled} onClick={() => this.props.nextPage(UserVideos.queries.videos())}>
               <Icon name="chevron-circle-right" /> Next Page
             </Button>
           </Col>
@@ -58,8 +65,8 @@ class UserVideos extends Component {
 
 UserVideos.propTypes = {
   videos: PropTypes.object.isRequired,
-  nextPageClick: PropTypes.func.isRequired,
-  previousPageClick: PropTypes.func.isRequired
+  nextPage: PropTypes.func.isRequired,
+  previousPage: PropTypes.func.isRequired
 };
 
 UserVideos.queries = {

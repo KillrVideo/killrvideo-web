@@ -2,21 +2,36 @@ import { _, isUndefined } from 'lodash';
 import * as Actions from 'actions/paged';
 
 const defaultPagedState = {
-  _model: null,
+  _queryModel: null,
   
-  moreDataOnServer: false,
   isLoading: false,
   data: [],
+  moreDataOnServer: true,
   currentPageIndex: 0
 };
 
-function paged(state = defaultPagedState, action) {
-  let _model, moreDataOnServer, isLoading, data, currentPageIndex, restOfState;
+function paged(listId, pagingConfig, state, action) {
+  if (isUndefined(state)) {
+    state = { ...defaultPagedState, pagingConfig };
+  }
   
-  switch (action.type) {
+  if (isUndefined(state.data)) {
+    state = { ...state, ...defaultPagedState, pagingConfig };
+  }
+  
+  if (isUndefined(action) || isUndefined(action.payload) || action.payload.listId !== listId) {
+    return state;
+  }
+  
+  let queryModel, isLoading, data, moreDataOnServer, currentPageIndex, restOfState;
+  switch (action.payload.pagedType) {
     case Actions.RESET:
-      return defaultPagedState;
-    
+      ({ queryModel, isLoading, data, moreDataOnServer, currentPageIndex, ...restOfState } = state);
+      return {
+        ...restOfState,
+        ...defaultPagedState
+      };
+      
     case Actions.REQUEST:
       ({ isLoading, ...restOfState } = state);
       return {
@@ -25,12 +40,15 @@ function paged(state = defaultPagedState, action) {
       };
       
     case Actions.RECEIVE:
-      ({ _model, moreDataOnServer, isLoading, data, ...restOfState } = state);
+      ({ _queryModel: queryModel, isLoading, data, moreDataOnServer, ...restOfState } = state);
+      
+      queryModel = isUndefined(action.payload.queryModel) ? queryModel : action.payload.queryModel;
+      
       return {
-        _model: isUndefined(action.payload.model) ? _model : action.payload.model,
-        moreDataOnServer: action.payload.moreDataOnServer,
+        _queryModel: queryModel,
         isLoading: false,
         data: [ ...data, ...action.payload.data ],
+        moreDataOnServer: action.payload.moreDataOnServer,
         ...restOfState
       };
       
@@ -40,25 +58,27 @@ function paged(state = defaultPagedState, action) {
         currentPageIndex: action.payload.currentPageIndex,
         ...restOfState
       };
+    
   }
   
   return state;
 }
 
-function allPaged(state = {}, action) {
-  switch (action.type) {
-    case Actions.RESET:
-    case Actions.REQUEST:
-    case Actions.RECEIVE:
-    case Actions.CHANGE_PAGE:
-      let { [action.payload.listId]: listState, ...restOfState } = state;
-      return {
-        [action.payload.listId]: paged(listState, action),
-        ...restOfState
-      };
-  }
+/**
+ * Returns a function that will act as a reducer for paged state of the given list Id
+ */
+export function createPagedReducer(listId, pagingConfig) {
+  // Validate/normalize the paging config
+  if (isUndefined(pagingConfig.recordsPerPage))
+    throw new Error('You must specify recordsPerPage property on paging config.');
   
-  return state;
-}
-
-export default allPaged;
+  if (isUndefined(pagingConfig.recordsPerRequest))
+    pagingConfig.recordsPerRequest = pagingConfig.recordsPerPage;
+  
+  if (isUndefined(pagingConfig.incrementIndexPerPage))
+    pagingConfig.incrementIndexPerPage = pagingConfig.recordsPerPage;
+    
+  return function pagedReducer(state, action) {
+    return paged(listId, pagingConfig, state, action);
+  };
+};

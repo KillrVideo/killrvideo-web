@@ -4,7 +4,7 @@ import { Row, Col, Button } from 'react-bootstrap';
 import { isUndefined } from 'lodash';
 import { pushState } from 'react-router';
 
-import { load, unload, loadMoreComments, videosNextPageClick, videosPreviousPageClick } from 'actions/account-info';
+import { load, unload, loadMoreComments, videosNextPage, videosPreviousPage } from 'actions/account-info';
 import Icon from 'components/shared/icon';
 import UserProfile from './user-profile';
 import UserComments from './user-comments';
@@ -31,7 +31,7 @@ class AccountInfo extends Component {
   }
   
   render() {
-    const { userId, accountInfo: { user, comments, videos }, loadMoreComments, videosNextPageClick, videosPreviousPageClick } = this.props;
+    const { userId, accountInfo: { user, comments, videos }, loadMoreComments, videosNextPage, videosPreviousPage } = this.props;
     
     return (
       <Row>
@@ -46,7 +46,7 @@ class AccountInfo extends Component {
             <Icon name="comments" /> Latest Comments
           </h3>
           
-          <UserComments comments={comments} loadMoreComments={this.props.loadMoreComments} />
+          <UserComments comments={comments} loadMoreComments={loadMoreComments} />
         </Col>
         <Col md={7}>
           <h3>
@@ -59,7 +59,7 @@ class AccountInfo extends Component {
             </Button>
           </p>
           
-          <UserVideos videos={videos} nextPageClick={videosNextPageClick} previousPageClick={videosPreviousPageClick} />
+          <UserVideos videos={videos} nextPage={videosNextPage} previousPage={videosPreviousPage} />
         </Col>
       </Row>
     );
@@ -76,8 +76,8 @@ AccountInfo.propTypes = {
   load: PropTypes.func.isRequired, 
   unload: PropTypes.func.isRequired, 
   loadMoreComments: PropTypes.func.isRequired, 
-  videosNextPageClick: PropTypes.func.isRequired, 
-  videosPreviousPageClick: PropTypes.func.isRequired,
+  videosNextPage: PropTypes.func.isRequired, 
+  videosPreviousPage: PropTypes.func.isRequired,
   pushState: PropTypes.func.isRequired
 };
 
@@ -101,7 +101,7 @@ export default connect(mapStateToProps, {
   load, 
   unload, 
   loadMoreComments, 
-  videosNextPageClick, 
-  videosPreviousPageClick, 
+  videosNextPage, 
+  videosPreviousPage, 
   pushState 
 })(AccountInfo);

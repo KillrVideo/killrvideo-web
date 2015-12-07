@@ -9,18 +9,19 @@ import Icon from 'components/shared/icon';
 
 class UserComments extends Component {
   render() {
-    const { comments, isLoading, moreCommentsAvailable } = this.props.comments;
-    
-    if (isLoading) {
-      return <LoadingSpinner />
-    }
-    
+    const { data: comments, isLoading, moreDataOnServer } = this.props.comments;
+        
     let moreCommentsButton;
-    if (moreCommentsAvailable) {
+    if (moreDataOnServer) {
+      let loadingIcon;
+      if (isLoading) {
+        loadingIcon = (<Icon name="cog" animate="spin" />);
+      }
+      
       moreCommentsButton = (
         <li className="clearfix">
-          <Button bsStyle="default" block onClick={() => this.props.loadMoreComments()}>
-            <Icon name="cog" animate="spin" /> Load more comments
+          <Button bsStyle="default" block onClick={() => this.props.loadMoreComments(UserComments.queries.comments())} disabled={isLoading}>
+             {loadingIcon} Load more comments
           </Button>
         </li>
       );
