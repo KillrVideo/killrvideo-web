@@ -85,6 +85,10 @@ const routes = [
           videosForUser = [];
         }
         
+        videosForUser = _(videosForUser)
+          .sortByOrder([ v => moment(v.addedDate).toDate() ], [ 'desc' ])
+          .value();
+        
         pathSet.indicies.forEach(idx => {
           pathValues.push({
             path: [ 'usersById', userId, 'videos', idx ],

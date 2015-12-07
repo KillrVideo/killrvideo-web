@@ -195,10 +195,10 @@ const routes = [
       pathSet.userIds.forEach(userId => {
         // Slow to scan all comments by id, but will get the job done
         const commentsByUser = _(commentsByVideoIdStore).values().flatten()
-          .where(c => c.author === userId)
-          .sortByOrder(c => moment(c.addedDate).toDate(), 'desc')
+          .where({ author: userId })
+          .sortByOrder([ c => moment(c.addedDate).toDate() ], [ 'desc' ])
           .value();
-        
+                
         getIndexesFromRanges(pathSet.indexRanges).forEach(idx => {
           // Does comment exist at that index?
           if (idx >= commentsByUser.length) {
