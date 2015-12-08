@@ -124,29 +124,28 @@ const routes = [
   },
   {
     // Adding a comment to a video
-    route: 'commentsByVideo[{keys:videoTokens}].add',
+    route: 'videosById[{keys:videoIds}].comments.add',
     call(callPath, args) {
       const [ comment ] = args;
       let pathValues = [];
       
-      if (callPath.videoTokens.length !== 1) {
-        callPath.videoTokens.forEach(token => {
+      if (callPath.videoIds.length !== 1) {
+        callPath.videoIds.forEach(videoId => {
           pathValues.push({
-            path: [ 'commentsByVideo', token, 'addErrors' ],
+            path: [ 'videosById', videoId, 'comments', 'addErrors' ],
             value: $error('Cannot add a comment to multiple videos.')
           });
         });
         return pathValues;
       }
       
-      const token = callPath.videoTokens[0];
-      const [ videoId ] = token.split('_');
+      const videoId = callPath.videoIds[0];
       
       // Get current user
       const userId = this.requestContext.getUserId();
       if (isUndefined(userId)) {
         pathValues.push({
-          path: [ 'commentsByVideo', token, 'addErrors' ],
+          path: [ 'videosById', videoId, 'comments', 'addErrors' ],
           value: $error('Not currently logged in')
         });
         return pathValues;
@@ -170,13 +169,13 @@ const routes = [
       // Return the comment data
       forIn(newComment, (propValue, prop) => {
         pathValues.push({
-          path: [ 'commentsByVideo', token, 'addedComments', 0, prop ],
+          path: [ 'videosById', videoId, 'comments', 'addedComments', 0, prop ],
           value: prop !== 'author' ? propValue : $ref([ 'usersById', propValue ]) 
         });
       });
       
       // Invalidate the reference for the video and user comments collections so client will come back
-      // to the server next time in needs those comments
+      // to the server next time it needs those comments
       pathValues.push(
         { path: [ 'videosById', videoId, 'comments' ], invalidated: true }, 
         { path: [ 'usersById', userId, 'comments' ], invalidated: true }

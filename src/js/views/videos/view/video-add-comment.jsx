@@ -35,8 +35,7 @@ class VideoAddComment extends Component {
       invalid, 
       handleSubmit,
       isLoggedIn,
-      addedComments: { commentAdded, isLoading },
-      addAnotherComment
+      addedComments: { commentAdded, isLoading }
     } = this.props;
     
     const formClasses = classNames({
@@ -47,7 +46,7 @@ class VideoAddComment extends Component {
     return (
       <div className="video-add-comment">
         <Alert bsStyle="success" className={commentAdded ? 'small' : 'small hidden'}>
-          Comment added successfully. <a className="alert-link" href="#" onClick={addAnotherComment}>Click here</a> to add another.
+          Comment added successfully. <a className="alert-link" href="#" onClick={() => this.addAnotherComment()}>Click here</a> to add another.
         </Alert>
         
         <Alert bsStyle="warning" className={isLoggedIn ? 'small hidden' : 'small'}>

@@ -17,6 +17,7 @@ export const VIDEO_RESET = 'videoVideo/VIDEO_RESET';
 export const VIDEO_REQUESTED = 'viewVideo/VIDEO_REQUESTED';
 export const VIDEO_RECEIVED = 'viewVideo/VIDEO_RECEIVED';
 
+export const ADD_COMMENT_RESET = 'viewVideo/ADD_COMMENT_RESET';
 export const ADD_COMMENT_REQUESTED = 'viewVideo/ADD_COMMENT_REQUESTED';
 export const ADD_COMMENT_RECEIVED = 'viewVideo/ADD_COMMENT_RECEIVED';
 export const ADD_ANOTHER_COMMENT = 'viewVideo/ADD_ANOTHER_COMMENT';
@@ -32,6 +33,7 @@ const comments = createPagedActions(COMMENTS_LIST_ID, state => state.viewVideo.c
 
 const requestAddComment = createAction(ADD_COMMENT_REQUESTED);
 const receiveAddComment = createAction(ADD_COMMENT_RECEIVED, comment => ({ comment }));
+const resetAddComment = createAction(ADD_COMMENT_RESET);
 
 /**
  * Public action creators.
@@ -58,6 +60,7 @@ export function unload() {
   return dispatch => {
     dispatch(resetVideo());
     dispatch(comments.unload());
+    dispatch(resetAddComment());
   };
 };
 
@@ -69,8 +72,8 @@ export function addComment(videoId, comment, commentQueries) {
     dispatch(requestAddComment());
     
     commentQueries = commentQueries.map(q => [ 'addedComments', 0, ...q ]);
-    model.call([ 'videosById', videoId, 'add' ], [ comment ], [], commentQueries).then(response => {
-      dispatch(receiveAddComment(response.json.addedComments[0]));
+    model.call([ 'videosById', videoId, 'comments', 'add' ], [ comment ], [], commentQueries).then(response => {
+      dispatch(receiveAddComment(response.json.videosById[videoId].comments.addedComments[0]));
     });
   };
 };

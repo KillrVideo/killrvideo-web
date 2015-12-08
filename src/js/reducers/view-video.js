@@ -41,6 +41,9 @@ const defaultAddedComments = {
 
 function addedComments(state = defaultAddedComments, action) {
   switch (action.type) {
+    case Actions.ADD_COMMENT_RESET:
+      return defaultAddedComments;
+      
     case Actions.ADD_COMMENT_REQUESTED:
       return {
         ...state,
