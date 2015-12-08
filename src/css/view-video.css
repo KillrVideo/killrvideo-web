@@ -27,14 +27,6 @@
   }
 }
 
-#view-video-details .gm-scrollbar .thumb {
-  background-color: rgba(218, 54, 16, 0.6);
-}
-
-#view-video-details .gm-scrollbar .thumb:hover {
-  background-color: rgba(218, 54, 16, 1);
-}
-
 /* Video ratings when viewing videos */
 .video-rating-and-sharing {
   margin-bottom: 1em;
@@ -197,21 +189,6 @@
 
 .video-comments > li > div img {
   display: block;
-}
-
-/* User comments */
-.user-comments > li {
-  margin-left: 120px;
-  margin-bottom: 20px;
-}
-
-.user-comments > li > div {
-  margin-left: -120px;
-}
-
-.user-comments > li > div img {
-  width: 100px;
-  height: auto;
 }
 
 /* Add comment */

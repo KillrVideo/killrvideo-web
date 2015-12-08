@@ -16,7 +16,7 @@ export const COMMENTS_PAGING_CONFIG = {
 
 export const VIDEOS_LIST_ID = 'userVideos';
 export const VIDEOS_PAGING_CONFIG = {
-  recordsPerPage: 2
+  recordsPerPage: 10
 };
 
 /**
@@ -67,8 +67,8 @@ export function load(userId, userQueries, commentsQueries, previewsQueries) {
   };
 };
 
-// Loading more comments
-export const loadMoreComments = comments.nextPageClick;
+// Showing more comments
+export const showMoreComments = comments.nextPageClick;
 
 // Going to the next page of user videos
 export const videosNextPage = videos.nextPageClick;

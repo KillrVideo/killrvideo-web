@@ -60,6 +60,14 @@ ul.uimessage > li {
     padding: 1em;
 }
 
+.gm-scrollbar .thumb {
+  background-color: rgba(218, 54, 16, 0.6);
+}
+
+.gm-scrollbar .thumb:hover {
+  background-color: rgba(218, 54, 16, 1);
+}
+
 /**
  * Header Styles
  */

@@ -4,7 +4,7 @@ import { Row, Col, Button } from 'react-bootstrap';
 import { isUndefined } from 'lodash';
 import { pushState } from 'react-router';
 
-import { load, unload, loadMoreComments, videosNextPage, videosPreviousPage } from 'actions/account-info';
+import { load, unload, showMoreComments, videosNextPage, videosPreviousPage } from 'actions/account-info';
 import Icon from 'components/shared/icon';
 import UserProfile from './user-profile';
 import UserComments from './user-comments';
@@ -31,7 +31,7 @@ class AccountInfo extends Component {
   }
   
   render() {
-    const { userId, accountInfo: { user, comments, videos }, loadMoreComments, videosNextPage, videosPreviousPage } = this.props;
+    const { userId, accountInfo: { user, comments, videos }, showMoreComments, videosNextPage, videosPreviousPage } = this.props;
     
     return (
       <Row>
@@ -46,7 +46,7 @@ class AccountInfo extends Component {
             <Icon name="comments" /> Latest Comments
           </h3>
           
-          <UserComments comments={comments} loadMoreComments={loadMoreComments} />
+          <UserComments comments={comments} showMoreComments={showMoreComments} />
         </Col>
         <Col md={7}>
           <h3>
@@ -100,7 +100,7 @@ function mapStateToProps(state) {
 export default connect(mapStateToProps, {
   load, 
   unload, 
-  loadMoreComments, 
+  showMoreComments, 
   videosNextPage, 
   videosPreviousPage, 
   pushState 
