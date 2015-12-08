@@ -30,7 +30,15 @@ class VideoAddComment extends Component {
   }
   
   render() {
-    const { fields: { comment }, handleSubmit, submitting, invalid, isLoggedIn, commentAdded } = this.props;
+    const { 
+      fields: { comment },
+      invalid, 
+      handleSubmit,
+      isLoggedIn,
+      addedComments: { commentAdded, isLoading },
+      addAnotherComment
+    } = this.props;
+    
     const formClasses = classNames({
       inProgress: comment.active || comment.dirty,
       hidden: !isLoggedIn || commentAdded
@@ -39,7 +47,7 @@ class VideoAddComment extends Component {
     return (
       <div className="video-add-comment">
         <Alert bsStyle="success" className={commentAdded ? 'small' : 'small hidden'}>
-          Comment added successfully. <a className="alert-link" href="#" onClick={() => this.addAnotherComment()}>Click here</a> to add another.
+          Comment added successfully. <a className="alert-link" href="#" onClick={addAnotherComment}>Click here</a> to add another.
         </Alert>
         
         <Alert bsStyle="warning" className={isLoggedIn ? 'small hidden' : 'small'}>
@@ -51,8 +59,8 @@ class VideoAddComment extends Component {
           <Input {...comment} ref="commentInput" type="textarea" className="small" placeholder="Leave a comment" />
           
           <div className="text-right">
-            <Button type="submit" bsStyle="primary" disabled={submitting || invalid}>
-              <Icon name="cog" animate="spin" className={submitting ? undefined : 'hidden'} /> Add Comment
+            <Button type="submit" bsStyle="primary" disabled={isLoading || invalid}>
+              <Icon name="cog" animate="spin" className={isLoading ? undefined : 'hidden'} /> Add Comment
             </Button>
           </div>
         </form>
@@ -66,13 +74,11 @@ VideoAddComment.propTypes = {
   // Provided by redux-form
   fields: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
-  submitting: PropTypes.bool.isRequired,
   invalid: PropTypes.bool.isRequired,
   resetForm: PropTypes.func.isRequired,
   // Passed in
   isLoggedIn: PropTypes.bool.isRequired,
-  addingComment: PropTypes.bool.isRequired,
-  commentAdded: PropTypes.bool.isRequired,
+  addedComments: PropTypes.object.isRequired,
   // Actions
   addAnotherComment: PropTypes.func.isRequired
 };
@@ -82,24 +88,8 @@ const constraints = {
   comment: { presence: true }
 };
 
-function mapStateToProps(state) {
-  const { 
-    viewVideo: { 
-      videoComments: { addingComment, commentAdded } 
-    },
-    authentication: {
-      currentUser: { isLoggedIn }
-    } 
-  } = state;
-  return {
-    addingComment,
-    commentAdded,
-    isLoggedIn
-  };
-}
-
 export default reduxForm({
   form: 'addComment',
   fields: [ 'comment' ],
   validate: vals => validate(vals, constraints) || {}
-}, mapStateToProps, { addAnotherComment })(VideoAddComment);
+})(VideoAddComment);

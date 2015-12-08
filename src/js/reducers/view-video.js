@@ -2,6 +2,8 @@ import * as Actions from 'actions/view-video';
 import { _, isNull, isUndefined } from 'lodash';
 import { combineReducers } from 'redux';
 
+import { createPagedReducer } from './paged';
+
 
 // Default state for the video's details
 const defaultVideoDetails = {
@@ -10,9 +12,9 @@ const defaultVideoDetails = {
 };
 
 // Reducer for the video's details
-function videoDetails(state = defaultVideoDetails, action) {
+function details(state = defaultVideoDetails, action) {
   switch(action.type) {
-    case Actions.UNLOAD:
+    case Actions.VIDEO_RESET:
       return defaultVideoDetails;
       
     case Actions.VIDEO_REQUESTED:
@@ -31,80 +33,44 @@ function videoDetails(state = defaultVideoDetails, action) {
   return state;
 }
 
-// Default state for the video's comments
-const defaultVideoComments = {
-  _startIdx: 0,
-  _model: null,
-  
+const defaultAddedComments = {
   isLoading: false,
-  comments: [],
-  moreCommentsAvailable: false,
-  addingComment: false,
-  commentAdded: false
+  commentAdded: false,
+  comments: []
 };
 
-// Reducer for the video's comments state
-function videoComments(state = defaultVideoComments, action) {
-  let _model, _startIdx, isLoading, comments, moreCommentsAvailable, addingComment, commentAdded, restOfState;
-  
+function addedComments(state = defaultAddedComments, action) {
   switch (action.type) {
-    case Actions.UNLOAD:
-      return defaultVideoComments;
-      
-    case Actions.COMMENTS_REQUESTED:
-      ({ isLoading, ...restOfState } = state);
-      return {
-        isLoading: true,
-        ...restOfState
-      };
-      
-    case Actions.COMMENTS_RECEIVED:
-      ({ _startIdx, _model, isLoading, comments, moreCommentsAvailable, ...restOfState } = state);
-      
-      // More comments are available only if we got a full page of comments
-      moreCommentsAvailable = action.payload.comments.length === Actions.COMMENTS_PER_REQUEST;
-      
-      return {
-        _startIdx: _startIdx + Actions.COMMENTS_PER_REQUEST,
-        _model: isUndefined(action.payload.commentsModel) ? _model : action.payload.commentsModel,
-        isLoading: false,
-        comments: [ ...comments, ...action.payload.comments ],
-        moreCommentsAvailable,
-        ...restOfState
-      };
-      
     case Actions.ADD_COMMENT_REQUESTED:
-      ({ addingComment, ...restOfState } = state);
       return {
-        addingComment: true,
-        ...restOfState
+        ...state,
+        isLoading: true
       };
       
     case Actions.ADD_COMMENT_RECEIVED:
-      ({ addingComment, commentAdded, comments, ...restOfState } = state);
       return {
-        addingComment: false,
+        isLoading: false,
         commentAdded: true,
-        comments: [ action.payload.comment, ...comments ],
-        ...restOfState
+        comments: [ action.payload.comment, ...state.comments ]
       };
       
     case Actions.ADD_ANOTHER_COMMENT:
-      ({ commentAdded, ...restOfState } = state);
       return {
-        commentAdded: false,
-        ...restOfState
+        ...state,
+        commentAdded: false
       };
   }
   
   return state;
 }
 
-
+// Create reducer for showing comments
+const comments = createPagedReducer(Actions.COMMENTS_LIST_ID, Actions.COMMENTS_PAGING_CONFIG);
 
 const viewVideo = combineReducers({
-  videoDetails,
-  videoComments
+  details,
+  comments,
+  addedComments
 });
 
 export default viewVideo;

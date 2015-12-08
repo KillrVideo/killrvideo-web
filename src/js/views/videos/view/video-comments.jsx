@@ -1,28 +1,53 @@
 import React, { Component, PropTypes } from 'react';
 import { Button } from 'react-bootstrap';
 import moment from 'moment';
+import { range } from 'lodash';
 
 import Icon from 'components/shared/icon';
 import UserProfileLink from 'components/users/user-profile-link';
 import UserProfileImage from 'components/users/user-profile-image';
 
+// Helper function that renders a single comment
+function renderComment(c) {
+  return (
+    <li className="clearfix" key={c.commentId}>
+      <UserProfileLink userId={c.author.userId} className="pull-left">
+        <UserProfileImage email={c.author.email} className="small img-circle" />
+      </UserProfileLink>
+      <UserProfileLink userId={c.author.userId}>
+        {c.author.firstName + ' ' + c.author.lastName}
+      </UserProfileLink> <span className="text-muted">{moment(c.addedDate).fromNow()}</span><br/>
+      
+      {c.comment}
+    </li>
+  );
+}
+
 // Displays the comments on a video
 class VideoComments extends Component {
   render() {
-    const { comments, isLoading, moreCommentsAvailable } = this.props.videoComments;
+    const {
+      comments: { data, isLoading, moreDataOnServer, currentPageIndex, pagingConfig },
+      addedComments: { comments: addedData },
+      showMoreComments
+    } = this.props;
     
-    // See if we need to show the "Load more comments" button
-    let loadMoreButton, icon;
-    if (moreCommentsAvailable) {
-      let icon;
+    // See if we need to show the "Show more comments" button
+    const commentsToShow = currentPageIndex + pagingConfig.recordsPerPage;
+    
+    let moreCommentsButton;
+    if (data.length > commentsToShow || moreDataOnServer) {
+      let loadingIcon;
       if (isLoading) {
-        icon = <Icon name="cog" animate="spin" />
+        loadingIcon = (<Icon name="cog" animate="spin" />);
       }
       
-      loadMoreButton = (
-        <Button bsStyle="default" className="clearfix" block disabled={isLoading} onClick={() => this.props.loadMoreComments()}>
-          {icon} Load more comments
-        </Button>
+      moreCommentsButton = (
+        <li className="clearfix">
+          <Button bsStyle="default" block onClick={showMoreComments} disabled={isLoading}>
+             {loadingIcon} Show more comments
+          </Button>
+        </li>
       );
     }
     
@@ -31,22 +56,13 @@ class VideoComments extends Component {
       <div id="view-video-comments">
         <h5>Latest Comments</h5>
         <ul className="video-comments list-unstyled">
-          {comments.map(c => {
-            return (
-              <li className="clearfix" key={c.commentId}>
-                <UserProfileLink userId={c.author.userId} className="pull-left">
-                  <UserProfileImage email={c.author.email} className="small img-circle" />
-                </UserProfileLink>
-                <UserProfileLink userId={c.author.userId}>
-                  {c.author.firstName + ' ' + c.author.lastName}
-                </UserProfileLink> <span className="text-muted">{moment(c.addedDate).fromNow()}</span><br/>
-                
-                {c.comment}
-              </li>
-            );
+          {addedData.map(c => renderComment(c))}
+          {range(0, commentsToShow).map(idx => {
+            if (idx >= data.length) return;
+            return renderComment(data[idx]);
           })}
+          {moreCommentsButton}
         </ul>
-        {loadMoreButton}
       </div>
     );
   }
@@ -64,10 +80,11 @@ VideoComments.queries = {
 
 // Prop validation
 VideoComments.propTypes = {
-  videoComments: PropTypes.object.isRequired,
+  comments: PropTypes.object.isRequired,
+  addedComments: PropTypes.object.isRequired,
   
   // Actions
-  loadMoreComments: PropTypes.func.isRequired
+  showMoreComments: PropTypes.func.isRequired
 };
 
 export default VideoComments;

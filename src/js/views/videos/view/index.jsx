@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { connect } from 'react-redux';
-import { load, unload, loadMoreComments, addComment } from 'actions/view-video';
+import { load, unload, showMoreComments, addComment, addAnotherComment } from 'actions/view-video';
 import { isUndefined } from 'lodash';
 
 import VideoPlayer from './video-player';
@@ -26,29 +26,33 @@ class ViewVideo extends Component {
       this.props.load(this.props.videoId, ViewVideo.queries.video(), ViewVideo.queries.comments());
     }
   }
-  
-  loadMoreComments() {
-    this.props.loadMoreComments(ViewVideo.queries.comments());
-  }
-    
+      
   recordPlayback() {
     // TODO: record playback stats
     console.log('Playback started!');
   }
     
   render() {
-    const { viewVideo: { videoDetails, videoComments }, currentUser: { isLoggedIn }, videoId } = this.props;
+    const {
+      videoId, 
+      viewVideo: { details, comments, addedComments }, 
+      currentUser: { isLoggedIn }, 
+      showMoreComments,
+      addComment,
+      addAnotherComment
+   } = this.props;
     
     return (
       <div>
         <Row>
           <Col md={7} xs={12} id="view-video-embed">
-            <VideoPlayer videoDetails={videoDetails} onPlaybackStarted={() => this.recordPlayback()} />
+            <VideoPlayer videoDetails={details} onPlaybackStarted={() => this.recordPlayback()} />
           </Col>
           <Col md={5} xs={12} id="view-video-details">
-            <VideoDetails videoDetails={videoDetails} videoComments={videoComments} isLoggedIn={isLoggedIn}
-                          loadMoreComments={() => this.loadMoreComments()} />
-            <VideoAddComment onSubmit={vals => this.props.addComment(vals.comment, ViewVideo.queries.comments())} />
+            <VideoDetails details={details} comments={comments} addedComments={addedComments} isLoggedIn={isLoggedIn}
+                          showMoreComments={() => showMoreComments(ViewVideo.queries.comments())} />
+            <VideoAddComment addedComments={addedComments} isLoggedIn={isLoggedIn} addAnotherComment={addAnotherComment}
+                             onSubmit={vals => addComment(videoId, vals.comment, ViewVideo.queries.comments())} />
           </Col>
         </Row>
         <VideoPreviewList title="More Videos Like This" list={VideoPreviewList.lists.relatedVideos(videoId)} />
@@ -77,14 +81,17 @@ ViewVideo.queries = {
 ViewVideo.propTypes = {
   // From the router parameter (based on URL)
   videoId: PropTypes.string.isRequired,
+  
   // From redux
   viewVideo: PropTypes.object.isRequired,
   currentUser: PropTypes.object.isRequired,
+  
   // Actions
   load: PropTypes.func.isRequired,
   unload: PropTypes.func.isRequired,
-  loadMoreComments: PropTypes.func.isRequired,
-  addComment: PropTypes.func.isRequired
+  showMoreComments: PropTypes.func.isRequired,
+  addComment: PropTypes.func.isRequired,
+  addAnotherComment: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state) {
@@ -95,4 +102,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { load, unload, loadMoreComments, addComment })(ViewVideo);
+export default connect(mapStateToProps, { load, unload, showMoreComments, addComment, addAnotherComment })(ViewVideo);
