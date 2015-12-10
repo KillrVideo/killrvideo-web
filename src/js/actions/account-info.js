@@ -1,23 +1,8 @@
 import createAction from 'redux-actions/lib/createAction';
 import model from 'stores/falcor-model';
-import { isUndefined, values } from 'lodash';
+import { isUndefined } from 'lodash';
 
 import { createPagedActions } from './paged';
-
-/**
- * Paging setup for user's videos and comments lists
- */
-
-export const COMMENTS_LIST_ID = 'userComments';
-export const COMMENTS_PAGING_CONFIG = {
-  recordsPerPage: 5,
-  recordsPerRequest: 10
-};
-
-export const VIDEOS_LIST_ID = 'userVideos';
-export const VIDEOS_PAGING_CONFIG = {
-  recordsPerPage: 10
-};
 
 /**
  * Action type constants
@@ -35,8 +20,8 @@ const resetUser = createAction(RESET_USER);
 const requestUser = createAction(REQUEST_USER);
 const receiveUser = createAction(RECEIVE_USER, user => ({ user }));
 
-const comments = createPagedActions(COMMENTS_LIST_ID, state => state.accountInfo.comments);
-const videos = createPagedActions(VIDEOS_LIST_ID, state => state.accountInfo.videos);
+const comments = createPagedActions(state => state.accountInfo.comments);
+const videos = createPagedActions(state => state.accountInfo.videos);
 
 /**
  * Public action creators

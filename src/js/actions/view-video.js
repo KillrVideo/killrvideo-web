@@ -4,12 +4,6 @@ import { values, isUndefined } from 'lodash';
 
 import { createPagedActions } from './paged';
 
-export const COMMENTS_LIST_ID = 'videoComments';
-export const COMMENTS_PAGING_CONFIG = {
-  recordsPerPage: 5,
-  recordsPerRequest: 10
-};
-
 /**
  * Public action constants
  */
@@ -29,7 +23,7 @@ const resetVideo = createAction(VIDEO_RESET);
 const requestVideo = createAction(VIDEO_REQUESTED);
 const receiveVideo = createAction(VIDEO_RECEIVED, (video) => ({ video }));
 
-const comments = createPagedActions(COMMENTS_LIST_ID, state => state.viewVideo.comments);
+const comments = createPagedActions(state => state.viewVideo.comments);
 
 const requestAddComment = createAction(ADD_COMMENT_REQUESTED);
 const receiveAddComment = createAction(ADD_COMMENT_RECEIVED, comment => ({ comment }));

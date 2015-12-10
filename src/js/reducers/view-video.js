@@ -68,7 +68,12 @@ function addedComments(state = defaultAddedComments, action) {
 }
 
 // Create reducer for showing comments
-const comments = createPagedReducer(Actions.COMMENTS_LIST_ID, Actions.COMMENTS_PAGING_CONFIG);
+const COMMENTS_LIST_ID = 'videoComments';
+const COMMENTS_PAGING_CONFIG = {
+  recordsPerPage: 5,
+  recordsPerRequest: 10
+};
+const comments = createPagedReducer(COMMENTS_LIST_ID, COMMENTS_PAGING_CONFIG);
 
 const viewVideo = combineReducers({
   details,

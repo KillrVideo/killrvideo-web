@@ -30,8 +30,18 @@ function user(state = defaultUserInfo, action) {
 }
 
 // Create reducers for user's comments and videos
-const comments = createPagedReducer(Actions.COMMENTS_LIST_ID, Actions.COMMENTS_PAGING_CONFIG);
-const videos = createPagedReducer(Actions.VIDEOS_LIST_ID, Actions.VIDEOS_PAGING_CONFIG);
+const COMMENTS_LIST_ID = 'userComments';
+const COMMENTS_PAGING_CONFIG = {
+  recordsPerPage: 5,
+  recordsPerRequest: 10
+};
+const comments = createPagedReducer(COMMENTS_LIST_ID, COMMENTS_PAGING_CONFIG);
+
+const VIDEOS_LIST_ID = 'userVideos';
+const VIDEOS_PAGING_CONFIG = {
+  recordsPerPage: 10
+};
+const videos = createPagedReducer(VIDEOS_LIST_ID, VIDEOS_PAGING_CONFIG);
 
 const accountInfo = combineReducers({
   user,

@@ -1,9 +1,6 @@
 import createAction from 'redux-actions/lib/createAction';
 import model from 'stores/falcor-model';
 import { isUndefined, values } from 'lodash';
-import Promise from 'bluebird';
-
-Promise.config({ cancellation: true });
 
 /**
  * Paging action constants
@@ -52,10 +49,6 @@ function changePage(listId, currentPageIndex) {
   };
 }
 
-/**
- * Private action creators that are exported as part of the public API by the createPagedActions function.
- */
-
 function reset(listId) {
   return {
     type: `paged/${listId}/RESET`,
@@ -66,18 +59,20 @@ function reset(listId) {
   };
 }
 
-
+/**
+ * Private action creators that are exported as part of the public API by the createPagedActions function.
+ */
 
 // Action to get the initial page of records in a list using falcor
-function getInitialPage(listId, selectPagedState, queryRoot, queries) {
+function getInitialPage(selectPagedState, queryRoot, queries) {
   return (dispatch, getState) => {
+    let { _listId: listId, pagingConfig } = selectPagedState(getState());
+    
     // Reset any existing state
     dispatch(reset(listId));
         
     // Tell the UI we're loading
     dispatch(request(listId));
-    
-    let { pagingConfig } = selectPagedState(getState());
     
     // Add paging range to queries
     queries = queries.map(q => [ { from: 0, length: pagingConfig.recordsPerPage }, ...q ]);
@@ -105,11 +100,11 @@ function getInitialPage(listId, selectPagedState, queryRoot, queries) {
 };
 
 // Go to the next page of records in the list
-function nextPageClick(listId, selectPagedState, queries) {
+function nextPageClick(selectPagedState, queries) {
   return (dispatch, getState) => {
     // Grab some of the current state
-    let { _queryModel: queryModel, moreDataOnServer, data, currentPageIndex, pagingConfig } = selectPagedState(getState());
-        
+    let { _listId: listId, _queryModel: queryModel, moreDataOnServer, data, currentPageIndex, pagingConfig } = selectPagedState(getState());
+    
     const nextPageStartIdx = currentPageIndex + pagingConfig.incrementIndexPerPage;
     const alreadyHaveSomeOfNextPage = data.length > nextPageStartIdx;
     
@@ -151,14 +146,22 @@ function nextPageClick(listId, selectPagedState, queries) {
 };
 
 // Go to the previous page of records in the list
-function previousPageClick(listId, selectPagedState) {
+function previousPageClick(selectPagedState) {
   return (dispatch, getState) => {
-    let { currentPageIndex, pagingConfig } = selectPagedState(getState());
+    let { _listId: listId, currentPageIndex, pagingConfig } = selectPagedState(getState());
     
     if (currentPageIndex === 0) return;
     dispatch(changePage(listId, currentPageIndex - pagingConfig.incrementIndexPerPage));
   };
 };
+
+// Reset state when unloaded
+function unload(selectPagedState) {
+  return (dispatch, getState) => {
+    let { _listId: listId } = selectPagedState(getState());
+    dispatch(reset(listId));
+  };
+}
 
 
 /**
@@ -166,23 +169,23 @@ function previousPageClick(listId, selectPagedState) {
  * should uniquely identify a list. The selectPagedState function should take one parameter (the current 
  * state from redux) and return the part of the state tree where the list's reducer is mounted.
  */
-export function createPagedActions(listId, selectPagedState) {
+export function createPagedActions(selectPagedState) {
   // Return an object with the public API's actions  
   return {
     getInitialPage(queryRoot, queries) {
-      return getInitialPage(listId, selectPagedState, queryRoot, queries);
+      return getInitialPage(selectPagedState, queryRoot, queries);
     },
     
     nextPageClick(queries) {
-      return nextPageClick(listId, selectPagedState, queries);
+      return nextPageClick(selectPagedState, queries);
     },
     
     previousPageClick() {
-      return previousPageClick(listId, selectPagedState);
+      return previousPageClick(selectPagedState);
     },
     
     unload() {
-      return reset(listId);
+      return unload(selectPagedState);
     }
   };
 };
