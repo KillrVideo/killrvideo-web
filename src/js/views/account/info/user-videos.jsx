@@ -17,7 +17,7 @@ class UserVideos extends Component {
     }
     
     const previousPageDisabled = isLoading || currentPageIndex === 0;
-    const firstIdxOnNextPage = currentPageIndex + pagingConfig.recordsPerPage;
+    const firstIdxOnNextPage = currentPageIndex + pagingConfig.incrementIndexPerPage;
     const nextPageDisabled = isLoading || (firstIdxOnNextPage >= data.length && moreDataOnServer === false);
     
     return (

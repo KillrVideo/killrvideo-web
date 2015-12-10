@@ -39,9 +39,11 @@ class SearchResults extends Component {
   }
   
   render() {
-    const { query, isLoading, previews, currentPageIndex, morePreviewsAvailable } = this.props;
+    const { query, isLoading, data, moreDataOnServer, currentPageIndex, pagingConfig } = this.props;
+    
     const previousPageDisabled = isLoading || currentPageIndex === 0;
-    const nextPageDisabled = isLoading || (morePreviewsAvailable === false && currentPageIndex + 8 >= previews.length);
+    const firstIdxOnNextPage = currentPageIndex + pagingConfig.incrementIndexPerPage;
+    const nextPageDisabled = isLoading || (firstIdxOnNextPage >= data.length && moreDataOnServer === false);
     
     return (
       <div>
@@ -50,11 +52,11 @@ class SearchResults extends Component {
         </h3>
         
         <div id="search-results">
-          <h4 className={isLoading && previews.length === 0 ? undefined : 'hidden'}>
+          <h4 className={isLoading && data.length === 0 ? undefined : 'hidden'}>
             <Icon name="spinner" animate="spin" /> Searching...
           </h4>
           
-          <Alert bsStyle="info" className={isLoading === false && previews.length === 0 ? undefined : 'hidden'}>
+          <Alert bsStyle="info" className={moreDataOnServer === false && data.length === 0 ? undefined : 'hidden'}>
             There are currently no videos for <strong>{query}</strong>. Why don't you <Link to="/videos/add" className="alert-link">add one</Link>?
           </Alert>
           
@@ -62,9 +64,9 @@ class SearchResults extends Component {
             {range(0, 8).map(idx => {
               // Get the index in the preview collection adjusting for the current page start index
               const previewIdx = currentPageIndex + idx;
-              if (previewIdx >= previews.length) return;
+              if (previewIdx >= data.length) return;
               
-              const preview = previews[previewIdx];
+              const preview = data[previewIdx];
               return (
                 <Col sm={3} key={preview.videoId}>
                   <VideoPreview preview={preview} onClick={() => this.gotoVideo(preview.videoId)} />
@@ -107,9 +109,10 @@ SearchResults.propTypes = {
   
   // From redux search state
   isLoading: PropTypes.bool.isRequired,
-  previews: PropTypes.arrayOf(PropTypes.object).isRequired,
+  data: PropTypes.arrayOf(PropTypes.object).isRequired,
   currentPageIndex: PropTypes.number.isRequired,
-  morePreviewsAvailable: PropTypes.bool.isRequired,
+  moreDataOnServer: PropTypes.bool.isRequired,
+  pagingConfig: PropTypes.object.isRequired,
   
   // Actions
   searchFor: PropTypes.func.isRequired,
