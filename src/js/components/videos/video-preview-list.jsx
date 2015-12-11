@@ -20,8 +20,8 @@ class VideoPreviewList extends Component {
   
   render() {
     const { 
-      title, isLoading, data, currentPageIndex, moreDataOnServer, pagingConfig,
-      nextPageClick, previousPageClick 
+      title, isLoading, data, currentPageIndex, moreDataOnServer, pagingConfig, nextPageDisabled, previousPageDisabled,
+      nextPageClick, previousPageClick
     } = this.props;
     
     const [ titleFirstWord, ...restOfTitle ] = title.split(' ');
@@ -31,10 +31,6 @@ class VideoPreviewList extends Component {
       'overlay': data.length > 0,
       'hidden': !isLoading
     });
-    
-    const previousPageDisabled = isLoading || currentPageIndex === 0;
-    const firstIdxOnNextPage = currentPageIndex + pagingConfig.incrementIndexPerPage;
-    const nextPageDisabled = isLoading || (firstIdxOnNextPage >= data.length && moreDataOnServer === false);
     
     return (
       <div>
@@ -119,6 +115,8 @@ VideoPreviewList.propTypes = {
   currentPageIndex: PropTypes.number.isRequired,
   moreDataOnServer: PropTypes.bool.isRequired,
   pagingConfig: PropTypes.object.isRequired,
+  nextPageDisabled: PropTypes.bool.isRequired,
+  previousPageDisabled: PropTypes.bool.isRequired,
   
   // Actions
   load: PropTypes.func.isRequired,

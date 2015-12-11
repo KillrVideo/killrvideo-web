@@ -1,6 +1,11 @@
 import { isUndefined } from 'lodash';
 import * as Actions from 'actions/paged';
 
+function isNextPageDisabled(currentPageIndex, pagingConfig, data, moreDataOnServer) {
+  const firstIdxOnNextPage = currentPageIndex + pagingConfig.incrementIndexPerPage;
+  return firstIdxOnNextPage >= data.length && moreDataOnServer === false;
+}
+
 function paged(defaultState, state, action) {
   // Add default state if necessary
   if (isUndefined(state) || isUndefined(state.data)) {
@@ -22,24 +27,32 @@ function paged(defaultState, state, action) {
     case Actions.REQUEST:
       return {
         ...state,
-        isLoading: true
+        isLoading: true,
+        nextPageDisabled: true,
+        previousPageDisabled: true
       };
       
     case Actions.RECEIVE:
       let queryModel = isUndefined(action.payload.queryModel) ? state._queryModel : action.payload.queryModel;
+      let newData = [ ...state.data, ...action.payload.data ];
+      let moreDataOnServer = action.payload.moreDataOnServer;
       
       return {
         ...state,
         _queryModel: queryModel,
         isLoading: false,
-        data: [ ...state.data, ...action.payload.data ],
-        moreDataOnServer: action.payload.moreDataOnServer
+        data: newData,
+        moreDataOnServer: moreDataOnServer,
+        nextPageDisabled: isNextPageDisabled(state.currentPageIndex, state.pagingConfig, newData, moreDataOnServer),
+        previousPageDisabled: state.currentPageIndex === 0
       };
       
     case Actions.CHANGE_PAGE:
       return {
         ...state,
-        currentPageIndex: action.payload.currentPageIndex
+        currentPageIndex: action.payload.currentPageIndex,
+        nextPageDisabled: isNextPageDisabled(action.payload.currentPageIndex, state.pagingConfig, state.data, state.moreDataOnServer),
+        previousPageDisabled: action.payload.currentPageIndex === 0
       };
     
   }
@@ -53,7 +66,9 @@ const defaultPagedState = {
   isLoading: false,
   data: [],
   moreDataOnServer: true,
-  currentPageIndex: 0
+  currentPageIndex: 0,
+  nextPageDisabled: true,
+  previousPageDisabled: true
 };
 
 /**

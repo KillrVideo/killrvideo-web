@@ -27,7 +27,7 @@ function renderComment(c) {
 class VideoComments extends Component {
   render() {
     const {
-      comments: { data, isLoading, moreDataOnServer, currentPageIndex, pagingConfig },
+      comments: { data, isLoading, moreDataOnServer, currentPageIndex, pagingConfig, nextPageDisabled },
       addedComments: { comments: addedData },
       showMoreComments
     } = this.props;
@@ -36,7 +36,7 @@ class VideoComments extends Component {
     const commentsToShow = currentPageIndex + pagingConfig.recordsPerPage;
     
     let moreCommentsButton;
-    if (data.length > commentsToShow || moreDataOnServer) {
+    if (nextPageDisabled === false || isLoading) {
       let loadingIcon;
       if (isLoading) {
         loadingIcon = (<Icon name="cog" animate="spin" />);

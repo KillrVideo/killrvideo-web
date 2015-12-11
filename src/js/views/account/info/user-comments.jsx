@@ -10,12 +10,12 @@ import Icon from 'components/shared/icon';
 
 class UserComments extends Component {
   render() {
-    const { data: comments, isLoading, moreDataOnServer, currentPageIndex, pagingConfig } = this.props.comments;
+    const { data: comments, isLoading, moreDataOnServer, currentPageIndex, pagingConfig, nextPageDisabled } = this.props.comments;
     
     const commentsToShow = currentPageIndex + pagingConfig.recordsPerPage;
     
     let moreCommentsButton;
-    if (comments.length > commentsToShow || moreDataOnServer) {
+    if (nextPageDisabled === false || isLoading) {
       let loadingIcon;
       if (isLoading) {
         loadingIcon = (<Icon name="cog" animate="spin" />);

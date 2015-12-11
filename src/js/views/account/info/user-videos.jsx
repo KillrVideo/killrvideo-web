@@ -10,16 +10,12 @@ import Icon from 'components/shared/icon';
 
 class UserVideos extends Component {
   render() {
-    const { isLoading, data, moreDataOnServer, currentPageIndex, pagingConfig } = this.props.videos;
+    const { isLoading, data, moreDataOnServer, currentPageIndex, pagingConfig, nextPageDisabled, previousPageDisabled } = this.props.videos;
     
     if (isLoading && data.length === 0) {
       return <LoadingSpinner />;
     }
-    
-    const previousPageDisabled = isLoading || currentPageIndex === 0;
-    const firstIdxOnNextPage = currentPageIndex + pagingConfig.incrementIndexPerPage;
-    const nextPageDisabled = isLoading || (firstIdxOnNextPage >= data.length && moreDataOnServer === false);
-    
+        
     return (
       <div>
         <Table striped>

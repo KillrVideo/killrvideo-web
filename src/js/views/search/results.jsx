@@ -39,12 +39,8 @@ class SearchResults extends Component {
   }
   
   render() {
-    const { query, isLoading, data, moreDataOnServer, currentPageIndex, pagingConfig } = this.props;
-    
-    const previousPageDisabled = isLoading || currentPageIndex === 0;
-    const firstIdxOnNextPage = currentPageIndex + pagingConfig.incrementIndexPerPage;
-    const nextPageDisabled = isLoading || (firstIdxOnNextPage >= data.length && moreDataOnServer === false);
-    
+    const { query, isLoading, data, moreDataOnServer, currentPageIndex, pagingConfig, nextPageDisabled, previousPageDisabled } = this.props;
+        
     return (
       <div>
         <h3 className="section-divider">
@@ -113,6 +109,8 @@ SearchResults.propTypes = {
   currentPageIndex: PropTypes.number.isRequired,
   moreDataOnServer: PropTypes.bool.isRequired,
   pagingConfig: PropTypes.object.isRequired,
+  nextPageDisabled: PropTypes.bool.isRequired,
+  previousPageDisabled: PropTypes.bool.isRequired,
   
   // Actions
   searchFor: PropTypes.func.isRequired,
