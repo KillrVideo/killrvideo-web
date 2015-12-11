@@ -1,4 +1,4 @@
-import createAction from 'redux-actions/lib/createAction';
+import { createAction } from 'redux-actions';
 
 export const TOGGLE_WHAT_IS_THIS = 'TOGGLE_WHAT_IS_THIS';
 

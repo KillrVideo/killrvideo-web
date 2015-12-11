@@ -1,4 +1,4 @@
-import createAction from 'redux-actions/lib/createAction';
+import { createAction } from 'redux-actions';
 import model from 'stores/falcor-model';
 import { values, isUndefined } from 'lodash';
 
