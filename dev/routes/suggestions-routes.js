@@ -34,7 +34,7 @@ const routes = [
   },
   {
     // Personalized recommendations for a user
-    route: 'usersById[{keys:userIds}].suggestedVideos[{integers:indicies}]',
+    route: 'usersById[{keys:userIds}].recommendedVideos[{integers:indicies}]',
     get(pathSet) {
       const MAX_SUGGESTED_VIDEOS = 5;
       
@@ -43,7 +43,7 @@ const routes = [
         // Only authorized to retrieve suggested videos for the logged in user
         if (this.requestContext.getUserId() !== userId) {
           pathValues.push({
-            path: [ 'usersById', userId, 'suggestedVideos' ],
+            path: [ 'usersById', userId, 'recommendedVideos' ],
             value: $error('Not authorized')
           });
           return;
@@ -56,7 +56,7 @@ const routes = [
         
         pathSet.indicies.forEach(idx => {
           pathValues.push({
-            path: [ 'usersById', userId, 'suggestedVideos', idx ],
+            path: [ 'usersById', userId, 'recommendedVideos', idx ],
             value: idx < suggestedVideos.length ? $ref([ 'videosById', suggestedVideos[idx] ]) : $atom()
           });
         });

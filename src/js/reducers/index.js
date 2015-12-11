@@ -1,12 +1,12 @@
 import { combineReducers } from 'redux';
-import { reducer as formReducer } from 'redux-form';
-import { routerStateReducer } from 'redux-router';
+import { reducer as form } from 'redux-form';
+import { routerStateReducer as router } from 'redux-router';
 import * as ActionTypes from 'actions';
 
 // Reducers in other files
-import videoPreviews from './video-previews';
+import home from './home';
 import viewVideo from './view-video';
-import auth from './authentication';
+import authentication from './authentication';
 import search from './search';
 import accountInfo from './account-info';
 
@@ -20,14 +20,14 @@ function whatIsThis(state = { visible: false }, action) {
 }
 
 const rootReducer = combineReducers({
-  router: routerStateReducer,
-  form: formReducer,
-  whatIsThis: whatIsThis,
-  authentication: auth,
-  search: search,
-  videoPreviews: videoPreviews,
-  viewVideo: viewVideo,
-  accountInfo: accountInfo
+  router,
+  form,
+  whatIsThis,
+  authentication,
+  search,
+  home,
+  viewVideo,
+  accountInfo
 });
 
 export default rootReducer;
