@@ -58,7 +58,7 @@ export function login(email, password) {
     
     // Make the request
     return model.call('currentUser.login', [ email, password ], defaultUserAttributes).then(response => {
-      return dispatch(loginSuccess(response.json.currentUser.info));
+      return dispatch(loginSuccess(response.json.currentUser));
     }, errors => {
       return dispatch(loginFailure(pluck(errors, 'value')));
     });
@@ -106,7 +106,7 @@ export function register(firstName, lastName, email, password) {
     
     // Make falcor request and handle results
     return model.call('currentUser.register', [ firstName, lastName, email, password ], defaultUserAttributes).then(response => {
-      dispatch(registerSuccess(response.json.currentUser.info));
+      dispatch(registerSuccess(response.json.currentUser));
     }, errors => {
       dispatch(registerFailure(pluck(errors, 'value')));
     });
