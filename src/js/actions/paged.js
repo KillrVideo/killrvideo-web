@@ -1,6 +1,14 @@
 import createAction from 'redux-actions/lib/createAction';
 import model from 'stores/falcor-model';
-import { isUndefined, values } from 'lodash';
+import { isUndefined, range } from 'lodash';
+
+function getDataFromResponse(response, startIndex, maxRecords) {
+  return range(startIndex, startIndex + maxRecords).reduce((arr, idx) => {
+    if (isUndefined(response[idx])) return arr;
+    arr.push(response[idx]);
+    return arr;
+  }, []);
+}
 
 /**
  * Paging action constants
@@ -74,28 +82,27 @@ function getInitialPage(selectPagedState, queryRoot, queries) {
     // Tell the UI we're loading
     dispatch(request(listId));
     
-    // Add paging range to queries
-    queries = queries.map(q => [ { from: 0, length: pagingConfig.recordsPerPage }, ...q ]);
+    // Add query root and paging range to queries
+    queries = queries.map(q => [ ...queryRoot, { from: 0, length: pagingConfig.recordsPerPage }, ...q ]);
     
-    let queryModel = null;
-    model.deref(queryRoot, ...queries)
-      .subscribe(
-        m => { queryModel = m; },
-        null, // TODO: Error handler?
-        () => {
-          // Possible to have null for the query model if no results were found
-          if (queryModel === null) {
-            dispatch(receive(listId, [], false, null));
-            return;
-          }
-          
-          queryModel.get(...queries).then(response => {
-            const data = isUndefined(response) ? [] : values(response.json);
-            const moreDataOnServer = data.length === pagingConfig.recordsPerPage;
-            dispatch(receive(listId, data, moreDataOnServer, queryModel));
-          });
-        }
-      );
+    model.get(...queries).then(response => {
+      // If response is undefined, just dispatch empty results
+      if (isUndefined(response)) {
+        dispatch(receive(listId, [], false, null));
+        return;
+      }
+      
+      // Get the response relative to the query root
+      const relativeResponse = queryRoot.reduce((responseVal, queryPath) => {
+        return !isUndefined(responseVal) ? responseVal[queryPath] : responseVal;
+      }, response.json);
+            
+      // Collect values from response and dispatch
+      const data = getDataFromResponse(relativeResponse, 0, pagingConfig.recordsPerPage);
+      const queryModel = model.deref(relativeResponse); 
+      const moreDataOnServer = data.length === pagingConfig.recordsPerPage;
+      dispatch(receive(listId, data, moreDataOnServer, queryModel));
+    });
   };
 };
 
@@ -131,7 +138,7 @@ function nextPageClick(selectPagedState, queries) {
     
     queries = queries.map(q => [ { from: data.length, length: pagingConfig.recordsPerRequest }, ...q ]);
     queryModel.get(...queries).then(response => {
-      const newData = isUndefined(response) ? [] : values(response.json);
+      const newData = isUndefined(response) ? [] : getDataFromResponse(response.json, data.length, pagingConfig.recordsPerRequest);
       const moreDataAvailable = newData.length === pagingConfig.recordsPerRequest;
       dispatch(receive(listId, newData, moreDataAvailable));
       
