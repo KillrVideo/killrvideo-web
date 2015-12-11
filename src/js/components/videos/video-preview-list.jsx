@@ -64,7 +64,7 @@ class VideoPreviewList extends Component {
                 // Regular video previews
                 return (
                   <li className="popout-on-hover" key={preview.videoId}>
-                    <VideoPreview preview={preview} onClick={() => console.log('Fix this!')} />
+                    <VideoPreview preview={preview} />
                     {/* Shim for holding the width of the li when the video preview is "popped out" on hover in larger viewports */ }
                     <div className="hidden-xs video-preview-shim"></div>
                   </li>

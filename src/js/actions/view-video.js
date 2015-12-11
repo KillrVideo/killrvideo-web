@@ -33,8 +33,10 @@ const resetAddComment = createAction(ADD_COMMENT_RESET);
  * Public action creators.
  */
 
-export function load(videoId, videoQueries, commentQueries) {
-  return dispatch => {
+export function load(videoQueries, commentQueries) {
+  return (dispatch, getState) => {
+    const { router: { params: { videoId } } } = getState();
+    
     const queryRoot = [ 'videosById', videoId ];
     
     // Get video
@@ -60,8 +62,10 @@ export function unload() {
 
 export const showMoreComments = comments.nextPageClick;
 
-export function addComment(videoId, comment, commentQueries) {
-  return dispatch => {
+export function addComment(comment, commentQueries) {
+  return (dispatch, getState) => {
+    const { router: { params: { videoId } } } = getState();
+    
     // Tell the UI we're trying to add the comment
     dispatch(requestAddComment());
     
@@ -74,3 +78,10 @@ export function addComment(videoId, comment, commentQueries) {
 
 export const addAnotherComment = createAction(ADD_ANOTHER_COMMENT);
 
+export const moreLikeThis = createPagedActions(state => state.viewVideo.moreLikeThis);
+moreLikeThis.load = function(queries) {
+  return (dispatch, getState) => {
+    const { router: { params: { videoId } } } = getState();
+    return dispatch(moreLikeThis.getInitialPage([ 'videosById', videoId, 'relatedVideos' ], queries));
+  };
+};

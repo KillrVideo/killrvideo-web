@@ -1,13 +1,15 @@
 import React, { Component, PropTypes } from 'react';
 import moment from 'moment';
 
+import ViewVideoLink from './view-video-link';
+
 // Component for rendering a video preview
 class VideoPreview extends Component {
   render() {
     const v = this.props.preview;
     const imageStyle = { backgroundImage: `url("${v.previewImageLocation}")` };
     return (
-      <div className="video-preview" onClick={() => this.props.onClick()}>
+      <ViewVideoLink videoId={v.videoId} className="video-preview">
         <div className="video-preview-image" style={imageStyle}></div>
 
         <div className="video-preview-info">
@@ -22,7 +24,7 @@ class VideoPreview extends Component {
         </div>
 
         <div className="clearfix visible-xs-block"></div>
-      </div>
+      </ViewVideoLink>
     );
   }
 }
@@ -31,7 +33,7 @@ class VideoPreview extends Component {
 VideoPreview.queries = {
   preview() {
     // recentVideos[0..4]['name', 'addedDate', ...]
-    let details = [ [ 'name', 'previewImageLocation', 'addedDate' ] ];
+    let details = [ [ 'videoId', 'name', 'previewImageLocation', 'addedDate' ] ];
     // recentVideos[0..4].stats.views
     let views = [ 'stats', 'views' ];
     // recentVideos[0..4].author['firstName', 'lastName']
@@ -46,8 +48,7 @@ VideoPreview.queries = {
 
 // Prop validation
 VideoPreview.propTypes = {
-  preview: PropTypes.object.isRequired,
-  onClick: PropTypes.func.isRequired
+  preview: PropTypes.object.isRequired
 };
 
 export default VideoPreview;

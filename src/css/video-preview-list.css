@@ -57,6 +57,7 @@
 }
 
 .video-preview {
+  display: block;
   background-color: #f6f6f6;
   color: #888;
   padding: 3px;
@@ -92,6 +93,11 @@
 
 .video-preview:hover {
   background-color: #222222;
+}
+
+.video-preview:hover,
+.video-preview:active {
+  text-decoration: none;
 }
 
 .video-preview:hover > .video-preview-info {

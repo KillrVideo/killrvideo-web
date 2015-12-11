@@ -1,9 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { connect } from 'react-redux';
-import { load, unload, showMoreComments, addComment, addAnotherComment } from 'actions/view-video';
+import { bindActionCreators } from 'redux';
 import { isUndefined } from 'lodash';
 
+import * as Actions from 'actions/view-video';
 import VideoPlayer from './video-player';
 import VideoDetails from './video-details';
 import VideoAddComment from './video-add-comment';
@@ -12,7 +13,7 @@ import VideoPreviewList from 'components/videos/video-preview-list';
 class ViewVideo extends Component {
   componentDidMount() {
     // Get the video once mounted
-    this.props.load(this.props.videoId, ViewVideo.queries.video(), ViewVideo.queries.comments());
+    this.props.load(ViewVideo.queries.video(), ViewVideo.queries.comments());
   }
   
   componentWillUnmount() {
@@ -23,7 +24,9 @@ class ViewVideo extends Component {
     // If the video id changes, we need to get the video again
     if (this.props.videoId !== prevProps.videoId) {
       this.props.unload();
-      this.props.load(this.props.videoId, ViewVideo.queries.video(), ViewVideo.queries.comments());
+      this.props.moreLikeThisActions.unload();
+      this.props.load(ViewVideo.queries.video(), ViewVideo.queries.comments());
+      this.props.moreLikeThisActions.load(VideoPreviewList.queries.preview());
     }
   }
       
@@ -35,11 +38,12 @@ class ViewVideo extends Component {
   render() {
     const {
       videoId, 
-      viewVideo: { details, comments, addedComments }, 
+      viewVideo: { details, comments, addedComments, moreLikeThis }, 
       currentUser: { isLoggedIn }, 
       showMoreComments,
       addComment,
-      addAnotherComment
+      addAnotherComment,
+      moreLikeThisActions
    } = this.props;
     
     return (
@@ -52,10 +56,10 @@ class ViewVideo extends Component {
             <VideoDetails details={details} comments={comments} addedComments={addedComments} isLoggedIn={isLoggedIn}
                           showMoreComments={() => showMoreComments(ViewVideo.queries.comments())} />
             <VideoAddComment addedComments={addedComments} isLoggedIn={isLoggedIn} addAnotherComment={addAnotherComment}
-                             onSubmit={vals => addComment(videoId, vals.comment, ViewVideo.queries.comments())} />
+                             onSubmit={vals => addComment(vals.comment, ViewVideo.queries.comments())} />
           </Col>
         </Row>
-        <VideoPreviewList title="More Videos Like This" list={VideoPreviewList.lists.relatedVideos(videoId)} />
+        <VideoPreviewList title="More Videos Like This" {...moreLikeThis} {...moreLikeThisActions}  />
       </div>
     );
   }
@@ -91,7 +95,8 @@ ViewVideo.propTypes = {
   unload: PropTypes.func.isRequired,
   showMoreComments: PropTypes.func.isRequired,
   addComment: PropTypes.func.isRequired,
-  addAnotherComment: PropTypes.func.isRequired
+  addAnotherComment: PropTypes.func.isRequired,
+  moreLikeThisActions: PropTypes.object.isRequired
 };
 
 function mapStateToProps(state) {
@@ -102,4 +107,15 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { load, unload, showMoreComments, addComment, addAnotherComment })(ViewVideo);
+function mapDispatchToProps(dispatch) {
+  return {
+    load: bindActionCreators(Actions.load, dispatch),
+    unload: bindActionCreators(Actions.unload, dispatch),
+    showMoreComments: bindActionCreators(Actions.showMoreComments, dispatch),
+    addComment: bindActionCreators(Actions.addComment, dispatch),
+    addAnotherComment: bindActionCreators(Actions.addAnotherComment, dispatch),
+    moreLikeThisActions: bindActionCreators(Actions.moreLikeThis, dispatch)
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ViewVideo);
