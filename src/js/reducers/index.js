@@ -9,6 +9,7 @@ import viewVideo from './view-video';
 import authentication from './authentication';
 import search from './search';
 import accountInfo from './account-info';
+import addVideo from './add-video';
 
 // Handle what is this UI state
 function whatIsThis(state = { visible: false }, action) {
@@ -27,7 +28,8 @@ const rootReducer = combineReducers({
   search,
   home,
   viewVideo,
-  accountInfo
+  accountInfo,
+  addVideo
 });
 
 export default rootReducer;

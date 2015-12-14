@@ -7,7 +7,7 @@ class Icon extends Component {
   render() {
     let fontAwesomeClass = classNames({
       'fa': true,
-      [ `fa-${this.props.name}` ]: true,
+      [ `fa-${this.props.name}` ]: !!this.props.name,
       [ `fa-${this.props.size}` ]: !!this.props.size,
       'fa-fw': this.props.fixedWidth,
       'fa-li': this.props.list,

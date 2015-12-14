@@ -60,6 +60,7 @@ ul.uimessage > li {
     padding: 1em;
 }
 
+/* Custom scrollbars with the gemini plugin */
 .gm-scrollbar .thumb {
   background-color: rgba(218, 54, 16, 0.6);
 }
@@ -67,6 +68,26 @@ ul.uimessage > li {
 .gm-scrollbar .thumb:hover {
   background-color: rgba(218, 54, 16, 1);
 }
+
+/* Inverse button style (light instead of dark which is default) */
+.btn-inverse,
+.open > .dropdown-toggle.btn-inverse {
+  border-color: #ccc;
+  background-color: #fff;
+}
+
+.btn-inverse:hover, .btn-inverse:focus, .btn-inverse:active,
+.open > .dropdown-toggle.btn-inverse:hover, .open > .dropdown-toggle.btn-inverse:focus {
+  border-color: #adadad;
+  background-color: #e6e6e6;
+}
+
+.btn-inverse, .btn-inverse:hover, .btn-inverse:focus, .btn-inverse:active, 
+.open > .dropdown-toggle.btn-inverse, .open > .dropdown-toggle.btn-inverse:hover, .open > .dropdown-toggle.btn-inverse:focus {
+  color: #333;
+}
+
+
 
 /**
  * Header Styles

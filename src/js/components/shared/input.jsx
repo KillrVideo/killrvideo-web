@@ -33,9 +33,13 @@ class Input extends Component {
       textAreaValue = this.props.value || '';
     }
     
+    const { children, ...otherProps } = this.props;
+    
     return (
-      <BootstrapInput {...this.props} {...this.getBootstrapProps(this.props.touched, this.props.error)}
-                      value={textAreaValue} ref={c => this._input = c} />
+      <BootstrapInput {...otherProps} {...this.getBootstrapProps(this.props.touched, this.props.error)}
+                      value={textAreaValue} ref={c => this._input = c}>
+        {children}
+      </BootstrapInput>
     );
   }
 }
