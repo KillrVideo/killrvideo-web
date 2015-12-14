@@ -82,7 +82,7 @@ gulp.task('js', function() {
   var appBundle = bundleApp();
   
   // Create vendor bundle
-  var vendor = browserify({ debug: false });
+  var vendor = browserify(cfg.BROWSERIFY_OPTS);
   VENDOR_LIBS.forEach(function(lib) {
     vendor.require(nodeResolve.sync(lib), { expose: lib });
   });
