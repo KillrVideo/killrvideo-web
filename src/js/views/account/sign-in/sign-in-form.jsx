@@ -7,10 +7,6 @@ import Input from 'components/shared/input';
 import Icon from 'components/shared/icon';
 
 class SignInForm extends Component {
-  componentWillMount() {
-    this.props.resetForm();
-  }
-  
   render() {
     const { fields: { email, password }, handleSubmit, submitting } = this.props;
     

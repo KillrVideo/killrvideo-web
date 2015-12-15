@@ -7,10 +7,6 @@ import Icon from 'components/shared/icon';
 import Input from 'components/shared/input';
 
 class RegistrationForm extends Component {
-  componentWillMount() {
-    this.props.resetForm();
-  }
-  
   render() {
     const { fields: { firstName, lastName, email, password, retypePassword }, handleSubmit, submitting, hideForm } = this.props;
     
