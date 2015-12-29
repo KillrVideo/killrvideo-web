@@ -11,6 +11,10 @@ import { setYouTubeVideoSelection, clearYouTubeVideoSelection } from 'actions/ad
 
 // Inputs needed for adding a YouTube video
 class AddYouTubeVideo extends Component {
+  componentWillUnmount() {
+    this.props.clearYouTubeVideoSelection();
+  }
+  
   doReset() {
     this.props.resetForm();
     this.props.clearYouTubeVideoSelection();

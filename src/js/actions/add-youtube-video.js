@@ -7,6 +7,7 @@ import { createActionTypeConstants } from './promises';
 import getYouTubeClient from 'lib/youtube-client';
 import parseYouTubeVideoId from 'lib/parse-youtube-video-id';
 
+// Rejected promises for common errors with values that redux-form can propogate to the UI field
 const YOUTUBE_NOT_AVAILABLE = Promise.reject({ youTubeUrl: [ 'YouTube is currently not available. Please try again later.' ] });
 YOUTUBE_NOT_AVAILABLE.suppressUnhandledRejections();
 
@@ -63,8 +64,6 @@ export function setYouTubeVideoSelection(youTubeVideoUrl) {
     // Return the promise so redux-form will know about any errors
     return promise;
   };
-  
-  
 };
 
 export const clearYouTubeVideoSelection = createAction(ActionTypes.CLEAR_YOUTUBE_VIDEO);

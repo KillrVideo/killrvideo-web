@@ -41,6 +41,12 @@ class VideoSourceSelector extends Component {
       this.props.onBlur();
     }, 1);
   }
+  
+  handleSelect(selectedValue) {
+    if (this.props.value !== selectedValue) {
+      this.props.onChange(selectedValue);
+    }
+  }
     
   render() {
     const { value, onChange, onFocus, onBlur } = this.props;
@@ -48,7 +54,7 @@ class VideoSourceSelector extends Component {
     const selectedSource = isUndefined(value) || value === '' ? defaultSource : find(sources, { value });
     
     return (
-      <Dropdown vertical block id="add-video-source" onSelect={(event, eventKey) => onChange(eventKey)}
+      <Dropdown vertical block id="add-video-source" onSelect={(event, eventKey) => this.handleSelect(eventKey)}
                 onFocus={() => this.handleFocus()} onBlur={() => this.handleBlur()}>
         <Dropdown.Toggle className="form-control btn-inverse">
           <span className="h4"><Icon name={selectedSource.icon} fixedWidth /> {selectedSource.text}</span>

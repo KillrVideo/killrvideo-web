@@ -1,5 +1,6 @@
 import { ActionTypes as YouTubeActions } from 'actions/add-youtube-video';
 import { combineReducers } from 'redux';
+import VideoLocationTypes from 'lib/video-location-types';
 
 const commonDefaultState = {
   videoId: null,
