@@ -16,5 +16,5 @@ const youTubeLoaded = new Promise(resolve => {
   }
 });
 
-// Export promise that will be resolved once YouTube API is available
+// Export promise that will be resolved once YouTube Player API is available
 export default youTubeLoaded;

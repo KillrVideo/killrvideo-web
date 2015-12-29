@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { reduxForm } from 'redux-form';
-import validate from 'validate.js';
+import { validate } from 'validate.js';
 
 import Icon from 'components/shared/icon';
 import Input from 'components/shared/input';

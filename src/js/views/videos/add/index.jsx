@@ -3,16 +3,19 @@ import { Row, Col, Alert } from 'react-bootstrap';
 import { reduxForm } from 'redux-form';
 import validate from 'validate.js';
 
+import VideoLocationTypes from 'lib/video-location-types';
 import ViewVideoLink from 'components/videos/view-video-link';
 import SourceSelector from './source-selector';
 import Input from 'components/shared/input';
+import AddYouTubeVideo from './add-youtube-video';
+import AddUploadedVideo from './add-uploaded-video';
 
-class AddVideo extends Component {
+class AddVideo extends Component {  
   render() {
     const { 
       videoId,
       showCommonDetails,
-      fields: { source, name, description, tags } 
+      fields,
     } = this.props;
     
     // Center columns until we're showing the common video details column
@@ -27,6 +30,16 @@ class AddVideo extends Component {
       );
     }
     
+    let selectedSourceInput;
+    switch(fields.locationType.value) {
+      case VideoLocationTypes.YOUTUBE:
+        selectedSourceInput = <AddYouTubeVideo />;
+        break;
+      case VideoLocationTypes.UPLOAD:
+        selectedSourceInput = <AddUploadedVideo />;
+        break;
+    }
+    
     return (
       <div id="video-add">
         <Row>
@@ -39,20 +52,20 @@ class AddVideo extends Component {
           </Col>
         </Row>
         <Row>
-          <form className={videoId !== null ? 'hidden' : ''}>
-            {/* Source selection and source-specific form fields */}
-            <Col sm={6} smPush={columnPush}>
-              <Input {...source} label="Source">
-                <SourceSelector {...source} />
-              </Input>
-            </Col>
-            {/* Common video details */}
-            <Col sm={6} className={showCommonDetails === false ? 'hidden' : ''}>
-              <Input {...name} type="text" placeholder="Video name" label="Name" />
-              <Input {...description} type="textarea" placeholder="Video description" label="Description" />
-              <Input {...tags} type="text" label="Tags" />
-            </Col>
-          </form>
+          {/* Source selection and source-specific form */}
+          <Col sm={6} smPush={columnPush}>
+            <Input {...fields.locationType} label="Source">
+              <SourceSelector {...fields.locationType} />
+            </Input>
+            
+            {selectedSourceInput}
+          </Col>
+          {/* Common video details */}
+          <Col sm={6} className={showCommonDetails === false ? 'hidden' : ''}>
+            <Input {...fields.name} type="text" placeholder="Video name" label="Name" />
+            <Input {...fields.description} type="textarea" placeholder="Video description" label="Description" />
+            <Input {...fields.tags} type="text" label="Tags" />
+          </Col>
         </Row>
       </div>
     );
@@ -65,28 +78,26 @@ AddVideo.propTypes = {
   videoId: PropTypes.string,
   showCommonDetails: PropTypes.bool.isRequired,
   
-  // From redux form state
-  fields: PropTypes.object.isRequired,
+  // From redux form
+  fields: PropTypes.object.isRequired
 };
 
 // Map redux store state to component props
 function mapStateToProps(state) {
-  const { addVideo } = state;
+  const { addVideo: { common } } = state;
   return {
-    ...addVideo
+    ...common
   };
 }
 
-// Form validation constraints
-const constraints = {
-  source: { presence: true },
-  name: { presence: true },
-  description: { presence: true },
-  tags: { presence: true }
-};
-
-export default reduxForm({
+export default reduxForm({ 
   form: 'addVideo',
-  fields: [ 'source', 'name', 'description', 'tags' ],
-  validate: vals => validate(vals, constraints) || {}
+  fields: [ 'locationType', 'name', 'description', 'tags', 'location' ],
+  initialValues: {
+    locationType: VideoLocationTypes.YOUTUBE,
+    name: '',
+    description: '',
+    tags: '',
+    location: ''
+  }
 }, mapStateToProps)(AddVideo);

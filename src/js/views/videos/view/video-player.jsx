@@ -2,11 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { ResponsiveEmbed } from 'react-bootstrap';
 import VideoPlayerYouTube from './video-player-youtube';
 import VideoPlayerUpload from './video-player-upload';
-
-const VideoLocationTypes = {
-  YOUTUBE: 0,
-  UPLOAD: 1
-};
+import VideoLocationTypes from 'lib/video-location-types';
 
 class VideoPlayer extends Component {
   render() {

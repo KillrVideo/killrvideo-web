@@ -1,13 +1,50 @@
-// The default add video state
-const defaultAddVideo = {
+import { ActionTypes as YouTubeActions } from 'actions/add-youtube-video';
+import { combineReducers } from 'redux';
+
+const commonDefaultState = {
   videoId: null,
   showCommonDetails: false
 };
 
-// Reducer for add video state
-function addVideo(state = defaultAddVideo, action) {
+// Reducer for common add video state
+function common(state = commonDefaultState, action) {
+  switch(action.type) {
+    case YouTubeActions.CLEAR_YOUTUBE_VIDEO:
+      return {
+        ...state,
+        showCommonDetails: false
+      };
+    case YouTubeActions.SET_YOUTUBE_VIDEO.SUCCESS:
+      return {
+        ...state,
+        showCommonDetails: true
+      };
+  }
+  return state;
+}
+
+const youTubeDefaultState = {
+  videoId: null
+};
+
+// Reducer for youtube-specific state
+function youTube(state = youTubeDefaultState, action) {
+  switch (action.type) {
+    case YouTubeActions.CLEAR_YOUTUBE_VIDEO:
+      return youTubeDefaultState;
+      
+    case YouTubeActions.SET_YOUTUBE_VIDEO.SUCCESS:
+      return {
+        ...state,
+        videoId: action.payload.videoId
+      };
+  }
+  
   return state;
 }
 
 // Export reducer
-export default addVideo;
+export default combineReducers({
+  common,
+  youTube
+});

@@ -1,9 +1,9 @@
 import React, { Component, PropTypes } from 'react';
-import youTubeApiLoaded from 'lib/youtube-api-loaded';
+import youTubePlayerLoaded from 'lib/youtube-player-loaded';
 
 class VideoPlayerYouTube extends Component {
   createYouTubePlayer() {
-    youTubeApiLoaded.then(YT => {
+    youTubePlayerLoaded.then(YT => {
       // Fire the playback started handler whenever the state changes appropriately
       const youTubePlayer = new YT.Player(this.refs.youTubeIframe, {
         events: {

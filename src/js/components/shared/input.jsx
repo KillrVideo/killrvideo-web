@@ -28,12 +28,12 @@ class Input extends Component {
     // React treats undefined differently for textarea inputs so we need to change undefined
     // to an empty string here to prevent it from being uncontrolled (and thus not responding to a reset)
     // (see: https://github.com/facebook/react/issues/2533)
-    let textAreaValue;
+    let textAreaValue = this.props.value;
     if (this.props.type === 'textarea') {
       textAreaValue = this.props.value || '';
     }
     
-    const { children, ...otherProps } = this.props;
+    const { children, value, ...otherProps } = this.props;
     
     return (
       <BootstrapInput {...otherProps} {...this.getBootstrapProps(this.props.touched, this.props.error)}

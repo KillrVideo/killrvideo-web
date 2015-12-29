@@ -1,13 +1,14 @@
 import React, { Component, PropTypes } from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
-import Icon from 'components/shared/icon';
 import { isUndefined, find } from 'lodash';
 
+import Icon from 'components/shared/icon';
+import VideoLocationTypes from 'lib/video-location-types'
 
 const defaultSource = { icon: '', text: 'Select a video source' };
 const sources = [
-  { icon: 'folder-open', text: 'Local Computer', value: 'upload' },
-  { icon: 'youtube', text: 'YouTube', value: 'youtube' }
+  { icon: 'folder-open', text: 'Local Computer', value: VideoLocationTypes.UPLOAD },
+  { icon: 'youtube', text: 'YouTube', value: VideoLocationTypes.YOUTUBE }
 ];
 
 class VideoSourceSelector extends Component {
@@ -68,7 +69,7 @@ class VideoSourceSelector extends Component {
 
 // Prop validation
 VideoSourceSelector.propTypes = {
-  value: PropTypes.string,
+  value: PropTypes.number,
   onChange: PropTypes.func.isRequired,
   onFocus: PropTypes.func.isRequired,
   onBlur: PropTypes.func.isRequired
