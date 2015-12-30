@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { reduxForm } from 'redux-form';
-import validate from 'validate.js';
+import { validateForm } from 'lib/validation';
 
 class SearchBox extends Component {
   render() {
@@ -47,5 +47,5 @@ function mapStateToProps(state) {
 export default reduxForm({
   form: 'search',
   fields: [ 'query' ],
-  validate: vals => { return validate(vals, searchConstraints) || {}; }
+  validate: vals => validateForm(vals, searchConstraints)
 }, mapStateToProps)(SearchBox);

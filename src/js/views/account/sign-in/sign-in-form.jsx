@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Button } from 'react-bootstrap';
 import { reduxForm } from 'redux-form';
-import validate from 'validate.js';
+import { validateForm } from 'lib/validation';
 
 import Input from 'components/shared/input';
 import Icon from 'components/shared/icon';
@@ -39,5 +39,5 @@ const constraints = {
 export default reduxForm({
   form: 'signIn',
   fields: [ 'email', 'password' ],
-  validate: vals => validate(vals, constraints) || {}
+  validate: vals => validateForm(vals, constraints)
 })(SignInForm);

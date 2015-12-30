@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { reduxForm } from 'redux-form';
-import validate from 'validate.js';
+import { validateForm } from 'lib/validation';
 import classNames from 'classnames';
 
 import { Alert, Button } from 'react-bootstrap';
@@ -90,5 +90,5 @@ const constraints = {
 export default reduxForm({
   form: 'addComment',
   fields: [ 'comment' ],
-  validate: vals => validate(vals, constraints) || {}
+  validate: vals => validateForm(vals, constraints)
 })(VideoAddComment);
