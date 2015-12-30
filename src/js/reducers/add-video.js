@@ -45,7 +45,8 @@ function youTube(state = youTubeDefaultState, action) {
 }
 
 const uploadDefaultState = {
-  
+  statusMessage: 'The upload status message',
+  percentComplete: 0
 };
 
 // Reducer for upload-specific state

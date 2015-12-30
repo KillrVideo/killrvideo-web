@@ -26,3 +26,8 @@
 .has-error > .add-video-upload-drop {
   border-color: #ff0039;
 }
+
+.add-video-upload-progress, 
+.add-video-upload-buttons {
+  padding-top: 0.5em;
+}
