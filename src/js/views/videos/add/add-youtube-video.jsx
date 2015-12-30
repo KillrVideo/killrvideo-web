@@ -1,10 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import { Button } from 'react-bootstrap';
 import { reduxForm } from 'redux-form';
-import { validate } from 'validate.js';
-import { isUndefined } from 'lodash';
+import { validateForm } from 'lib/validation';
 
-import parseYouTubeVideoId from 'lib/parse-youtube-video-id';
 import Input from 'components/shared/input';
 import Icon from 'components/shared/icon';
 import { setYouTubeVideoSelection, clearYouTubeVideoSelection } from 'actions/add-youtube-video';
@@ -72,19 +70,6 @@ AddYouTubeVideo.propTypes = {
   clearYouTubeVideoSelection: PropTypes.func.isRequired
 };
 
-// Custom validator for checking if a value is a valid YouTube video URL
-validate.validators.youTubeVideoUrl = function(value, options) {
-  if (!value) return;
-  
-  const isValid = isUndefined(parseYouTubeVideoId(value)) === false;
-  if (isValid) { 
-    return;
-  }
-  return isUndefined(options.message) 
-    ? 'is not a valid YouTube video URL' 
-    : options.message;
-};
-
 // Validation constraints
 const constraints = {
   youTubeUrl: {
@@ -106,6 +91,6 @@ export default reduxForm({
   form: 'addYouTubeVideo',
   fields: [ 'youTubeUrl' ],
   validate(vals) {
-    return validate(vals, constraints) || {};
+    return validateForm(vals, constraints);
   }
 }, mapStateToProps, { setYouTubeVideoSelection, clearYouTubeVideoSelection })(AddYouTubeVideo);

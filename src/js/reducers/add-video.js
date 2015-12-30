@@ -44,8 +44,18 @@ function youTube(state = youTubeDefaultState, action) {
   return state;
 }
 
+const uploadDefaultState = {
+  
+};
+
+// Reducer for upload-specific state
+function upload(state = uploadDefaultState, action) {
+  return state;
+}
+
 // Export reducer
 export default combineReducers({
   common,
-  youTube
+  youTube,
+  upload
 });

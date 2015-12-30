@@ -94,7 +94,7 @@ export default reduxForm({
   form: 'addVideo',
   fields: [ 'locationType', 'name', 'description', 'tags', 'location' ],
   initialValues: {
-    locationType: VideoLocationTypes.YOUTUBE,
+    locationType: VideoLocationTypes.UPLOAD,
     name: '',
     description: '',
     tags: '',

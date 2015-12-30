@@ -10,3 +10,19 @@
 #add-video-source-menu {
   width: 100%;
 }
+
+.add-video-upload-drop {
+  border: 3px dashed #ccc;
+  text-align: center;
+  padding: 3em 0;
+  cursor: pointer;
+}
+
+.add-video-upload-drop.active {
+  border-color: #adadad;
+  background-color: #e6e6e6;
+}
+
+.has-error > .add-video-upload-drop {
+  border-color: #ff0039;
+}
