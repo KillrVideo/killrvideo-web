@@ -3,23 +3,24 @@ import classNames from 'classnames';
 
 // Create component for displaying Font Awesome icons
 class Icon extends Component {
-    
   render() {
-    let fontAwesomeClass = classNames({
+    const { className, name, size, fixedWidth, list, border, pull, animate, rotate, flip, ...otherProps } = this.props;
+    
+    const fontAwesomeClass = classNames({
       'fa': true,
-      [ `fa-${this.props.name}` ]: !!this.props.name,
-      [ `fa-${this.props.size}` ]: !!this.props.size,
-      'fa-fw': this.props.fixedWidth,
-      'fa-li': this.props.list,
-      'fa-border': this.props.border,
-      [ `fa-pull-${this.props.pull}` ]: !!this.props.pull,
-      [ `fa-${this.props.animate}` ]: !!this.props.animate,
-      [ `fa-rotate-${this.props.rotate}` ]: !!this.props.rotate,
-      [ `fa-flip-${this.props.flip}` ]: !!this.props.flip,
-      [ this.props.className ]: !!this.props.className
-    }); 
+      [ `fa-${name}` ]: !!name,
+      [ `fa-${size}` ]: !!size,
+      'fa-fw': fixedWidth,
+      'fa-li': list,
+      'fa-border': border,
+      [ `fa-pull-${pull}` ]: !!pull,
+      [ `fa-${animate}` ]: !!animate,
+      [ `fa-rotate-${rotate}` ]: !!rotate,
+      [ `fa-flip-${flip}` ]: !!flip,
+      [ className ]: !!className
+    });
     return (
-      <i className={fontAwesomeClass}></i>
+      <i {...otherProps} className={fontAwesomeClass}></i>
     );
   }
 }

@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import { reduxForm } from 'redux-form';
 import { validateForm } from 'lib/validation';
+import { uploadVideo, cancelUpload } from 'actions/add-uploaded-video';
 
-import { Alert, Row, Col, ProgressBar } from 'react-bootstrap';
+import { Alert, Row, Col, ProgressBar, Button } from 'react-bootstrap';
 import Dropzone from 'react-dropzone';
 import Input from 'components/shared/input';
 import Icon from 'components/shared/icon';
@@ -23,18 +24,36 @@ class AddUploadedVideo extends Component {
   handleDropzoneKeys(e) {
     if (e.key === 'Enter' || e.key === ' ') {
       this.refs.dropzone.open();
+      e.preventDefault();
+    }
+  }
+  
+  handleDropzoneDrop(files) {
+    this.props.fields.uploadFile.onChange(files[0]);
+  }
+  
+  componentDidUpdate(prevProps) {
+    // Once we have a valid file, start the upload
+    if (prevProps.fields.uploadFile.invalid && this.props.fields.uploadFile.valid) {
+      this.props.handleSubmit();
     }
   }
   
   render() {
-    const { fields: { uploadFile }, statusMessage, percentComplete } = this.props;
+    const { fields: { uploadFile }, statusMessage, statusMessageStyle, percentComplete } = this.props;
     const fileName = uploadFile.valid ? uploadFile.value.name : '';
     
+    const resetButton = (
+      <Button type="reset" title="Reset video selection">
+        <Icon name="times" title="Reset video selection" />
+      </Button>
+    );
+    
     return (
-      <div>
+      <form>
         <Input {...uploadFile} wrapperClassName={uploadFile.valid ? 'hidden' : undefined}>
           <Dropzone multiple={false} tabIndex="0" className="add-video-upload-drop" activeClassName="active" ref="dropzone"
-                    onDrop={files => uploadFile.onChange(files[0])} onFocus={uploadFile.onFocus}
+                    onDrop={files => this.handleDropzoneDrop(files)} onFocus={uploadFile.onFocus}
                     onBlur={uploadFile.onBlur} onKeyPress={e => this.handleDropzoneKeys(e)}>
             <div>
               <Icon name="file-video-o" size="4x" /><br/>
@@ -45,13 +64,13 @@ class AddUploadedVideo extends Component {
         </Input>
         <Row className={uploadFile.invalid ? 'hidden' : undefined}>
           <Col xs={12}>
-            File: {fileName}
+            <Input type="text" label="Video File" value={fileName} buttonAfter={resetButton} disabled />
           </Col>
         </Row>
         <Row className={uploadFile.invalid ? 'hidden' : undefined}>
           <Col xs={8}>
-            <span className="text-muted text-uppercase small">{statusMessage}</span><br/>
-            <ProgressBar now={percentComplete} />
+            <span className={`text-${statusMessageStyle} text-uppercase small`}>{statusMessage}</span><br/>
+            <ProgressBar now={percentComplete} bsStyle={statusMessageStyle} />
           </Col>
           <Col xs={2} className="add-video-upload-progress">
             {percentComplete}%
@@ -59,10 +78,10 @@ class AddUploadedVideo extends Component {
           <Col xs={2} className="text-right add-video-upload-buttons">
             <Icon name="refresh" title="Retry upload" />
             <Icon name="stop" title="Cancel upload" />
-            <Icon name="times-circle-o" title="Reset video selection" />
+            
           </Col>
         </Row>
-      </div>
+      </form>
     );
   }
 }
@@ -71,10 +90,15 @@ class AddUploadedVideo extends Component {
 AddUploadedVideo.propTypes = {
   // Redux state
   statusMessage: PropTypes.string.isRequired,
+  statusMessageStyle: PropTypes.string.isRequired,
   percentComplete: PropTypes.number.isRequired,
   
   // From redux-form
-  fields: PropTypes.object.isRequired
+  fields: PropTypes.object.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  
+  // Actions
+  cancelUpload: PropTypes.func.isRequired
 };
 
 // Validation constraints
@@ -100,7 +124,7 @@ const AddUploadedVideoForm = reduxForm({
   validate(vals) {
     return validateForm(vals, constraints);
   }
-}, mapStateToProps, {})(AddUploadedVideo);
+}, mapStateToProps, { onSubmit: uploadVideo, cancelUpload })(AddUploadedVideo);
 
 // Export the appropriate component based on whether upload is supported
 const uploadSupported = global.File && global.FileReader && global.FileList && global.Blob;
