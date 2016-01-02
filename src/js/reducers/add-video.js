@@ -49,12 +49,8 @@ function youTube(state = youTubeDefaultState, action) {
 const uploadDefaultState = {
   statusMessage: 'The upload status message',
   statusMessageStyle: 'info',
-  percentComplete: 0,
-  
-  _uploadDestinationUrl: null
+  percentComplete: 0
 };
-
-const UNEXPECTED_FAILURE_MESSAGE = 'An unexpected error occurred. Please try again later.';
 
 // Reducer for upload-specific state
 function upload(state = uploadDefaultState, action) {
@@ -69,6 +65,13 @@ function upload(state = uploadDefaultState, action) {
         percentComplete: 0
       };
     
+    case UploadActions.UPLOAD_VIDEO_PROGRESS:
+      return {
+        ...state,
+        statusMessage: action.payload.statusMessage,
+        percentComplete: action.payload.percentComplete
+      };
+    
     case UploadActions.UPLOAD_VIDEO.SUCCESS:
       return {
         ...state,
@@ -80,32 +83,12 @@ function upload(state = uploadDefaultState, action) {
     case UploadActions.UPLOAD_VIDEO.FAILURE:
       return {
         ...state,
+        statusMessage: 'An unexpected error occurred. Please try again later.',
         statusMessageStyle: 'danger'
       };
       
-    case UploadActions.GENERATE_UPLOAD_DESTINATION.LOADING:
-      return {
-        ...state,
-        statusMessage: 'Preparing to upload video'
-      };
-      
-    case UploadActions.GENERATE_UPLOAD_DESTINATION.SUCCESS:
-      return {
-        ...state,
-        percentComplete: 1,
-        _uploadDestinationUrl: action.payload.json.uploads.destinationUrl
-      };
-      
-    case UploadActions.GENERATE_UPLOAD_DESTINATION.FAILURE:
-      // We'll get an array back if the server responded with some kind of "business logic" failure 
-      statusMessage = isArray(action.payload)
-        ? action.payload[0].value
-        : UNEXPECTED_FAILURE_MESSAGE;
-      
-      return {
-        ...state,
-        statusMessage
-      };
+    
+    
   }
   
   return state;

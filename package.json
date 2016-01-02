@@ -76,6 +76,7 @@
     "redux-router": "^1.0.0-beta4",
     "redux-thunk": "^1.0.0",
     "validate.js": "^0.9.0",
-    "video.js": "^5.2.1"
+    "video.js": "^5.2.1",
+    "xhr": "^2.2.0"
   }
 }
