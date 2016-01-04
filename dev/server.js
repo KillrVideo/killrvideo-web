@@ -13,6 +13,9 @@ const app = express();
 // Serve up static build assets
 app.use('/static', express.static(`${__dirname}/../dist`));
 
+// Dummy upload file endpoint
+app.put('/dummyUploadEndpoint/*', (req, res) => res.sendStatus(201));
+
 // Parse POST body for requests to falcor endpoint
 app.use(bodyParser.urlencoded({ extended: false }));
 

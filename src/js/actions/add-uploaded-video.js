@@ -61,22 +61,19 @@ function uploadRemainingFileChunks() {
   // Figure out progress to report
   const startKb = Math.floor(start / 1024);
   const fileKb = Math.floor(this.file.size / 1024);
-  const percentComplete = 5 + (start / this.file.size * 90);
+  const percentComplete = Math.floor(5 + (start / this.file.size * 90));
   this.reportProgress(`Uploading file (${startKb} of ${fileKb})`, percentComplete);
   
   // Figure out the end position in file for the chunk
   const end = start + DEFAULT_CHUNK_SIZE >= this.file.size
     ? this.file.size
     : start + DEFAULT_CHUNK_SIZE;
-    
-  return readFileChunk(start, end).then(putFileChunk).then(uploadRemainingFileChunks);
-}
-
-function readFileChunk(start, end) {
+  
   if (this.fileReader === null) {
     this.fileReader = new FileReader();
   }
   
+  // Create promise that will be resolved once file chunk has been read
   const loaded = new Promise((resolve, reject) => {
     // Listen for load end event and resolve the promise appropriately
     this.fileReader.onloadend = e => {
@@ -89,8 +86,8 @@ function readFileChunk(start, end) {
   });
   
   // Start reading the file and return the promise
-  fileReader.readAsArrayBuffer(this.file.slice(start, end));
-  return loaded;
+  this.fileReader.readAsArrayBuffer(this.file.slice(start, end));
+  return loaded.bind(this).then(putFileChunk).then(uploadRemainingFileChunks);
 }
 
 function putFileChunk(chunkData) {
@@ -105,7 +102,7 @@ function putFileChunk(chunkData) {
   this.blockIds.push(blockId);
   
   // Modify some query string params on the destination URL
-  const putUrl = parseUrl(destinationUrl, true);
+  const putUrl = parseUrl(this.destinationUrl, true);
   putUrl.query.comp = 'block';
   putUrl.query.blockid = blockId;
   
