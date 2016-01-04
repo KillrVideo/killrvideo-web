@@ -2,6 +2,8 @@ import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import { extname } from 'path';
 import { format } from 'url';
 
+import config from '../config';
+
 const routes = [
   {
     // Generate a destination for an uploaded video file
@@ -21,7 +23,8 @@ const routes = [
       const req = this.requestContext.request;
       const destination = format({
         protocol: req.protocol,
-        host: req.get('host'),  // Should include port
+        hostname: config.uploadEndpointHost,
+        port: req.app.locals.port,  // Local is added before server is started in server.js
         pathname: `/dummyUploadEndpoint/${fileName}`
       });
       

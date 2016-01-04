@@ -1,4 +1,6 @@
 import express from 'express';
+import vhost from 'vhost';
+import cors from 'cors';
 import { dataSourceRoute } from 'falcor-express';
 import bodyParser from 'body-parser';
 import session from 'express-session';
@@ -6,15 +8,25 @@ import cookieParser from 'cookie-parser';
 
 import KillrVideoRouter from './router';
 import RequestContext from './request-context';
+import config from './config';
+
+// Create an app that will run on a separate domain for simulating CORS uploads
+const uploadApp = express();
+
+// Allow CORS pre-flight options call
+uploadApp.options('/dummyUploadEndpoint/*', cors());
+
+// Dummy upload file endpoint
+uploadApp.put('/dummyUploadEndpoint/*', cors(), (req, res) => res.sendStatus(201));
 
 // Create a server for use during development
 const app = express();
 
+// Run upload app on different domain
+app.use(vhost(config.uploadEndpointHost, uploadApp));
+
 // Serve up static build assets
 app.use('/static', express.static(`${__dirname}/../dist`));
-
-// Dummy upload file endpoint
-app.put('/dummyUploadEndpoint/*', (req, res) => res.sendStatus(201));
 
 // Parse POST body for requests to falcor endpoint
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -41,8 +53,12 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
+// Figure out port and store as local
+const listenPort = process.env.PORT || 3000;
+app.locals.port = listenPort;
+
 // Start the server
-const server = app.listen(process.env.PORT || 3000, function() {
+const server = app.listen(listenPort, function() {
   const host = server.address().address;
   const port = server.address().port;
 
