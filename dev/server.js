@@ -14,10 +14,17 @@ import config from './config';
 const uploadApp = express();
 
 // Allow CORS pre-flight options call
-uploadApp.options('/dummyUploadEndpoint/*', cors());
+uploadApp.options('/dummyUploadEndpoint/:fileName', cors());
 
 // Dummy upload file endpoint
-uploadApp.put('/dummyUploadEndpoint/*', cors(), (req, res) => res.sendStatus(201));
+uploadApp.put('/dummyUploadEndpoint/:fileName', cors(), (req, res) => {
+  // Quick way to simulate failures
+  if (req.params.fileName === 'Wildlife.wmv') {
+    res.sendStatus(500);
+  } else {
+    res.sendStatus(201);
+  }
+});
 
 // Create a server for use during development
 const app = express();

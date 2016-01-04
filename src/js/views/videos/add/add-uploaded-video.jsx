@@ -49,14 +49,25 @@ class AddUploadedVideo extends Component {
   }
   
   render() {
-    const { fields: { uploadFile }, statusMessage, statusMessageStyle, percentComplete } = this.props;
+    const { fields: { uploadFile }, handleSubmit, statusMessage, statusMessageStyle, percentComplete } = this.props;
     const fileName = uploadFile.valid ? uploadFile.value.name : '';
     
     const resetButton = (
-      <Button type="reset" title="Reset video selection" onClick={() => this.doReset()}>
+      <Button type="reset" key="reset" title="Reset video selection" onClick={() => this.doReset()}>
         <Icon name="times" title="Reset video selection" />
       </Button>
     );
+    
+    const retryButton = (
+      <Button type="button" key="retry" title="Retry upload" bsStyle="primary" onClick={handleSubmit}>
+        <Icon name="refresh" title="Retry upload" />
+      </Button>
+    );
+    
+    // If there is an error, include the retry button
+    const buttonsAfter = statusMessageStyle === 'danger'
+      ? [ resetButton, retryButton ]
+      : [ resetButton ];
     
     return (
       <form>
@@ -73,21 +84,13 @@ class AddUploadedVideo extends Component {
         </Input>
         <Row className={uploadFile.invalid ? 'hidden' : undefined}>
           <Col xs={12}>
-            <Input type="text" label="Video File" value={fileName} buttonAfter={resetButton} disabled />
+            <Input type="text" label="Video File" value={fileName} buttonAfter={buttonsAfter} disabled />
           </Col>
         </Row>
         <Row className={uploadFile.invalid ? 'hidden' : undefined}>
-          <Col xs={8}>
+          <Col xs={12}>
             <span className={`text-${statusMessageStyle} text-uppercase small`}>{statusMessage}</span><br/>
             <ProgressBar now={percentComplete} bsStyle={statusMessageStyle} />
-          </Col>
-          <Col xs={2} className="add-video-upload-progress">
-            {percentComplete}%
-          </Col>
-          <Col xs={2} className="text-right add-video-upload-buttons">
-            <Icon name="refresh" title="Retry upload" />
-            <Icon name="stop" title="Cancel upload" />
-            
           </Col>
         </Row>
       </form>
