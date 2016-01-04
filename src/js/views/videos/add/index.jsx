@@ -10,7 +10,20 @@ import Input from 'components/shared/input';
 import AddYouTubeVideo from './add-youtube-video';
 import AddUploadedVideo from './add-uploaded-video';
 
-class AddVideo extends Component {  
+class AddVideo extends Component {
+  handleLocationTypeChange(newVal) {
+    // When location type changes, reset the form first
+    this.props.resetForm();
+    this.props.fields.locationType.onChange(newVal);
+  }
+  
+  componentDidUpdate(prevProps) {
+    // If common details go from hidden to shown, focus the Name input
+    if (prevProps.showCommonDetails === false && this.props.showCommonDetails) {
+      this.refs.nameInput.focus();
+    }
+  }
+  
   render() {
     const { 
       videoId,
@@ -55,14 +68,14 @@ class AddVideo extends Component {
           {/* Source selection and source-specific form */}
           <Col sm={6} smPush={columnPush}>
             <Input {...fields.locationType} label="Source">
-              <SourceSelector {...fields.locationType} />
+              <SourceSelector {...fields.locationType} onChange={newVal => this.handleLocationTypeChange(newVal)} />
             </Input>
             
             {selectedSourceInput}
           </Col>
           {/* Common video details */}
           <Col sm={6} className={showCommonDetails === false ? 'hidden' : ''}>
-            <Input {...fields.name} type="text" placeholder="Video name" label="Name" />
+            <Input {...fields.name} type="text" placeholder="Video name" label="Name" ref="nameInput" />
             <Input {...fields.description} type="textarea" placeholder="Video description" label="Description" />
             <Input {...fields.tags} type="text" label="Tags" />
           </Col>
@@ -79,7 +92,8 @@ AddVideo.propTypes = {
   showCommonDetails: PropTypes.bool.isRequired,
   
   // From redux form
-  fields: PropTypes.object.isRequired
+  fields: PropTypes.object.isRequired,
+  resetForm: PropTypes.func.isRequired
 };
 
 // Map redux store state to component props
