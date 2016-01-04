@@ -1,6 +1,6 @@
 import { createAction } from 'redux-actions';
 import { isUndefined } from 'lodash';
-import { Promise } from 'bluebird';
+import { Promise } from 'lib/promise';
 import { change } from 'redux-form';
 
 import { createActionTypeConstants } from './promises';

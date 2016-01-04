@@ -1,11 +1,15 @@
 import { createAction } from 'redux-actions';
 import { isUndefined } from 'lodash';
-import { Promise } from 'bluebird';
+import { Promise } from 'lib/promise';
 import { parse as parseUrl, format as formatUrl } from 'url';
 import xhr from 'xhr';
 import model from 'stores/falcor-model';
 import { createActionTypeConstants } from './promises';
 
+// Enable cancellation
+Promise.config({ cancellation: true });
+
+// Promisify the put method on the xhr lib
 const xhrPut = Promise.promisify(xhr.put);
 
 // Upload in 512 KB chunks
@@ -19,7 +23,8 @@ const UPLOAD_VIDEO = 'addVideo/UPLOAD_VIDEO';
 // Public action types
 export const ActionTypes = {
   UPLOAD_VIDEO: createActionTypeConstants(UPLOAD_VIDEO),
-  UPLOAD_VIDEO_PROGRESS: 'addVideo/UPLOAD_VIDEO_PROGRESS'
+  UPLOAD_VIDEO_PROGRESS: 'addVideo/UPLOAD_VIDEO_PROGRESS',
+  CLEAR_UPLOAD_VIDEO_SELECTION: 'addVideo/CLEAR_UPLOAD_VIDEO_SELECTION'
 };
 
 /**
@@ -28,21 +33,17 @@ export const ActionTypes = {
 
 const reportProgress = createAction(ActionTypes.UPLOAD_VIDEO_PROGRESS, (statusMessage, percentComplete) => ({ statusMessage, percentComplete }));
 
-function checkForCancellation() {
-  
-}
-
 const DESTINATION_PROGRESS_MESSAGE = 'Preparing to upload file';
 function generateUploadDestination() {
   const fileName = this.file.name;
   
-  this.reportProgress(DESTINATION_PROGRESS_MESSAGE, 1);
+  this.dispatch(reportProgress(DESTINATION_PROGRESS_MESSAGE, 1));
   
   return model
     .call('uploads.generateDestination', [ fileName ], [], [ 'destinationUrl' ])
     .then(response => {
       this.destinationUrl = response.json.uploads.destinationUrl;
-      this.reportProgress(DESTINATION_PROGRESS_MESSAGE, 2);
+      this.dispatch(reportProgress(DESTINATION_PROGRESS_MESSAGE, 2));
     });
 }
 
@@ -62,7 +63,7 @@ function uploadRemainingFileChunks() {
   const startKb = Math.floor(start / 1024);
   const fileKb = Math.floor(this.file.size / 1024);
   const percentComplete = Math.floor(5 + (start / this.file.size * 90));
-  this.reportProgress(`Uploading file (${startKb} of ${fileKb})`, percentComplete);
+  this.dispatch(reportProgress(`Uploading file (${startKb} of ${fileKb})`, percentComplete));
   
   // Figure out the end position in file for the chunk
   const end = start + DEFAULT_CHUNK_SIZE >= this.file.size
@@ -121,7 +122,7 @@ function putFileChunk(chunkData) {
 
 const BLOCK_LIST_PROGRESS_MESSAGE = 'Finishing upload';
 function putBlockList() {
-  this.reportProgress(BLOCK_LIST_PROGRESS_MESSAGE, 98);
+  this.dispatch(reportProgress(BLOCK_LIST_PROGRESS_MESSAGE, 98));
   
   // Generate the XML for the block list
   let blockListBody = '';
@@ -146,7 +147,7 @@ function putBlockList() {
       throw new Error(`Put request failed with status code ${response.statusCode}`);
     }
     
-    this.reportProgress(BLOCK_LIST_PROGRESS_MESSAGE, 99);
+    this.dispatch(reportProgress(BLOCK_LIST_PROGRESS_MESSAGE, 99));
   });
 }
 
@@ -166,7 +167,12 @@ export function uploadVideo(formVals) {
     // Tell redux we're uploading a video
     dispatch({
       type: UPLOAD_VIDEO,
-      payload: { promise }
+      payload: { 
+        promise,
+        data: {
+          promise
+        }
+      }
     });
     
     // Upload state will be the 'this' context for all promises because of the Promise.bind call above
@@ -176,9 +182,7 @@ export function uploadVideo(formVals) {
       fileReader: null,
       currentChunk: null,
       blockIds: [],
-      reportProgress(statusMessage, percentComplete) {
-        dispatch(reportProgress(statusMessage, percentComplete));
-      }
+      dispatch
     };
     
     // Start the upload process
@@ -186,6 +190,14 @@ export function uploadVideo(formVals) {
   };
 };
 
-export function cancelUpload() {
-  
+export function clearVideoSelection() {
+  return (dispatch, getState) => {
+    const { addVideo: { upload: { _promise: p } } } = getState();
+    if (p !== null) p.cancel();
+    
+    dispatch({
+      type: ActionTypes.CLEAR_UPLOAD_VIDEO_SELECTION,
+      payload: ActionTypes.CLEAR_UPLOAD_VIDEO_SELECTION
+    });
+  };
 };

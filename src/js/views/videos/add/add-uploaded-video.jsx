@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { reduxForm } from 'redux-form';
 import { validateForm } from 'lib/validation';
-import { uploadVideo, cancelUpload } from 'actions/add-uploaded-video';
+import { uploadVideo, clearVideoSelection } from 'actions/add-uploaded-video';
 
 import { Alert, Row, Col, ProgressBar, Button } from 'react-bootstrap';
 import Dropzone from 'react-dropzone';
@@ -39,12 +39,21 @@ class AddUploadedVideo extends Component {
     }
   }
   
+  componentWillUnmount() {
+    this.props.clearVideoSelection();
+  }
+  
+  doReset() {
+    this.props.clearVideoSelection();
+    this.props.resetForm();
+  }
+  
   render() {
     const { fields: { uploadFile }, statusMessage, statusMessageStyle, percentComplete } = this.props;
     const fileName = uploadFile.valid ? uploadFile.value.name : '';
     
     const resetButton = (
-      <Button type="reset" title="Reset video selection">
+      <Button type="reset" title="Reset video selection" onClick={() => this.doReset()}>
         <Icon name="times" title="Reset video selection" />
       </Button>
     );
@@ -96,9 +105,10 @@ AddUploadedVideo.propTypes = {
   // From redux-form
   fields: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
+  resetForm: PropTypes.func.isRequired,
   
   // Actions
-  cancelUpload: PropTypes.func.isRequired
+  clearVideoSelection: PropTypes.func.isRequired
 };
 
 // Validation constraints
@@ -124,7 +134,7 @@ const AddUploadedVideoForm = reduxForm({
   validate(vals) {
     return validateForm(vals, constraints);
   }
-}, mapStateToProps, { onSubmit: uploadVideo, cancelUpload })(AddUploadedVideo);
+}, mapStateToProps, { onSubmit: uploadVideo, clearVideoSelection })(AddUploadedVideo);
 
 // Export the appropriate component based on whether upload is supported
 const uploadSupported = global.File && global.FileReader && global.FileList && global.Blob;

@@ -1,4 +1,4 @@
-import { Promise } from 'bluebird';
+import { Promise } from 'lib/promise';
 import falcor from 'falcor';
 import HttpDataSource from 'falcor-http-datasource';
 

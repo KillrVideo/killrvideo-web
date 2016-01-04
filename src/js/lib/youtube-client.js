@@ -1,4 +1,4 @@
-import Promise from 'bluebird';
+import Promise from 'lib/promise';
 import { isUndefined } from 'lodash';
 import loadScript from 'load-script';
 import model from 'stores/falcor-model';

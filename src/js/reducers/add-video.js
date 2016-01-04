@@ -12,12 +12,15 @@ const commonDefaultState = {
 // Reducer for common add video state
 function common(state = commonDefaultState, action) {
   switch(action.type) {
+    case UploadActions.CLEAR_UPLOAD_VIDEO_SELECTION:
     case YouTubeActions.CLEAR_YOUTUBE_VIDEO:
       return {
         ...state,
         showCommonDetails: false
       };
+      
     case YouTubeActions.SET_YOUTUBE_VIDEO.SUCCESS:
+    case UploadActions.UPLOAD_VIDEO.LOADING:
       return {
         ...state,
         showCommonDetails: true
@@ -47,6 +50,8 @@ function youTube(state = youTubeDefaultState, action) {
 }
 
 const uploadDefaultState = {
+  _promise: null,
+  
   statusMessage: 'The upload status message',
   statusMessageStyle: 'info',
   percentComplete: 0
@@ -57,9 +62,13 @@ function upload(state = uploadDefaultState, action) {
   let statusMessage;
   
   switch (action.type) {
+    case UploadActions.CLEAR_UPLOAD_VIDEO_SELECTION:
+      return uploadDefaultState;
+      
     case UploadActions.UPLOAD_VIDEO.LOADING:
       return {
         ...state,
+        _promise: action.payload.promise,
         statusMessage: 'Starting upload process',
         statusMessageStyle: 'info',
         percentComplete: 0
@@ -86,9 +95,6 @@ function upload(state = uploadDefaultState, action) {
         statusMessage: 'An unexpected error occurred. Please try again later.',
         statusMessageStyle: 'danger'
       };
-      
-    
-    
   }
   
   return state;
