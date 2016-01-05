@@ -16,12 +16,12 @@ class Input extends Component {
   
   getBootstrapProps(touched, error) {
     if (!touched) {
-      return {};
+      return { };
     }
     
     return error 
       ? { bsStyle: 'error', help: error.join('. ') } 
-      : { bsStyle: 'success' };
+      : { bsStyle: 'success', help: this.props.help };
   }
   
   render() {

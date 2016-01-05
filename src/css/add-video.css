@@ -27,7 +27,27 @@
   border-color: #ff0039;
 }
 
-.add-video-upload-progress, 
-.add-video-upload-buttons {
-  padding-top: 0.5em;
+.add-video-tags.form-control {
+  height: auto;
+  padding-bottom: 0;
+}
+
+.add-video-tags > .label {
+  padding: 6px 10px;
+  margin-right: 5px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.add-video-tags > .label,
+.add-video-tags > input {
+  margin-bottom: 10px;
+}
+
+.add-video-tags > input {
+  border: none;
+}
+
+.add-video-tags > input:focus {
+  outline: none;
 }

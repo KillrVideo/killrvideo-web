@@ -1,12 +1,14 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col, Alert } from 'react-bootstrap';
 import { reduxForm } from 'redux-form';
-import validate from 'validate.js';
+import { isUndefined } from 'lodash';
+import { validateForm } from 'lib/validation';
 
 import VideoLocationTypes from 'lib/video-location-types';
 import ViewVideoLink from 'components/videos/view-video-link';
 import SourceSelector from './source-selector';
 import Input from 'components/shared/input';
+import TagsInput from './tags-input';
 import AddYouTubeVideo from './add-youtube-video';
 import AddUploadedVideo from './add-uploaded-video';
 
@@ -52,7 +54,7 @@ class AddVideo extends Component {
         selectedSourceInput = <AddUploadedVideo />;
         break;
     }
-    
+    console.log()
     return (
       <div id="video-add">
         <Row>
@@ -77,7 +79,9 @@ class AddVideo extends Component {
           <Col sm={6} className={showCommonDetails === false ? 'hidden' : ''}>
             <Input {...fields.name} type="text" placeholder="Video name" label="Name" ref="nameInput" />
             <Input {...fields.description} type="textarea" placeholder="Video description" label="Description" />
-            <Input {...fields.tags} type="text" label="Tags" />
+            <Input {...fields.tags} label="Tags" help="Press enter after each tag to add it to the list">
+              <TagsInput {...fields.tags} placeholder="Video tags (keywords)" />
+            </Input>
           </Col>
         </Row>
       </div>
@@ -96,6 +100,17 @@ AddVideo.propTypes = {
   resetForm: PropTypes.func.isRequired
 };
 
+// Validation constraints
+const constraints = {
+  locationType: { presence: true },
+  name: { presence: true },
+  tags: {  
+    length: { maximum: 10, message: '^No more than 10 tags are allowed' },
+    preventDuplicates: true
+  },
+  location: { presence: true }
+};
+
 // Map redux store state to component props
 function mapStateToProps(state) {
   const { addVideo: { common } } = state;
@@ -111,7 +126,10 @@ export default reduxForm({
     locationType: VideoLocationTypes.UPLOAD,
     name: '',
     description: '',
-    tags: '',
+    tags: [],
     location: ''
+  },
+  validate(vals) {
+    return validateForm(vals, constraints);
   }
 }, mapStateToProps)(AddVideo);

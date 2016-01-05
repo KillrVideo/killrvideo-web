@@ -1,5 +1,5 @@
 import { validate } from 'validate.js';
-import { isUndefined } from 'lodash';
+import { isUndefined, isArray, uniq } from 'lodash';
 
 import parseYouTubeVideoId from 'lib/parse-youtube-video-id';
 
@@ -36,6 +36,20 @@ validate.validators.fileMaxSize = function(value, options) {
   
   return isUndefined(options.message)
     ? `cannot be larger than ${options.size} bytes`
+    : options.message;
+};
+
+/**
+ * Custom validator for preventing duplicates in an array.
+ */
+validate.validators.preventDuplicates = function (value, options) {
+  if (!value || !isArray(value)) return;
+  
+  const isValid = uniq(value).length === value.length;
+  if (isValid) return;
+  
+  return isUndefined(options.message)
+    ? 'cannot have duplicate values'
     : options.message;
 };
 
