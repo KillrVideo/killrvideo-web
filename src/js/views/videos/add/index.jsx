@@ -1,8 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Row, Col, Alert } from 'react-bootstrap';
 import { reduxForm } from 'redux-form';
-import { isUndefined } from 'lodash';
-import { validateForm } from 'lib/validation';
 
 import VideoLocationTypes from 'lib/video-location-types';
 import ViewVideoLink from 'components/videos/view-video-link';
@@ -12,13 +10,9 @@ import TagsInput from './tags-input';
 import AddYouTubeVideo from './add-youtube-video';
 import AddUploadedVideo from './add-uploaded-video';
 
+import { setSource } from 'actions/add-video';
+
 class AddVideo extends Component {
-  handleLocationTypeChange(newVal) {
-    // When location type changes, reset the form first
-    this.props.resetForm();
-    this.props.fields.locationType.onChange(newVal);
-  }
-  
   componentDidUpdate(prevProps) {
     // If common details go from hidden to shown, focus the Name input
     if (prevProps.showCommonDetails === false && this.props.showCommonDetails) {
@@ -27,10 +21,12 @@ class AddVideo extends Component {
   }
   
   render() {
-    const { 
+    const {
       videoId,
       showCommonDetails,
       fields,
+      resetForm,
+      videoLocationType
     } = this.props;
     
     // Center columns until we're showing the common video details column
@@ -45,16 +41,16 @@ class AddVideo extends Component {
       );
     }
     
-    let selectedSourceInput;
-    switch(fields.locationType.value) {
+    let SourceSpecificComponent;
+    switch(videoLocationType) {
       case VideoLocationTypes.YOUTUBE:
-        selectedSourceInput = <AddYouTubeVideo />;
+        SourceSpecificComponent = AddYouTubeVideo;
         break;
       case VideoLocationTypes.UPLOAD:
-        selectedSourceInput = <AddUploadedVideo />;
+        SourceSpecificComponent = AddUploadedVideo;
         break;
     }
-    console.log()
+    
     return (
       <div id="video-add">
         <Row>
@@ -69,11 +65,11 @@ class AddVideo extends Component {
         <Row>
           {/* Source selection and source-specific form */}
           <Col sm={6} smPush={columnPush}>
-            <Input {...fields.locationType} label="Source">
-              <SourceSelector {...fields.locationType} onChange={newVal => this.handleLocationTypeChange(newVal)} />
+            <Input label="Source">
+              <SourceSelector value={videoLocationType} onChange={newVal => this.props.setSource(newVal)} />
             </Input>
             
-            {selectedSourceInput}
+            <SourceSpecificComponent fields={fields} resetForm={resetForm} />
           </Col>
           {/* Common video details */}
           <Col sm={6} className={showCommonDetails === false ? 'hidden' : ''}>
@@ -91,45 +87,39 @@ class AddVideo extends Component {
 
 // Prop validation
 AddVideo.propTypes = {
-  // From redux state
+  // Common state from redux
   videoId: PropTypes.string,
   showCommonDetails: PropTypes.bool.isRequired,
+  
+  // Source-specific state from redux
+  videoLocationType: PropTypes.number.isRequired,
+  sourceSpecific: PropTypes.object.isRequired,
   
   // From redux form
   fields: PropTypes.object.isRequired,
   resetForm: PropTypes.func.isRequired
 };
 
-// Validation constraints
-const constraints = {
-  locationType: { presence: true },
-  name: { presence: true },
-  tags: {  
-    length: { maximum: 10, message: '^No more than 10 tags are allowed' },
-    preventDuplicates: true
-  },
-  location: { presence: true }
-};
-
 // Map redux store state to component props
 function mapStateToProps(state) {
-  const { addVideo: { common } } = state;
+  const { 
+    addVideo: { 
+      common, 
+      sourceSpecific: {
+        form,
+        videoLocationType,
+        ...sourceSpecific
+      } 
+    } 
+  } = state;
   return {
-    ...common
+    ...common,
+    ...form,
+    videoLocationType,
+    sourceSpecific
   };
 }
 
 export default reduxForm({ 
-  form: 'addVideo',
-  fields: [ 'locationType', 'name', 'description', 'tags', 'location' ],
-  initialValues: {
-    locationType: VideoLocationTypes.UPLOAD,
-    name: '',
-    description: '',
-    tags: [],
-    location: ''
-  },
-  validate(vals) {
-    return validateForm(vals, constraints);
-  }
-}, mapStateToProps)(AddVideo);
+  form: 'addVideo'
+}, mapStateToProps, { setSource })(AddVideo);

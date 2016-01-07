@@ -1,9 +1,15 @@
-import { ActionTypes as YouTubeActions } from 'actions/add-youtube-video';
-import { ActionTypes as UploadActions } from 'actions/add-uploaded-video';
+import { ActionTypes } from 'actions/add-video';
 import { combineReducers } from 'redux';
-import { isArray } from 'lodash';
+import { isUndefined } from 'lodash';
 import VideoLocationTypes from 'lib/video-location-types';
 
+import youTube from './add-youtube-video';
+import upload from './add-uploaded-video';
+
+// The default video source when adding a video
+const defaultSource = VideoLocationTypes.YOUTUBE;
+
+// Default common state for all add video sources
 const commonDefaultState = {
   videoId: null,
   showCommonDetails: false
@@ -12,89 +18,39 @@ const commonDefaultState = {
 // Reducer for common add video state
 function common(state = commonDefaultState, action) {
   switch(action.type) {
-    case UploadActions.CLEAR_UPLOAD_VIDEO_SELECTION:
-    case YouTubeActions.CLEAR_YOUTUBE_VIDEO:
-      return {
-        ...state,
-        showCommonDetails: false
-      };
+    case ActionTypes.SET_SOURCE:
+      return commonDefaultState;
       
-    case YouTubeActions.SET_YOUTUBE_VIDEO.SUCCESS:
-    case UploadActions.UPLOAD_VIDEO.LOADING:
+    case ActionTypes.SET_COMMON_DETAILS_VISIBILITY:
       return {
         ...state,
-        showCommonDetails: true
+        showCommonDetails: action.payload.showCommonDetails
       };
-  }
-  return state;
-}
-
-const youTubeDefaultState = {
-  videoId: null
-};
-
-// Reducer for youtube-specific state
-function youTube(state = youTubeDefaultState, action) {
-  switch (action.type) {
-    case YouTubeActions.CLEAR_YOUTUBE_VIDEO:
-      return youTubeDefaultState;
-      
-    case YouTubeActions.SET_YOUTUBE_VIDEO.SUCCESS:
+    
+    case ActionTypes.ADD_SUCCESSFUL:
       return {
         ...state,
-        videoId: action.payload.videoId
+        videoId: action.payload.addedVideoId
       };
   }
   
   return state;
 }
 
-const uploadDefaultState = {
-  _promise: null,
+function sourceSpecific(state, action) {
+  // Figure out which reducer to dispatch to the action to
+  const source = action.type === ActionTypes.SET_SOURCE
+    ? action.payload.videoLocationType  // Changing sources so dispatch to new source that is being set
+    : isUndefined(state)
+      ? defaultSource   // We have no state yet, so use the default
+      : state.videoLocationType;  // We've got state, so use whatever source is currently selected
   
-  statusMessage: 'The upload status message',
-  statusMessageStyle: 'info',
-  percentComplete: 0
-};
-
-// Reducer for upload-specific state
-function upload(state = uploadDefaultState, action) {
-  let statusMessage;
-  
-  switch (action.type) {
-    case UploadActions.CLEAR_UPLOAD_VIDEO_SELECTION:
-      return uploadDefaultState;
-      
-    case UploadActions.UPLOAD_VIDEO.LOADING:
-      return {
-        ...state,
-        _promise: action.payload.promise,
-        statusMessage: 'Starting upload process',
-        statusMessageStyle: 'info',
-        percentComplete: 0
-      };
-    
-    case UploadActions.UPLOAD_VIDEO_PROGRESS:
-      return {
-        ...state,
-        statusMessage: action.payload.statusMessage,
-        percentComplete: action.payload.percentComplete
-      };
-    
-    case UploadActions.UPLOAD_VIDEO.SUCCESS:
-      return {
-        ...state,
-        statusMessage: 'Video uploaded successfully',
-        statusMessageStyle: 'success',
-        percentComplete: 100
-      };
-      
-    case UploadActions.UPLOAD_VIDEO.FAILURE:
-      return {
-        ...state,
-        statusMessage: 'An unexpected error occurred. Please try again later.',
-        statusMessageStyle: 'danger'
-      };
+  // Dispatch actions based on the appropriate source
+  switch (source) {
+    case VideoLocationTypes.YOUTUBE:
+      return youTube(state, action);
+    case VideoLocationTypes.UPLOAD:
+      return upload(state, action);
   }
   
   return state;
@@ -103,6 +59,5 @@ function upload(state = uploadDefaultState, action) {
 // Export reducer
 export default combineReducers({
   common,
-  youTube,
-  upload
+  sourceSpecific
 });

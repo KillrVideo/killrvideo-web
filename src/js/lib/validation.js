@@ -1,5 +1,5 @@
 import { validate } from 'validate.js';
-import { isUndefined, isArray, uniq } from 'lodash';
+import { isUndefined, isArray, uniq, mapValues } from 'lodash';
 
 import parseYouTubeVideoId from 'lib/parse-youtube-video-id';
 
@@ -57,6 +57,13 @@ validate.validators.preventDuplicates = function (value, options) {
  * Validate form values using the constraints specified.
  */
 export function validateForm(vals, constraints) {
+  const result = validate(vals, constraints);
+  
   // Redux form expects an empty object if there are not validation errors
-  return validate(vals, constraints) || {};
+  if (isUndefined(result)) {
+    return {};
+  }
+  
+  // Validate.js returns an array of errors for each prop and redux-form expects just a string
+  return mapValues(result, val => val.join('. '));
 };

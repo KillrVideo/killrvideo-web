@@ -1,96 +1,80 @@
 import React, { Component, PropTypes } from 'react';
-import { Button } from 'react-bootstrap';
 import { reduxForm } from 'redux-form';
-import { validateForm } from 'lib/validation';
+import { connect } from 'react-redux';
 
+import { setYouTubeVideoSelection, clearYouTubeVideoSelection } from 'actions/add-youtube-video';
+
+import { Button } from 'react-bootstrap';
 import Input from 'components/shared/input';
 import Icon from 'components/shared/icon';
-import { setYouTubeVideoSelection, clearYouTubeVideoSelection } from 'actions/add-youtube-video';
 
 // Inputs needed for adding a YouTube video
 class AddYouTubeVideo extends Component {
-  componentWillUnmount() {
+  clearYouTubeVideo() {
+    // Dispatch the action and clear the form
     this.props.clearYouTubeVideoSelection();
-  }
-  
-  doReset() {
     this.props.resetForm();
-    this.props.clearYouTubeVideoSelection();
   }
-  
-  render() {
-    const { fields: { youTubeUrl }, handleSubmit, submitting, videoId } = this.props;
     
-    let buttonAfter;
-    if (videoId === null) {
+  render() {
+    const {
+      fields: { youTubeUrl },
+      youTubeVideoId,
+      setSelectionInProgress
+    } = this.props;
+    
+    const hasYouTubeVideoId = !!youTubeVideoId;
+    
+    let buttonAfter, previewImage;
+    if (!hasYouTubeVideoId) {
       buttonAfter = (
-        <Button key="submit" type="submit" disabled={submitting}>
-          <Icon name="cog" animate="spin" className={submitting ? undefined : 'hidden'} /> Get it
+        <Button key="set" type="button" onClick={() => this.props.setYouTubeVideoSelection()} disabled={setSelectionInProgress || youTubeUrl.invalid}>
+          <Icon name="cog" animate="spin" className={setSelectionInProgress ? undefined : 'hidden'} /> Get it
         </Button>
       );
     } else {
       buttonAfter = (
-        <Button key="clear" type="reset" onClick={() => this.doReset()}>
+        <Button key="clear" type="button" onClick={() => this.clearYouTubeVideo()}>
           <Icon name="close" />
         </Button>
       );
-    }
-     
-    
-    let previewImage;
-    if (videoId !== null) {
+      
       previewImage = (
         <Input label="Preview Image">
-          <img className="img-responsive" src={ videoId === null ? undefined : `//img.youtube.com/vi/${videoId}/hqdefault.jpg` } />
+          <img className="img-responsive" src={`//img.youtube.com/vi/${youTubeVideoId}/hqdefault.jpg`} />
         </Input>
       );
     }
-        
+    
     return (
-      <form onSubmit={handleSubmit(vals => this.props.setYouTubeVideoSelection(vals.youTubeUrl))}>
-        <Input {...youTubeUrl} type="text" label="YouTube URL" buttonAfter={buttonAfter} disabled={videoId !== null}
+      <div>
+        <Input {...youTubeUrl} type="text" label="YouTube URL" buttonAfter={buttonAfter} disabled={hasYouTubeVideoId}
                placeholder="Enter the URL for the video on YouTube (i.e. http://www.youtube.com/watch?v=XXXXXXXX)" />
         {previewImage}
-      </form>
+      </div>
     );
   }
 }
 
 // Prop Validation
 AddYouTubeVideo.propTypes = {
-  videoId: PropTypes.string,
-  
-  // From redux form
+  // Redux-form values from parent
   fields: PropTypes.object.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
-  submitting: PropTypes.bool.isRequired,
+  resetForm: PropTypes.func.isRequired,
   
-  // Actions
-  setYouTubeVideoSelection: PropTypes.func.isRequired,
-  clearYouTubeVideoSelection: PropTypes.func.isRequired
-};
-
-// Validation constraints
-const constraints = {
-  youTubeUrl: {
-    presence: { message: '^YouTube URL can\'t be blank' },
-    youTubeVideoUrl: { message: '^YouTube URL is not a valid YouTube video URL' }
-  }
+  // Source specific fields
+  youTubeVideoId: PropTypes.string,
+  setSelectionInProgress: PropTypes.bool.isRequired
 };
 
 // Map redux state to component props
 function mapStateToProps(state) {
-  const { addVideo: { youTube } } = state;
+  const { addVideo: { sourceSpecific: {  youTubeVideoId, setSelectionInProgress } } } = state;
   return {
-    ...youTube
+    youTubeVideoId,
+    setSelectionInProgress
   };
 }
 
-// Connect to redux with redux-form
-export default reduxForm({
-  form: 'addYouTubeVideo',
-  fields: [ 'youTubeUrl' ],
-  validate(vals) {
-    return validateForm(vals, constraints);
-  }
-}, mapStateToProps, { setYouTubeVideoSelection, clearYouTubeVideoSelection })(AddYouTubeVideo);
+// Export the component
+export default connect(mapStateToProps, { setYouTubeVideoSelection, clearYouTubeVideoSelection })(AddYouTubeVideo);

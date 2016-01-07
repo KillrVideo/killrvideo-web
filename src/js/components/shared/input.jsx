@@ -20,7 +20,7 @@ class Input extends Component {
     }
     
     return error 
-      ? { bsStyle: 'error', help: error.join('. ') } 
+      ? { bsStyle: 'error', help: error } 
       : { bsStyle: 'success', help: this.props.help };
   }
   
@@ -46,7 +46,7 @@ class Input extends Component {
 
 Input.propTypes = {
   touched: PropTypes.bool,
-  error: PropTypes.array,
+  error: PropTypes.string,
   focusOnMount: PropTypes.bool
 };
 
