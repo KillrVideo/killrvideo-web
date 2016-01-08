@@ -14,6 +14,11 @@ import { setSource } from 'actions/add-video';
 
 class AddVideo extends Component {
   componentDidUpdate(prevProps) {
+    // If location type changes, reset the form
+    if (prevProps.videoLocationType !== this.props.videoLocationType) {
+      this.props.resetForm();
+    }
+    
     // If common details go from hidden to shown, focus the Name input
     if (prevProps.showCommonDetails === false && this.props.showCommonDetails) {
       this.refs.nameInput.focus();

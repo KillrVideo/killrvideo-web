@@ -45,9 +45,19 @@ function upload(state = uploadDefaultState, action) {
   let statusMessage;
   
   switch (action.type) {
-    // Changing source so return default state
     case CommonActions.SET_SOURCE:
-      return uploadDefaultState;
+      if (action.payload.videoLocationType === VideoLocationTypes.UPLOAD) {
+        // Switch TO upload
+        return uploadDefaultState;  
+      } else {
+        // Switch FROM upload
+        const p = state._uploadPromise;
+        if (p !== null) p.cancel();
+        return {
+          _uploadPromise: null,
+          ...state
+        };
+      }
       
     case UploadActions.CLEAR_UPLOAD_VIDEO_SELECTION:
       return uploadDefaultState;

@@ -15,7 +15,7 @@ class AddYouTubeVideo extends Component {
     this.props.clearYouTubeVideoSelection();
     this.props.resetForm();
   }
-    
+      
   render() {
     const {
       fields: { youTubeUrl },

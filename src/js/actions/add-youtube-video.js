@@ -151,7 +151,11 @@ export function setYouTubeVideoSelection() {
 
 // Clear the YouTube video selection
 export function clearYouTubeVideoSelection() {
-  return dispatch => {
+  return (dispatch, getState) => {
+    // Cancel any validation that's in progress
+    const { addVideo: { sourceSpecific: { _validationPromise: p } } } = getState();
+    if (p !== null) p.cancel();
+    
     dispatch(hideCommonDetails());
     dispatch(clearYouTubeVideo());
   };

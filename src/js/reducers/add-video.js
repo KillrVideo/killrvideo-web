@@ -37,20 +37,25 @@ function common(state = commonDefaultState, action) {
   return state;
 }
 
-function sourceSpecific(state, action) {
-  // Figure out which reducer to dispatch to the action to
-  const source = action.type === ActionTypes.SET_SOURCE
-    ? action.payload.videoLocationType  // Changing sources so dispatch to new source that is being set
-    : isUndefined(state)
-      ? defaultSource   // We have no state yet, so use the default
-      : state.videoLocationType;  // We've got state, so use whatever source is currently selected
-  
-  // Dispatch actions based on the appropriate source
+function dispatchToSource(source, state, action) {
   switch (source) {
     case VideoLocationTypes.YOUTUBE:
       return youTube(state, action);
     case VideoLocationTypes.UPLOAD:
       return upload(state, action);
+  }
+}
+
+function sourceSpecific(state, action) {
+  // Figure out the currently selected source
+  const currentSource = isUndefined(state) ? defaultSource : state.videoLocationType;
+  
+  // Dispatch action to the current source
+  state = dispatchToSource(currentSource, state, action);
+  
+  // If we're switching sources, dispatch to the new source as well
+  if (action.type === ActionTypes.SET_SOURCE) {
+    state = dispatchToSource(action.payload.videoLocationType, state, action);
   }
   
   return state;

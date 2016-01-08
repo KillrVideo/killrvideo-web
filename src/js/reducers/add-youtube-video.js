@@ -47,7 +47,18 @@ function youTube(state = youTubeDefaultState, action) {
   switch (action.type) {
     // Changing source, so return defaults
     case CommonActions.SET_SOURCE:
-      return youTubeDefaultState;
+      if (action.payload.videoLocationType === VideoLocationTypes.YOUTUBE) {
+        // Switching TO YouTube
+        return youTubeDefaultState;
+      } else {
+        // Switching FROM YouTube
+        const p = state._validationPromise;
+        if (p !== null) p.cancel();
+        return {
+          _validationPromise: null,
+          ...state
+        };
+      }
     
     case YouTubeActions.CLEAR_YOUTUBE_VIDEO:
       return youTubeDefaultState;

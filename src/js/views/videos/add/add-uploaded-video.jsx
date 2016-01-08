@@ -36,7 +36,7 @@ class AddUploadedVideo extends Component {
       this.doUpload();
     }
   }
-  
+    
   render() {
     const { fields: { uploadFile }, statusMessage, statusMessageStyle, percentComplete } = this.props;
     const fileName = uploadFile.valid ? uploadFile.value.name : '';
