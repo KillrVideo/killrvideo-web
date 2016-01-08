@@ -13,7 +13,7 @@ class AddUploadedVideoNotSupported extends Component {
   render() {
     return (
       <Alert bsStyle="danger">
-        Sorry, upload is not currently supported by this browser or device.
+        Sorry, uploading videos is not currently supported on this browser or device.
       </Alert>
     );
   }

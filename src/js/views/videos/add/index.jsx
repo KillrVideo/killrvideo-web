@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Row, Col, Alert } from 'react-bootstrap';
+import { Row, Col, Alert, Button } from 'react-bootstrap';
 import { reduxForm } from 'redux-form';
 
 import VideoLocationTypes from 'lib/video-location-types';
@@ -31,6 +31,7 @@ class AddVideo extends Component {
       showCommonDetails,
       fields,
       resetForm,
+      handleSubmit,
       videoLocationType
     } = this.props;
     
@@ -83,6 +84,9 @@ class AddVideo extends Component {
             <Input {...fields.tags} label="Tags" help="Press enter after each tag to add it to the list">
               <TagsInput {...fields.tags} placeholder="Video tags (keywords)" />
             </Input>
+            <Button type="button" bsStyle="primary" onClick={handleSubmit}>
+              Add Video
+            </Button>
           </Col>
         </Row>
       </div>
@@ -102,7 +106,8 @@ AddVideo.propTypes = {
   
   // From redux form
   fields: PropTypes.object.isRequired,
-  resetForm: PropTypes.func.isRequired
+  resetForm: PropTypes.func.isRequired,
+  handleSubmit: PropTypes.func.isRequired
 };
 
 // Map redux store state to component props

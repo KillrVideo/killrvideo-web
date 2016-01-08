@@ -3,7 +3,7 @@ import { validateForm } from 'lib/validation';
 import VideoLocationTypes from 'lib/video-location-types';
 
 import { ActionTypes as CommonActions } from 'actions/add-video';
-import { ActionTypes as YouTubeActions, validateYouTubeUrl } from 'actions/add-youtube-video';
+import { ActionTypes as YouTubeActions, validateYouTubeUrl, addYouTubeVideo } from 'actions/add-youtube-video';
 
 // Validation constraints
 const constraints = {
@@ -15,6 +15,7 @@ const constraints = {
 };
 
 const youTubeDefaultState = {
+  _youTubeUrl: null,
   _validationPromise: null,
   _allowValidationToComplete: null,
   
@@ -36,8 +37,8 @@ const youTubeDefaultState = {
     asyncValidate(vals, dispatch) {
       return dispatch(validateYouTubeUrl(vals.youTubeUrl));
     },
-    onSubmit(vals) {
-      console.log(vals);
+    onSubmit(vals, dispatch) {
+      return dispatch(addYouTubeVideo(vals));
     }
   }
 };
@@ -66,16 +67,9 @@ function youTube(state = youTubeDefaultState, action) {
     case YouTubeActions.VALIDATE_YOUTUBE_URL.LOADING:
       return {
         ...state,
+        _youTubeUrl: action.payload.youTubeUrl,
         _validationPromise: action.payload.promise,
         _allowValidationToComplete: action.payload.allowValidationToComplete
-      };
-      
-    case YouTubeActions.VALIDATE_YOUTUBE_URL.SUCCESS:
-    case YouTubeActions.VALIDATE_YOUTUBE_URL.FAILURE:
-      return {
-        ...state,
-        _validationPromise: null,
-        _allowValidationToComplete: null
       };
       
     case YouTubeActions.SET_YOUTUBE_VIDEO.LOADING:

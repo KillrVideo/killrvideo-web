@@ -2,6 +2,7 @@ import { createAction } from 'redux-actions';
 import { isUndefined } from 'lodash';
 import { Promise } from 'lib/promise';
 
+import model from 'stores/falcor-model';
 import { change, blur } from 'redux-form';
 import { showCommonDetails, hideCommonDetails } from './add-video';
 
@@ -22,11 +23,13 @@ INVALID_YOUTUBE_URL.suppressUnhandledRejections();
 
 const VALIDATE_YOUTUBE_URL = 'addVideo/VALIDATE_YOUTUBE_URL';
 const SET_YOUTUBE_VIDEO = 'addVideo/SET_YOUTUBE_VIDEO';
+const ADD_YOUTUBE_VIDEO = 'addVideo/ADD_YOUTUBE_VIDEO';
 
 // Public action types
 export const ActionTypes = {
   VALIDATE_YOUTUBE_URL: createActionTypeConstants(VALIDATE_YOUTUBE_URL),
   SET_YOUTUBE_VIDEO: createActionTypeConstants(SET_YOUTUBE_VIDEO),
+  ADD_YOUTUBE_VIDEO: createActionTypeConstants(ADD_YOUTUBE_VIDEO),
   CLEAR_YOUTUBE_VIDEO: 'addVideo/CLEAR_YOUTUBE_VIDEO'
 };
 
@@ -81,9 +84,23 @@ export function validateYouTubeUrl(youTubeUrl) {
       throw new Error('Invalid YouTube video URL');
     }
     
-    // Cancel any existing promise
-    const { addVideo: { sourceSpecific: { _validationPromise: existingPromise } } } = getState();
+    // See what the current async validation state is
+    const { 
+      addVideo: { 
+        sourceSpecific: { 
+          _youTubeUrl: validatedYouTubeUrl, 
+          _validationPromise: existingPromise 
+        } 
+      } 
+    } = getState();
+    
     if (existingPromise) {
+      // Is the URL we're validating the same as the current promise?
+      if (validatedYouTubeUrl === youTubeUrl) {
+        return existingPromise.return({});
+      }
+      
+      // Cancel existing validation so we can start again
       existingPromise.cancel();
     }
     
@@ -103,17 +120,19 @@ export function validateYouTubeUrl(youTubeUrl) {
     // it to complete in state
     dispatch({
       type: VALIDATE_YOUTUBE_URL,
-      payload: { 
-        promise, 
-        data: { 
+      payload: {
+        promise,
+        data: {
+          youTubeUrl,
           promise,
-          allowValidationToComplete 
+          allowValidationToComplete
         }
       }
     });
     
-    // Return the validation promise so redux-form knows it's in progress
-    return promise;
+    // The promise that reduxForm expects needs to return an empty object in the case of success, but the promise
+    // we currently have will return the results of the YouTube API lookup, so just return an empty object on success
+    return promise.return({});
   };
 };
 
@@ -145,6 +164,17 @@ export function setYouTubeVideoSelection() {
     allowValidationToComplete();
     
     // Return the promise
+    return promise;
+  };
+};
+
+// Add a YouTube video to the site
+export function addYouTubeVideo(vals) {
+  return dispatch => {
+    const promise = model.call();
+    
+    
+    
     return promise;
   };
 };
