@@ -3,11 +3,22 @@ import { validateForm } from 'lib/validation';
 import VideoLocationTypes from 'lib/video-location-types';
 
 import { ActionTypes as CommonActions } from 'actions/add-video';
-import { ActionTypes as UploadActions } from 'actions/add-uploaded-video';
+import { ActionTypes as UploadActions, uploadVideo } from 'actions/add-uploaded-video';
 
+// Validation constraints
+const constraints = {
+  uploadFile: {
+    presence: { message: '^Please select a video to upload' },
+    fileMaxSize: { message: '^Video is too large, please select a smaller video', size: 1073741824 }  // Support uploads of up to 1 GB
+  },
+  ...commonConstraints
+};
+
+// Default state for upload
 const uploadDefaultState = {
-  _promise: null,
+  _uploadPromise: null,
   
+  uploadUrl: null,
   statusMessage: 'The upload status message',
   statusMessageStyle: 'info',
   percentComplete: 0,
@@ -15,16 +26,13 @@ const uploadDefaultState = {
   // Common state returned by all sources
   videoLocationType: VideoLocationTypes.UPLOAD,
   form: {
-    fields: [ 'uploadUrl', ...commonFields ],
+    fields: [ 'uploadFile', ...commonFields ],
     initialValues: {
-      uploadUrl: '',
+      uploadFile: null,
       ...commonInitialValues
     },
     validate(vals) {
-      return validateForm(vals, {
-        uploadUrl: { presence: true },
-        ...commonConstraints
-      });
+      return validateForm(vals, constraints);
     },
     onSubmit(vals) {
       console.log(vals);
@@ -47,7 +55,7 @@ function upload(state = uploadDefaultState, action) {
     case UploadActions.UPLOAD_VIDEO.LOADING:
       return {
         ...state,
-        _promise: action.payload.promise,
+        _uploadPromise: action.payload.promise,
         statusMessage: 'Starting upload process',
         statusMessageStyle: 'info',
         percentComplete: 0

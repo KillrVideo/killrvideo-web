@@ -7,7 +7,7 @@ import youTube from './add-youtube-video';
 import upload from './add-uploaded-video';
 
 // The default video source when adding a video
-const defaultSource = VideoLocationTypes.YOUTUBE;
+const defaultSource = VideoLocationTypes.UPLOAD;
 
 // Default common state for all add video sources
 const commonDefaultState = {

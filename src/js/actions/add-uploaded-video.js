@@ -5,9 +5,7 @@ import { parse as parseUrl, format as formatUrl } from 'url';
 import xhr from 'xhr';
 import model from 'stores/falcor-model';
 import { createActionTypeConstants } from './promises';
-
-// Enable cancellation
-Promise.config({ cancellation: true });
+import { showCommonDetails, hideCommonDetails } from './add-video';
 
 // Promisify the put method on the xhr lib
 const xhrPut = Promise.promisify(xhr.put);
@@ -18,6 +16,7 @@ const DEFAULT_CHUNK_SIZE = 1024 * 512;
 /**
  * Action type constants
  */
+
 const UPLOAD_VIDEO = 'addVideo/UPLOAD_VIDEO';
 
 // Public action types
@@ -148,21 +147,31 @@ function putBlockList() {
     }
     
     this.dispatch(reportProgress(BLOCK_LIST_PROGRESS_MESSAGE, 99));
+    
+    // Return the URL the file was uploaded to
+    return {
+      uploadUrl: this.destinationUrl
+    };
   });
 }
 
+
 /**
- * Public action creators
+ * Action creators
  */
 
-export function uploadVideo(formVals) {
+export function uploadVideo(uploadFile) {
   return dispatch => {
     // Create a promise that we can manually trigger at the end of this method to start the upload
+    // after we've dispatched the promise
     let startUpload;
     const startPromise = new Promise(resolve => { startUpload = resolve; });
     
     // Create a promise to represent the entire upload process
-    const promise = Promise.bind(startPromise).then(generateUploadDestination).then(uploadRemainingFileChunks).then(putBlockList);
+    const promise = Promise.bind(startPromise)
+      .then(generateUploadDestination)
+      .then(uploadRemainingFileChunks)
+      .then(putBlockList);
     
     // Tell redux we're uploading a video
     dispatch({
@@ -175,9 +184,12 @@ export function uploadVideo(formVals) {
       }
     });
     
+    // Allow common details to be shown
+    dispatch(showCommonDetails());
+    
     // Upload state will be the 'this' context for all promises because of the Promise.bind call above
     let uploadState = {
-      file: formVals.uploadFile,
+      file: uploadFile,
       destinationUrl: null,
       fileReader: null,
       currentChunk: null,
@@ -187,14 +199,18 @@ export function uploadVideo(formVals) {
     
     // Start the upload process
     startUpload(uploadState);
+    
+    return promise;
   };
 };
 
 export function clearVideoSelection() {
   return (dispatch, getState) => {
-    const { addVideo: { upload: { _promise: p } } } = getState();
+    const { addVideo: { sourceSpecific: { _uploadPromise: p } } } = getState();
     if (p !== null) p.cancel();
     
+    // Hide common details and clear the selection
+    dispatch(hideCommonDetails());
     dispatch({
       type: ActionTypes.CLEAR_UPLOAD_VIDEO_SELECTION,
       payload: ActionTypes.CLEAR_UPLOAD_VIDEO_SELECTION
