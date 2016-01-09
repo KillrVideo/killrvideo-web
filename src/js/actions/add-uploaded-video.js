@@ -5,7 +5,6 @@ import { parse as parseUrl, format as formatUrl } from 'url';
 import xhr from 'xhr';
 import model from 'stores/falcor-model';
 import { createActionTypeConstants } from './promises';
-import { showCommonDetails, hideCommonDetails } from './add-video';
 
 // Promisify the put method on the xhr lib
 const xhrPut = Promise.promisify(xhr.put);
@@ -18,11 +17,13 @@ const DEFAULT_CHUNK_SIZE = 1024 * 512;
  */
 
 const UPLOAD_VIDEO = 'addVideo/UPLOAD_VIDEO';
+const ADD_UPLOADED_VIDEO = 'addVideo/ADD_UPLOADED_VIDEO';
 
 // Public action types
 export const ActionTypes = {
   UPLOAD_VIDEO: createActionTypeConstants(UPLOAD_VIDEO),
   UPLOAD_VIDEO_PROGRESS: 'addVideo/UPLOAD_VIDEO_PROGRESS',
+  ADD_UPLOADED_VIDEO: createActionTypeConstants(ADD_UPLOADED_VIDEO),
   CLEAR_UPLOAD_VIDEO_SELECTION: 'addVideo/CLEAR_UPLOAD_VIDEO_SELECTION'
 };
 
@@ -183,10 +184,7 @@ export function uploadVideo(uploadFile) {
         }
       }
     });
-    
-    // Allow common details to be shown
-    dispatch(showCommonDetails());
-    
+        
     // Upload state will be the 'this' context for all promises because of the Promise.bind call above
     let uploadState = {
       file: uploadFile,
@@ -204,16 +202,24 @@ export function uploadVideo(uploadFile) {
   };
 };
 
-export function clearVideoSelection() {
+// Add an uploaded video
+export function addUploadedVideo(vals) {
   return (dispatch, getState) => {
-    const { addVideo: { sourceSpecific: { _uploadPromise: p } } } = getState();
-    if (p !== null) p.cancel();
+    const { addVideo: { upload: { _uploadPromise: uploadPromise } } } = getState();
     
-    // Hide common details and clear the selection
-    dispatch(hideCommonDetails());
+    const promise = uploadPromise
+      .then(result => {
+        return model.call([ 'currentUser', 'videos', 'addUploaded' ], [ result.uploadUrl, vals.name, vals.description, vals.tags ], [ 'videoId' ]);
+      })
+      .then(response => ({ addedVideoId: response.json.currentUser.videos[0].videoId }));
+      
     dispatch({
-      type: ActionTypes.CLEAR_UPLOAD_VIDEO_SELECTION,
-      payload: ActionTypes.CLEAR_UPLOAD_VIDEO_SELECTION
+      type: ADD_UPLOADED_VIDEO,
+      payload: { promise }
     });
+    
+    return promise;
   };
 };
+
+export const clearVideoSelection = createAction(ActionTypes.CLEAR_UPLOAD_VIDEO_SELECTION);

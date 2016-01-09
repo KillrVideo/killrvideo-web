@@ -3,8 +3,7 @@ import { isUndefined } from 'lodash';
 import { Promise } from 'lib/promise';
 
 import model from 'stores/falcor-model';
-import { change, blur } from 'redux-form';
-import { showCommonDetails, hideCommonDetails } from './add-video';
+import { change } from 'redux-form';
 
 import { createActionTypeConstants } from './promises';
 import getYouTubeClient from 'lib/youtube-client';
@@ -57,9 +56,6 @@ function updateForm(videoDetails) {
   // Update some values on the addVideo form
   this.dispatch(change('addVideo', 'name', snippet.title));
   this.dispatch(change('addVideo', 'description', snippet.description));
-
-  // Show the common video details entry section
-  this.dispatch(showCommonDetails());
   
   // Return the video Id
   return {
@@ -86,12 +82,12 @@ export function validateYouTubeUrl(youTubeUrl) {
     
     // See what the current async validation state is
     const { 
-      addVideo: { 
-        sourceSpecific: { 
+      addVideo: {
+        youTube: { 
           _youTubeUrl: validatedYouTubeUrl, 
-          _validationPromise: existingPromise 
+          _validationPromise: existingPromise
         } 
-      } 
+      }
     } = getState();
     
     if (existingPromise) {
@@ -142,8 +138,8 @@ export function setYouTubeVideoSelection() {
     // Get the validation promise (which should be in progress) and the function we can
     // invoke to allow it to resolve/reject
     const { 
-      addVideo: { 
-        sourceSpecific: { 
+      addVideo: {
+        youTube: {
           _validationPromise: validationPromise,
           _allowValidationToComplete: allowValidationToComplete
         }
@@ -170,23 +166,20 @@ export function setYouTubeVideoSelection() {
 
 // Add a YouTube video to the site
 export function addYouTubeVideo(vals) {
-  return dispatch => {
-    const promise = model.call();
+  return (dispatch, getState) => {
+    const { addVideo: { youTube: { youTubeVideoId } } } = getState();
     
-    
+    const promise = model.call([ 'currentUser', 'videos', 'addYouTube' ], [ youTubeVideoId, vals.name, vals.description, vals.tags ], [ 'videoId' ])
+      .then(response => ({ addedVideoId: response.json.currentUser.videos[0].videoId }));
+      
+    dispatch({
+      type: ADD_YOUTUBE_VIDEO,
+      payload: { promise }
+    });
     
     return promise;
   };
 };
 
 // Clear the YouTube video selection
-export function clearYouTubeVideoSelection() {
-  return (dispatch, getState) => {
-    // Cancel any validation that's in progress
-    const { addVideo: { sourceSpecific: { _validationPromise: p } } } = getState();
-    if (p !== null) p.cancel();
-    
-    dispatch(hideCommonDetails());
-    dispatch(clearYouTubeVideo());
-  };
-};
+export const clearYouTubeVideoSelection = createAction(ActionTypes.CLEAR_YOUTUBE_VIDEO);

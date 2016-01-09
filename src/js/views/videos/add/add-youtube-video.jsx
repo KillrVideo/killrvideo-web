@@ -69,7 +69,7 @@ AddYouTubeVideo.propTypes = {
 
 // Map redux state to component props
 function mapStateToProps(state) {
-  const { addVideo: { sourceSpecific: {  youTubeVideoId, setSelectionInProgress } } } = state;
+  const { addVideo: { youTube: {  youTubeVideoId, setSelectionInProgress } } } = state;
   return {
     youTubeVideoId,
     setSelectionInProgress

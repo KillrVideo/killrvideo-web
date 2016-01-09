@@ -82,7 +82,6 @@ class AddUploadedVideo extends Component {
 // Prop validation
 AddUploadedVideo.propTypes = {
   // Redux state
-  uploadUrl: PropTypes.string,
   statusMessage: PropTypes.string.isRequired,
   statusMessageStyle: PropTypes.string.isRequired,
   percentComplete: PropTypes.number.isRequired,
@@ -99,8 +98,8 @@ AddUploadedVideo.propTypes = {
 // Map redux state to props
 function mapStateToProps(state) {
   const { 
-    addVideo: { 
-      sourceSpecific: { 
+    addVideo: {
+      upload: { 
         statusMessage,
         statusMessageStyle,
         percentComplete

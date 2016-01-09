@@ -42,7 +42,7 @@ const routes = [
         const views = viewsByVideoIdStore[videoId];
         pathValues.push({
           path: [ 'statsByVideoId', videoId, 'views' ],
-          value: isUndefined(views) ? $atom() : views
+          value: isUndefined(views) ? 0 : views
         });
       });
       

@@ -1,20 +1,17 @@
 import { createAction } from 'redux-actions';
 
 /**
- * Action type constants
+ * Action Type constants
  */
 
 export const ActionTypes = {
-  SET_SOURCE: 'addVideo/setSource',
-  SET_COMMON_DETAILS_VISIBILITY: 'addVideo/setCommonDetailsVisibility',
-  ADD_SUCCESSFUL: 'addVideo/addSucessful'
+  SET_SOURCE: 'addVideo/SET_SOURCE',
+  UNLOAD: 'addVideo/UNLOAD'
 };
 
 /**
- * Public action creators
+ * Action creators
  */
 
 export const setSource = createAction(ActionTypes.SET_SOURCE, videoLocationType => ({ videoLocationType }));
-export const showCommonDetails = createAction(ActionTypes.SET_COMMON_DETAILS_VISIBILITY, () => ({ showCommonDetails: true }));
-export const hideCommonDetails = createAction(ActionTypes.SET_COMMON_DETAILS_VISIBILITY, () => ({ showCommonDetails: false }));
-export const addSuccessful = createAction(ActionTypes.ADD_SUCCESSFUL, addedVideoId => ({ addedVideoId }));
+export const unload = createAction(ActionTypes.UNLOAD);

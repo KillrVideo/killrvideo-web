@@ -1,6 +1,7 @@
 import { _, isUndefined, range, pick } from 'lodash';
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import moment from 'moment';
+import uuid from 'uuid';
 
 import { getIntFromPartOfUuid } from './util';
 import getVideos from '../data/videos';
@@ -18,6 +19,9 @@ const videosByIdStore = _(getVideos()).indexBy('videoId').mapValues(video => {
   video.author = userIds[authorIdx];
   return video;
 }).value();
+
+// An uploaded video that we can use as a placeholder for newly added upload videos
+const sampleUpload = _(videosByIdStore).values().find(v => v.locationType === 1);
 
 // Index also by user (author) id
 const videosByUserIdStore = _(videosByIdStore).groupBy(v => v.author).value();
@@ -56,7 +60,8 @@ const routes = [
       const MAX_RECENT_VIDEOS = 9;
       
       // Figure out the most recent video ids
-      const videoIdsByDate = _(getVideos())
+      const videoIdsByDate = _(videosByIdStore)
+        .values()
         .sortByOrder(vid => moment(vid.addedDate).toDate(), 'desc')
         .pluck('videoId')
         .take(MAX_RECENT_VIDEOS)
@@ -96,6 +101,110 @@ const routes = [
           })
         });
       });
+      
+      return pathValues;
+    }
+  },
+  {
+    // Add YouTube video to the catalog
+    route: 'usersById[{keys:userIds}].videos.addYouTube',
+    call(callPath, args) {
+      const [ youTubeVideoId, name, description, tags ] = args;
+      
+      let pathValues = [];
+      
+      // Get current user
+      const userId = this.requestContext.getUserId();
+      if (isUndefined(userId)) {
+        pathValues.push({
+          path: [ 'currentUser', 'videos', 'addYouTubeErrors' ],
+          value: $error('Not currently logged in')
+        });
+        return pathValues;
+      }
+      
+      // Create video object for local storage
+      const videoId = uuid.v4();
+      const newVideo = {
+        videoId,
+        addedDate: moment().toISOString(),
+        name,
+        description,
+        tags,
+        previewImageLocation: `//img.youtube.com/vi/${youTubeVideoId}/hqdefault.jpg`,
+        location: youTubeVideoId,
+        locationType: 0,
+        author: userId
+      };
+      
+      // Add to videos by id
+      videosByIdStore[videoId] = newVideo;
+      
+      // Add to videos by user Id
+      let videosForUser = videosByUserIdStore[userId];
+      if (isUndefined(videosForUser)) {
+        videosForUser = [];
+        videosByUserIdStore[userId] = videosForUser;
+      }
+      videosForUser.push(newVideo);
+      
+      // Return
+      pathValues.push({ path: [ 'usersById', userId, 'videos' ], invalidated: true });
+      pathValues.push({ path: [ 'usersById', userId, 'videos', 0 ], value: $ref([ 'videosById', videoId ]) });
+      pathValues.push({ path: [ 'videosById', videoId, 'videoId' ], value: videoId });
+      pathValues.push({ path: [ 'recentVideos' ], invalidated: true });
+      
+      return pathValues;
+    }
+  },
+  {
+    // Add an Uploaded video to the catalog
+    route: 'usersById[{keys:userIds}].videos.addUploaded',
+    call(callPath, args) {
+      const [ uploadUrl, name, description, tags ] = args;
+      
+      let pathValues = [];
+      
+      // Get current user
+      const userId = this.requestContext.getUserId();
+      if (isUndefined(userId)) {
+        pathValues.push({
+          path: [ 'currentUser', 'videos', 'addUploadedErrors' ],
+          value: $error('Not currently logged in')
+        });
+        return pathValues;
+      }
+      
+      // Create video object for local storage
+      const videoId = uuid.v4();
+      const newVideo = {
+        videoId,
+        addedDate: moment().toISOString(),
+        name,
+        description,
+        tags,
+        previewImageLocation: sampleUpload.previewImageLocation,
+        location: sampleUpload.location,
+        locationType: 1,
+        author: userId
+      };
+      
+      // Add to videos by id
+      videosByIdStore[videoId] = newVideo;
+      
+      // Add to videos by user Id
+      let videosForUser = videosByUserIdStore[userId];
+      if (isUndefined(videosForUser)) {
+        videosForUser = [];
+        videosByUserIdStore[userId] = videosForUser;
+      }
+      videosForUser.push(newVideo);
+      
+      // Return
+      pathValues.push({ path: [ 'usersById', userId, 'videos' ], invalidated: true });
+      pathValues.push({ path: [ 'usersById', userId, 'videos', 0 ], value: $ref([ 'videosById', videoId ]) });
+      pathValues.push({ path: [ 'videosById', videoId, 'videoId' ], value: videoId });
+      pathValues.push({ path: [ 'recentVideos' ], invalidated: true });
       
       return pathValues;
     }

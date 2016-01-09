@@ -10,7 +10,7 @@ import TagsInput from './tags-input';
 import AddYouTubeVideo from './add-youtube-video';
 import AddUploadedVideo from './add-uploaded-video';
 
-import { setSource } from 'actions/add-video';
+import { setSource, unload } from 'actions/add-video';
 
 class AddVideo extends Component {
   componentDidUpdate(prevProps) {
@@ -25,24 +25,28 @@ class AddVideo extends Component {
     }
   }
   
+  componentWillUnmount() {
+    this.props.unload();
+  }
+  
   render() {
     const {
-      videoId,
+      addedVideoId,
       showCommonDetails,
+      videoLocationType,
       fields,
       resetForm,
-      handleSubmit,
-      videoLocationType
+      handleSubmit
     } = this.props;
     
     // Center columns until we're showing the common video details column
-    const columnPush = showCommonDetails === false ? 3 : undefined;
+    const columnPush = showCommonDetails === false || addedVideoId !== null ? 3 : undefined;
     
     let successAlert;
-    if (videoId !== null) {
+    if (addedVideoId !== null) {
       successAlert = (
         <Alert bsStyle="success">
-          Your video has successfully been added. <ViewVideoLink videoId={videoId} className="alert-link">Click here</ViewVideoLink> to view it.
+          Your video has successfully been added. <ViewVideoLink videoId={addedVideoId} className="alert-link">Click here</ViewVideoLink> to view it.
         </Alert>
       );
     }
@@ -68,7 +72,7 @@ class AddVideo extends Component {
             {successAlert}
           </Col>
         </Row>
-        <Row>
+        <Row className={addedVideoId !== null ? 'hidden' : undefined}>
           {/* Source selection and source-specific form */}
           <Col sm={6} smPush={columnPush}>
             <Input label="Source">
@@ -97,12 +101,9 @@ class AddVideo extends Component {
 // Prop validation
 AddVideo.propTypes = {
   // Common state from redux
-  videoId: PropTypes.string,
+  addedVideoId: PropTypes.string,
   showCommonDetails: PropTypes.bool.isRequired,
-  
-  // Source-specific state from redux
   videoLocationType: PropTypes.number.isRequired,
-  sourceSpecific: PropTypes.object.isRequired,
   
   // From redux form
   fields: PropTypes.object.isRequired,
@@ -112,24 +113,31 @@ AddVideo.propTypes = {
 
 // Map redux store state to component props
 function mapStateToProps(state) {
-  const { 
-    addVideo: { 
-      common, 
-      sourceSpecific: {
-        form,
-        videoLocationType,
-        ...sourceSpecific
-      } 
-    } 
-  } = state;
+  // Figure out which source is currently selected
+  const { addVideo: { videoLocationType } } = state;
+  let sourceState;
+  switch(videoLocationType) {
+    case VideoLocationTypes.YOUTUBE:
+      sourceState = state.addVideo.youTube;
+      break;
+    case VideoLocationTypes.UPLOAD:
+      sourceState = state.addVideo.upload;
+      break;
+    default:
+      throw new Error('Unknown source selected');
+  }
+  
+  // Extract common properties that are in every source's state
+  const { addedVideoId, showCommonDetails, form } = sourceState;
+  
   return {
-    ...common,
-    ...form,
+    addedVideoId,
+    showCommonDetails,
     videoLocationType,
-    sourceSpecific
+    ...form
   };
 }
 
 export default reduxForm({ 
   form: 'addVideo'
-}, mapStateToProps, { setSource })(AddVideo);
+}, mapStateToProps, { setSource, unload })(AddVideo);

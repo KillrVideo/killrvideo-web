@@ -3,7 +3,7 @@ import { validateForm } from 'lib/validation';
 import VideoLocationTypes from 'lib/video-location-types';
 
 import { ActionTypes as CommonActions } from 'actions/add-video';
-import { ActionTypes as UploadActions, uploadVideo } from 'actions/add-uploaded-video';
+import { ActionTypes as UploadActions, uploadVideo, addUploadedVideo } from 'actions/add-uploaded-video';
 
 // Validation constraints
 const constraints = {
@@ -18,13 +18,14 @@ const constraints = {
 const uploadDefaultState = {
   _uploadPromise: null,
   
-  uploadUrl: null,
   statusMessage: 'The upload status message',
   statusMessageStyle: 'info',
   percentComplete: 0,
   
   // Common state returned by all sources
   videoLocationType: VideoLocationTypes.UPLOAD,
+  addedVideoId: null,
+  showCommonDetails: false,
   form: {
     fields: [ 'uploadFile', ...commonFields ],
     initialValues: {
@@ -34,32 +35,20 @@ const uploadDefaultState = {
     validate(vals) {
       return validateForm(vals, constraints);
     },
-    onSubmit(vals) {
-      console.log(vals);
+    onSubmit(vals, dispatch) {
+      return dispatch(addUploadedVideo(vals));
     }
   }
 };
 
 // Reducer for upload-specific state
 function upload(state = uploadDefaultState, action) {
-  let statusMessage;
-  
   switch (action.type) {
     case CommonActions.SET_SOURCE:
-      if (action.payload.videoLocationType === VideoLocationTypes.UPLOAD) {
-        // Switch TO upload
-        return uploadDefaultState;  
-      } else {
-        // Switch FROM upload
-        const p = state._uploadPromise;
-        if (p !== null) p.cancel();
-        return {
-          _uploadPromise: null,
-          ...state
-        };
-      }
-      
+    case CommonActions.UNLOAD:  
     case UploadActions.CLEAR_UPLOAD_VIDEO_SELECTION:
+      const p = state._uploadPromise;
+      if (p !== null) p.cancel();
       return uploadDefaultState;
       
     case UploadActions.UPLOAD_VIDEO.LOADING:
@@ -68,7 +57,8 @@ function upload(state = uploadDefaultState, action) {
         _uploadPromise: action.payload.promise,
         statusMessage: 'Starting upload process',
         statusMessageStyle: 'info',
-        percentComplete: 0
+        percentComplete: 0,
+        showCommonDetails: true
       };
     
     case UploadActions.UPLOAD_VIDEO_PROGRESS:
@@ -91,6 +81,12 @@ function upload(state = uploadDefaultState, action) {
         ...state,
         statusMessage: 'An unexpected error occurred. Please try again later.',
         statusMessageStyle: 'danger'
+      };
+      
+    case UploadActions.ADD_UPLOADED_VIDEO.SUCCESS:
+      return {
+        ...state,
+        addedVideoId: action.payload.addedVideoId
       };
   }
   

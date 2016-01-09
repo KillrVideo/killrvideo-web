@@ -53,7 +53,7 @@
     "bootstrap": "^3.3.5",
     "bootswatch": "^3.3.5",
     "classnames": "^2.2.0",
-    "falcor": "github:netflix/falcor#0.x",
+    "falcor": "^0.1.15",
     "falcor-http-datasource": "^0.1.2",
     "font-awesome": "^4.4.0",
     "gemini-scrollbar": "^1.2.9",

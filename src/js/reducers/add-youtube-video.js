@@ -24,6 +24,8 @@ const youTubeDefaultState = {
     
   // Common state returned by all video sources
   videoLocationType: VideoLocationTypes.YOUTUBE,
+  addedVideoId: null,
+  showCommonDetails: false,
   form: {
     fields: [ 'youTubeUrl', ...commonFields  ],
     asyncBlurFields: [ 'youTubeUrl' ],
@@ -46,22 +48,11 @@ const youTubeDefaultState = {
 // Reducer for youtube-specific state
 function youTube(state = youTubeDefaultState, action) {
   switch (action.type) {
-    // Changing source, so return defaults
-    case CommonActions.SET_SOURCE:
-      if (action.payload.videoLocationType === VideoLocationTypes.YOUTUBE) {
-        // Switching TO YouTube
-        return youTubeDefaultState;
-      } else {
-        // Switching FROM YouTube
-        const p = state._validationPromise;
-        if (p !== null) p.cancel();
-        return {
-          _validationPromise: null,
-          ...state
-        };
-      }
-    
+    case CommonActions.SET_SOURCE:  
+    case CommonActions.UNLOAD:
     case YouTubeActions.CLEAR_YOUTUBE_VIDEO:
+      const p = state._validationPromise;
+      if (p !== null) p.cancel();
       return youTubeDefaultState;
     
     case YouTubeActions.VALIDATE_YOUTUBE_URL.LOADING:
@@ -87,9 +78,17 @@ function youTube(state = youTubeDefaultState, action) {
     case YouTubeActions.SET_YOUTUBE_VIDEO.SUCCESS:
       return {
         ...state,
+        showCommonDetails: true,
         setSelectionInProgress: false,
         youTubeVideoId: action.payload.videoId
       };
+      
+    case YouTubeActions.ADD_YOUTUBE_VIDEO.SUCCESS:
+      return {
+        ...state,
+        addedVideoId: action.payload.addedVideoId
+      };
+    
   }
   
   return state;
