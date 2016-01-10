@@ -9,6 +9,7 @@ import Input from 'components/shared/input';
 import TagsInput from './tags-input';
 import AddYouTubeVideo from './add-youtube-video';
 import AddUploadedVideo from './add-uploaded-video';
+import Icon from 'components/shared/icon'
 
 import { setSource, unload } from 'actions/add-video';
 
@@ -36,7 +37,8 @@ class AddVideo extends Component {
       videoLocationType,
       fields,
       resetForm,
-      handleSubmit
+      handleSubmit,
+      submitting
     } = this.props;
     
     // Center columns until we're showing the common video details column
@@ -88,8 +90,8 @@ class AddVideo extends Component {
             <Input {...fields.tags} label="Tags" help="Press enter after each tag to add it to the list">
               <TagsInput {...fields.tags} placeholder="Video tags (keywords)" />
             </Input>
-            <Button type="button" bsStyle="primary" onClick={handleSubmit}>
-              Add Video
+            <Button type="button" bsStyle="primary" onClick={handleSubmit} disabled={submitting}>
+              <Icon name="cog" animate="spin" className={submitting ? undefined : 'hidden'} /> Add Video
             </Button>
           </Col>
         </Row>
@@ -108,7 +110,8 @@ AddVideo.propTypes = {
   // From redux form
   fields: PropTypes.object.isRequired,
   resetForm: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func.isRequired
+  handleSubmit: PropTypes.func.isRequired,
+  submitting: PropTypes.bool.isRequired
 };
 
 // Map redux store state to component props

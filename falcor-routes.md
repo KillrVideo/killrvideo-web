@@ -49,6 +49,8 @@ Call Routes List
 - `currentUser.login(email, password)`
 - `currentUser.logout()`
 - `currentUser.register(firstName, lastName, email, password)`
+- `currentUser.videos.addYouTube(youTubeVideoId, name, description, tags)`
+- `currentUser.videos.addUploaded(uploadUrl, name, description, tags`
 - `videosById[{ key:uuid }].comments.add(comment)`
 
 All Routes Tree
@@ -84,6 +86,9 @@ All Routes Tree
     - `.videoId`
     - `.name`
     - `.previewImageLocation`
+- `.videos`
+  - `.addYouTube(youTubeVideoId, name, description, tags)`
+  - `.addUploaded(uploadUrl, name description, tags)`
 - `.videos[{ range }]`
   - `.videoId`
   - `.name`
