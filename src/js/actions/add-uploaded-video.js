@@ -47,35 +47,9 @@ function generateUploadDestination() {
     });
 }
 
-function uploadRemainingFileChunks() {
-  // Figure out what chunk we're uploading
-  this.currentChunk = this.currentChunk === null ? 0 : this.currentChunk + 1;
-  
-  // Figure out start position in file for that chunk
-  const start = this.currentChunk * DEFAULT_CHUNK_SIZE;
-  
-  // See if we're reached the end of the file and if so, just return a completed promise
-  if (start >= this.file.size) {
-    return Promise.resolve();
-  }
-  
-  // Figure out progress to report
-  const startKb = Math.floor(start / 1024);
-  const fileKb = Math.floor(this.file.size / 1024);
-  const percentComplete = Math.floor(5 + (start / this.file.size * 90));
-  this.dispatch(reportProgress(`Uploading file (${startKb} of ${fileKb})`, percentComplete));
-  
-  // Figure out the end position in file for the chunk
-  const end = start + DEFAULT_CHUNK_SIZE >= this.file.size
-    ? this.file.size
-    : start + DEFAULT_CHUNK_SIZE;
-  
-  if (this.fileReader === null) {
-    this.fileReader = new FileReader();
-  }
-  
+function readCurrentChunk() {
   // Create promise that will be resolved once file chunk has been read
-  const loaded = new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     // Listen for load end event and resolve the promise appropriately
     this.fileReader.onloadend = e => {
       if (e.target.readyState === FileReader.DONE) {
@@ -84,14 +58,21 @@ function uploadRemainingFileChunks() {
         reject(e);
       }
     };
+    
+    // Figure out start position in file for the chunk
+    const start = this.currentChunk * DEFAULT_CHUNK_SIZE;
+    
+    // Figure out the end position in file for the chunk
+    const end = start + DEFAULT_CHUNK_SIZE >= this.file.size
+      ? this.file.size
+      : start + DEFAULT_CHUNK_SIZE;
+    
+    // Start reading
+    this.fileReader.readAsArrayBuffer(this.file.slice(start, end));
   });
-  
-  // Start reading the file and return the promise
-  this.fileReader.readAsArrayBuffer(this.file.slice(start, end));
-  return loaded.bind(this).then(putFileChunk).then(uploadRemainingFileChunks);
 }
 
-function putFileChunk(chunkData) {
+function putCurrentChunk(chunkData) {
   // Generate a block Id for the chunk by padding zeroes before the current chunk number
   let blockId = '' + this.currentChunk;
   while (blockId.length < 10) {
@@ -118,6 +99,31 @@ function putFileChunk(chunkData) {
       throw new Error(`Put request failed with status code ${response.statusCode}`);
     }
   });
+}
+
+function gotoNextChunk() {
+  // Report progress
+  const chunkFinished = this.currentChunk + 1;
+  const percentComplete = Math.floor(5 + (chunkFinished / this.totalChunks * 90));
+  this.dispatch(reportProgress(`Uploading file (${chunkFinished} of ${this.totalChunks})`, percentComplete));
+  
+  // Increment the counter
+  this.currentChunk = this.currentChunk + 1;
+}
+
+function uploadTheFile() {
+  // Figure out how many chunks we're going to be uploading
+  this.totalChunks = Math.ceil(this.file.size / DEFAULT_CHUNK_SIZE);
+  
+  this.currentChunk = 0;
+  this.fileReader = new FileReader();
+  
+  let promise = Promise.bind(this);
+  for (let i = 0; i < this.totalChunks; i++) {
+    promise = promise.then(readCurrentChunk).then(putCurrentChunk).then(gotoNextChunk);
+  }
+  
+  return promise;
 }
 
 const BLOCK_LIST_PROGRESS_MESSAGE = 'Finishing upload';
@@ -171,7 +177,7 @@ export function uploadVideo(uploadFile) {
     // Create a promise to represent the entire upload process
     const promise = Promise.bind(startPromise)
       .then(generateUploadDestination)
-      .then(uploadRemainingFileChunks)
+      .then(uploadTheFile)
       .then(putBlockList);
     
     // Tell redux we're uploading a video
@@ -190,6 +196,7 @@ export function uploadVideo(uploadFile) {
       file: uploadFile,
       destinationUrl: null,
       fileReader: null,
+      totalChunks: null,
       currentChunk: null,
       blockIds: [],
       dispatch
