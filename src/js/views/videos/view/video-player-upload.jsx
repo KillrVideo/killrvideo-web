@@ -32,7 +32,7 @@ class VideoPlayerUpload extends Component {
     if (this.props.video.location) {
       player = <div ref={c => this.loadVideoJsPlayer(c)} className="embed-responsive-item"></div>; 
     } else {
-      player = <VideoUploadStatus />;
+      player = <VideoUploadStatus videoId={this.props.video.videoId} />;
     }
     
     // Render appropriate player
@@ -43,7 +43,7 @@ class VideoPlayerUpload extends Component {
 VideoPlayerUpload.queries = {
   video() {
     return [ 
-      [ [ 'location' ] ] 
+      [ [ 'videoId', 'location' ] ] 
     ];
   }
 };

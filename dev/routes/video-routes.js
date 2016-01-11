@@ -62,6 +62,7 @@ const routes = [
       // Figure out the most recent video ids
       const videoIdsByDate = _(videosByIdStore)
         .values()
+        .select(v => v.location !== null)
         .sortByOrder(vid => moment(vid.addedDate).toDate(), 'desc')
         .pluck('videoId')
         .take(MAX_RECENT_VIDEOS)
@@ -183,8 +184,8 @@ const routes = [
         name,
         description,
         tags,
-        previewImageLocation: sampleUpload.previewImageLocation,
-        location: sampleUpload.location,
+        previewImageLocation: null,   // Values are initially null to simulate "processing" having to happen behind the scenes
+        location: null,
         locationType: 1,
         author: userId
       };
@@ -199,6 +200,12 @@ const routes = [
         videosByUserIdStore[userId] = videosForUser;
       }
       videosForUser.push(newVideo);
+      
+      // Wait for 30 seconds, then fill the location entries with data to simulate "processing"
+      setTimeout(() => {
+        newVideo.previewImageLocation = sampleUpload.previewImageLocation;
+        newVideo.location = sampleUpload.location;
+      }, 30000);
       
       // Return
       pathValues.push({ path: [ 'usersById', userId, 'videos' ], invalidated: true });
