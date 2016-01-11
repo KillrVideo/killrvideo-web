@@ -1,9 +1,12 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 import { isUndefined, isNumber, find } from 'lodash';
 
 import Icon from 'components/shared/icon';
 import VideoLocationTypes from 'lib/video-location-types'
+
+import { setSource } from 'actions/add-video';
 
 const defaultSource = { icon: '', text: 'Select a video source' };
 const sources = [
@@ -107,4 +110,11 @@ VideoSourceSelector.propTypes = {
   onBlur: PropTypes.func
 };
 
-export default VideoSourceSelector;
+// Map redux state to component props
+function mapStateToProps(state) {
+  return {
+    value: state.addVideo.videoLocationType
+  };
+}
+
+export default connect(mapStateToProps, { onChange: setSource })(VideoSourceSelector);

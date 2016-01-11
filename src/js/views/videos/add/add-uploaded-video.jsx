@@ -2,11 +2,12 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { uploadVideo, clearVideoSelection } from 'actions/add-uploaded-video';
 
-import { Alert, Row, Col, ProgressBar, Button } from 'react-bootstrap';
+import { Alert, Row, Col, Button } from 'react-bootstrap';
 
 import Input from 'components/shared/input';
 import Icon from 'components/shared/icon';
 import UploadFileSelector from './upload-file-selector';
+import UploadProgress from './upload-progress';
 
 // Component for when current browser doesn't support APIs needed for uploading a video
 class AddUploadedVideoNotSupported extends Component {
@@ -70,8 +71,7 @@ class AddUploadedVideo extends Component {
         </Row>
         <Row className={uploadFile.invalid ? 'hidden' : undefined}>
           <Col xs={12}>
-            <span className={`text-${statusMessageStyle} text-uppercase small`}>{statusMessage}</span><br/>
-            <ProgressBar now={percentComplete} bsStyle={statusMessageStyle} />
+            <UploadProgress />
           </Col>
         </Row>
       </form>
@@ -81,12 +81,7 @@ class AddUploadedVideo extends Component {
 
 // Prop validation
 AddUploadedVideo.propTypes = {
-  // Redux state
-  statusMessage: PropTypes.string.isRequired,
-  statusMessageStyle: PropTypes.string.isRequired,
-  percentComplete: PropTypes.number.isRequired,
-  
-  // From redux-form
+  // Passed in from parent's redux-form state
   fields: PropTypes.object.isRequired,
   resetForm: PropTypes.func.isRequired,
   
@@ -95,27 +90,8 @@ AddUploadedVideo.propTypes = {
   clearVideoSelection: PropTypes.func.isRequired
 };
 
-// Map redux state to props
-function mapStateToProps(state) {
-  const { 
-    addVideo: {
-      upload: { 
-        statusMessage,
-        statusMessageStyle,
-        percentComplete
-      }
-    }
-  } = state;
-  
-  return {
-    statusMessage,
-    statusMessageStyle,
-    percentComplete
-  };
-}
-
 // Wrap component with redux form
-const AddUploadedVideoForm = connect(mapStateToProps, { uploadVideo, clearVideoSelection })(AddUploadedVideo);
+const AddUploadedVideoForm = connect(undefined, { uploadVideo, clearVideoSelection })(AddUploadedVideo);
 
 // Export the appropriate component based on whether upload is supported
 const uploadSupported = global.File && global.FileReader && global.FileList && global.Blob;

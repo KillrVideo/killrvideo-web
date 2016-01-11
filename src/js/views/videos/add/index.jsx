@@ -11,7 +11,7 @@ import AddYouTubeVideo from './add-youtube-video';
 import AddUploadedVideo from './add-uploaded-video';
 import Icon from 'components/shared/icon'
 
-import { setSource, unload } from 'actions/add-video';
+import { unload } from 'actions/add-video';
 
 class AddVideo extends Component {
   componentDidUpdate(prevProps) {
@@ -78,7 +78,7 @@ class AddVideo extends Component {
           {/* Source selection and source-specific form */}
           <Col sm={6} smPush={columnPush}>
             <Input label="Source">
-              <SourceSelector value={videoLocationType} onChange={newVal => this.props.setSource(newVal)} />
+              <SourceSelector />
             </Input>
             
             <SourceSpecificComponent fields={fields} resetForm={resetForm} />
@@ -143,4 +143,4 @@ function mapStateToProps(state) {
 
 export default reduxForm({ 
   form: 'addVideo'
-}, mapStateToProps, { setSource, unload })(AddVideo);
+}, mapStateToProps, { unload })(AddVideo);
