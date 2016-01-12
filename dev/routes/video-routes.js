@@ -41,10 +41,18 @@ const routes = [
           if (isUndefined(v)) {
             v = $error('Video not found');
           } else {
+            const isUpload = v.locationType === 1;
+            
             // Pick out the properties requested
             v = pick(v, videoProps);
             if (v.tags) v.tags = $atom(v.tags); // Tags are meant to be retrieved together so wrap in an atom
             if (v.author) v.author = $ref([ 'usersById', v.author ]);  // Author should be a reference to users by id
+            
+            // Allow null locations on uploads to be refreshed periodically
+            if (isUpload) {
+              if (v.previewImageLocation === null) v.previewImageLocation = $atom(null, { $expires: -3000 });
+              if (v.location === null) v.location = $atom(null, { $expires: -3000 });
+            }
           }
           acc[videoId] = v; 
           return acc;

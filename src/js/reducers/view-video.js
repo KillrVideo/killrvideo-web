@@ -28,6 +28,15 @@ function details(state = defaultVideoDetails, action) {
         isLoading: false,
         video: action.payload.video
       };
+      
+    case Actions.UPDATE_VIDEO_LOCATION:
+      return {
+        ...state,
+        video: {
+          ...state.video,
+          location: action.payload.location
+        }
+      };
   }
   
   return state;

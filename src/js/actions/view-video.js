@@ -10,6 +10,7 @@ import { createPagedActions } from './paged';
 export const VIDEO_RESET = 'videoVideo/VIDEO_RESET';
 export const VIDEO_REQUESTED = 'viewVideo/VIDEO_REQUESTED';
 export const VIDEO_RECEIVED = 'viewVideo/VIDEO_RECEIVED';
+export const UPDATE_VIDEO_LOCATION = 'viewVideo/UPDATE_VIDEO_LOCATION';
 
 export const ADD_COMMENT_RESET = 'viewVideo/ADD_COMMENT_RESET';
 export const ADD_COMMENT_REQUESTED = 'viewVideo/ADD_COMMENT_REQUESTED';
@@ -85,3 +86,6 @@ moreLikeThis.load = function(queries) {
     return dispatch(moreLikeThis.getInitialPage([ 'videosById', videoId, 'relatedVideos' ], queries));
   };
 };
+
+// Allow the video location to be updated (for ex, after waiting on an upload to finish processing)
+export const updateVideoLocation = createAction(UPDATE_VIDEO_LOCATION, location => ({ location }));

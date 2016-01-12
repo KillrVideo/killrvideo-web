@@ -24,6 +24,7 @@ Get Routes List
 
 ### Video as Root
 - `videosById[{ key:uuid }][ 'name', 'description', 'tags', 'addedDate', 'locationType, 'location' ]`
+- `videosById[{ key:uuid }][ 'status', 'statusDate' ]`
 - `videosById[{ key:uuid }].stats.views`
 - `videosById[{ key:uuid }].rating[ 'count', 'total' ]`
 - `videosById[{ key:uuid }].author[ 'firstName', 'lastName', 'email', 'userId' ]`
@@ -120,6 +121,8 @@ All Routes Tree
 - `.addedDate`
 - `.location`
 - `.locationType`
+- `.status`
+- `.statusDate`
 - `.stats`
   - `.views`
 - `.rating`
