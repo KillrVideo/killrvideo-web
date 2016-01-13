@@ -1,4 +1,4 @@
-import * as Actions from 'actions/view-video';
+import { ActionTypes } from 'actions/view-video';
 import { _, isNull, isUndefined } from 'lodash';
 import { combineReducers } from 'redux';
 
@@ -14,22 +14,28 @@ const defaultVideoDetails = {
 // Reducer for the video's details
 function details(state = defaultVideoDetails, action) {
   switch(action.type) {
-    case Actions.VIDEO_RESET:
+    case ActionTypes.RESET_VIDEO:
       return defaultVideoDetails;
       
-    case Actions.VIDEO_REQUESTED:
+    case ActionTypes.GET_VIDEO.LOADING:
       return {
         isLoading: true,
         video: null
       };
       
-    case Actions.VIDEO_RECEIVED:
+    case ActionTypes.GET_VIDEO.SUCCESS:
       return {
         isLoading: false,
-        video: action.payload.video
+        video: action.payload
       };
       
-    case Actions.UPDATE_VIDEO_LOCATION:
+    case ActionTypes.GET_VIDEO.FAILURE:
+      return {
+        ...state,
+        isLoading: false
+      };
+      
+    case ActionTypes.UPDATE_VIDEO_LOCATION:
       return {
         ...state,
         video: {
@@ -50,23 +56,23 @@ const defaultAddedComments = {
 
 function addedComments(state = defaultAddedComments, action) {
   switch (action.type) {
-    case Actions.ADD_COMMENT_RESET:
+    case ActionTypes.ADD_COMMENT_RESET:
       return defaultAddedComments;
       
-    case Actions.ADD_COMMENT_REQUESTED:
+    case ActionTypes.ADD_COMMENT_REQUESTED:
       return {
         ...state,
         isLoading: true
       };
       
-    case Actions.ADD_COMMENT_RECEIVED:
+    case ActionTypes.ADD_COMMENT_RECEIVED:
       return {
         isLoading: false,
         commentAdded: true,
         comments: [ action.payload.comment, ...state.comments ]
       };
       
-    case Actions.ADD_ANOTHER_COMMENT:
+    case ActionTypes.ADD_ANOTHER_COMMENT:
       return {
         ...state,
         commentAdded: false
