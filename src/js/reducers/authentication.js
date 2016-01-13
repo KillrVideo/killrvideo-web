@@ -1,4 +1,4 @@
-import * as Actions from 'actions/authentication';
+import { ActionTypes } from 'actions/authentication';
 import { combineReducers } from 'redux';
 import { merge } from 'lodash';
 
@@ -11,21 +11,21 @@ const defaultLoginState = {
 // Reducer for the login screen
 function loginReducer(state = defaultLoginState, action) {
   switch(action.type) {
-    case Actions.LOGIN_RESET:
-    case Actions.LOGIN_SUCCESS:
+    case ActionTypes.LOGIN_RESET:
+    case ActionTypes.LOGIN.SUCCESS:
       return defaultLoginState;
       
-    case Actions.LOGIN_REQUEST:
+    case ActionTypes.LOGIN.LOADING:
       let { isLoading, ...restOfState } = state;
       return {
         isLoading: true,
         ...restOfState
       };
       
-    case Actions.LOGIN_FAILURE:
+    case ActionTypes.LOGIN.FAILURE:
       return {
         isLoading: false,
-        errors: action.payload.errors
+        errors: action.payload
       };
   }
   
@@ -42,28 +42,28 @@ const defaultRegisterState = {
 // Reducer for the register screen
 function registerReducer(state = defaultRegisterState, action) {
   switch(action.type) {
-    case Actions.REGISTER_RESET:
+    case ActionTypes.REGISTER_RESET:
       return defaultRegisterState;
       
-    case Actions.REGISTER_REQUEST:
+    case ActionTypes.REGISTER.LOADING:
       let { isLoading, ...restOfState } = state;
       return {
         isLoading: true,
         ...restOfState
       };
       
-    case Actions.REGISTER_SUCCESS:
+    case ActionTypes.REGISTER.SUCCESS:
       return {
         isLoading: false,
         wasSuccessful: true,
         errors: []
       };
       
-    case Actions.REGISTER_FAILURE:
+    case ActionTypes.REGISTER.FAILURE:
       return {
         isLoading: false,
         wasSuccessful: false,
-        errors: action.payload.errors
+        errors: action.payload
       };
   }
   
@@ -80,24 +80,26 @@ const defaultCurrentUserState = {
 // Reducer for the currently authenticated user
 function currentUserReducer(state = defaultCurrentUserState, action) {
   switch (action.type) {
-    case Actions.LOGIN_SUCCESS:
-    case Actions.REGISTER_SUCCESS:
+    case ActionTypes.LOGIN.SUCCESS:
+    case ActionTypes.REGISTER.SUCCESS:
       return {
         isFromServer: true,
         isLoggedIn: true,
-        info: action.payload.currentUser
+        info: action.payload
       };
-    case Actions.LOGOUT_SUCCESS:
+      
+    case ActionTypes.LOGOUT.SUCCESS:
       return {
         isFromServer: true,
         isLoggedIn: false,
         info: null
       };
-    case Actions.RECEIVE_CURRENT_USER:
+      
+    case ActionTypes.GET_CURRENT_USER.SUCCESS:
       return {
         isFromServer: true,
-        isLoggedIn: action.payload.currentUser !== null,
-        info: action.payload.currentUser === null ? null : merge({}, state.info, action.payload.currentUser)
+        isLoggedIn: !!action.payload,
+        info: !!action.payload ? merge({}, state.info, action.payload) : null
       };
   }
   return state;
