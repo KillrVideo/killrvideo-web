@@ -9,15 +9,15 @@ import { createPagedActions } from './paged';
  * Public action constants
  */
 const GET_VIDEO = 'viewVideo/GET_VIDEO';
+const ADD_COMMENT = 'viewVideo/ADD_COMMENT';
 
 export const ActionTypes = {
   GET_VIDEO: createActionTypeConstants(GET_VIDEO),
   RESET_VIDEO: 'viewVideo/RESET_VIDEO',
   UPDATE_VIDEO_LOCATION: 'viewVideo.UPDATE_VIDEO_LOCATION',
   
+  ADD_COMMENT: createActionTypeConstants(ADD_COMMENT),
   ADD_COMMENT_RESET: 'viewVideo/ADD_COMMENT_RESET',
-  ADD_COMMENT_REQUESTED: 'viewVideo/ADD_COMMENT_REQUESTED',
-  ADD_COMMENT_RECEIVED: 'viewVideo/ADD_COMMENT_RECEIVED',
   ADD_ANOTHER_COMMENT: 'viewVideo/ADD_ANOTHER_COMMENT'
 };
 
@@ -28,9 +28,6 @@ export const ActionTypes = {
 const resetVideo = createAction(ActionTypes.RESET_VIDEO);
 
 const comments = createPagedActions(state => state.viewVideo.comments);
-
-const requestAddComment = createAction(ActionTypes.ADD_COMMENT_REQUESTED);
-const receiveAddComment = createAction(ActionTypes.ADD_COMMENT_RECEIVED, comment => ({ comment }));
 const resetAddComment = createAction(ActionTypes.ADD_COMMENT_RESET);
 
 /**
@@ -77,12 +74,18 @@ export function addComment(comment, commentQueries) {
   return (dispatch, getState) => {
     const { router: { params: { videoId } } } = getState();
     
-    // Tell the UI we're trying to add the comment
-    dispatch(requestAddComment());
-    
     commentQueries = commentQueries.map(q => [ 'addedComments', 0, ...q ]);
-    model.call([ 'videosById', videoId, 'comments', 'add' ], [ comment ], [], commentQueries).then(response => {
-      dispatch(receiveAddComment(response.json.videosById[videoId].comments.addedComments[0]));
+    const promise = model.call([ 'videosById', videoId, 'comments', 'add' ], [ comment ], [], commentQueries)
+      .then(response => response.json.videosById[videoId].comments.addedComments[0]);
+    
+    dispatch({
+      type: ADD_COMMENT,
+      payload: {
+        promise,
+        data: {
+          promise
+        }
+      }
     });
   };
 };

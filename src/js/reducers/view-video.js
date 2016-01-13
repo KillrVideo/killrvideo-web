@@ -59,17 +59,23 @@ function addedComments(state = defaultAddedComments, action) {
     case ActionTypes.ADD_COMMENT_RESET:
       return defaultAddedComments;
       
-    case ActionTypes.ADD_COMMENT_REQUESTED:
+    case ActionTypes.ADD_COMMENT.LOADING:
       return {
         ...state,
         isLoading: true
       };
       
-    case ActionTypes.ADD_COMMENT_RECEIVED:
+    case ActionTypes.ADD_COMMENT.SUCCESS:
       return {
         isLoading: false,
         commentAdded: true,
-        comments: [ action.payload.comment, ...state.comments ]
+        comments: [ action.payload, ...state.comments ]
+      };
+      
+    case ActionTypes.ADD_COMMENT.FAILURE:
+      return {
+        ...state,
+        isLoading: false
       };
       
     case ActionTypes.ADD_ANOTHER_COMMENT:
