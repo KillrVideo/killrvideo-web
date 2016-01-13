@@ -1,4 +1,5 @@
 import { createAction } from 'redux-actions';
+import { createActionTypeConstants } from './promises';
 import model from 'stores/falcor-model';
 import { isUndefined } from 'lodash';
 
@@ -8,17 +9,18 @@ import { createPagedActions } from './paged';
  * Action type constants
  */
 
-export const RESET_USER = 'accountInfo/RESET_USER';
-export const REQUEST_USER = 'accountInfo/REQUEST_USER';
-export const RECEIVE_USER = 'accountInfo/RECEIVE_USER';
+const GET_USER = 'accountInfo/GET_USER';
+
+export const ActionTypes = {
+  GET_USER: createActionTypeConstants(GET_USER),
+  RESET_USER: 'accountInfo/RESET_USER' 
+};
 
 /**
  * Private action creators
  */
 
-const resetUser = createAction(RESET_USER);
-const requestUser = createAction(REQUEST_USER);
-const receiveUser = createAction(RECEIVE_USER, user => ({ user }));
+const resetUser = createAction(ActionTypes.RESET_USER);
 
 const comments = createPagedActions(state => state.accountInfo.comments);
 const videos = createPagedActions(state => state.accountInfo.videos);
@@ -36,12 +38,21 @@ export function load(userId, userQueries, commentsQueries, previewsQueries) {
       : response => response.json.usersById[userId];
     
     // Get user info
-    dispatch(requestUser());
-    
     userQueries = userQueries.map(q => [ ...queryRoot, ...q ]);
-    model.get(...userQueries).then(response => {
-      const user = isUndefined(response) ? undefined : userSelector(response);
-      dispatch(receiveUser(user));
+    const promise = model.get(...userQueries)
+      .then(response => {
+        const user = isUndefined(response) ? undefined : userSelector(response);
+        return user;
+      });
+    
+    dispatch({
+      type: GET_USER,
+      payload: {
+        promise,
+        data: {
+          promise
+        }
+      }
     });
     
     // Get user comments

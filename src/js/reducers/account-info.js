@@ -1,4 +1,4 @@
-import * as Actions from 'actions/account-info';
+import { ActionTypes } from 'actions/account-info';
 import { combineReducers } from 'redux';
 
 import { createPagedReducer } from './paged';
@@ -11,18 +11,22 @@ const defaultUserInfo = {
 // Reducer for the user profile info
 function user(state = defaultUserInfo, action) {
   switch (action.type) {
-    case Actions.RESET_USER:
+    case ActionTypes.RESET_USER:
       return defaultUserInfo;
       
-    case Actions.REQUEST_USER:
+    case ActionTypes.GET_USER.LOADING:
       return {
         isLoading: true
       };
     
-    case Actions.RECEIVE_USER:
+    case ActionTypes.GET_USER.SUCCESS:
       return {
         isLoading: false,
-        ...action.payload.user
+        ...action.payload
+      };
+    case ActionTypes.GET_USER.FAILURE:
+      return {
+        isLoading: false
       };
   }
   

@@ -8,6 +8,7 @@ import { createPagedActions } from './paged';
 /**
  * Public action constants
  */
+
 const GET_VIDEO = 'viewVideo/GET_VIDEO';
 const ADD_COMMENT = 'viewVideo/ADD_COMMENT';
 
