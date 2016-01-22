@@ -29,14 +29,24 @@ gulp.task('build', function(cb) {
 gulp.task('watch', [ 'watch.css', 'watch.assets', 'watch.server' ]);
 
 // Clean the release output folder
-gulp.task('clean.release', function(cb) {
-  return del(RELEASE_OUTPUT, cb);
+gulp.task('clean.release', function() {
+  return del(RELEASE_OUTPUT);
+});
+
+// Copy build output to distribution folder
+gulp.task('copy.release', function() {
+  return gulp.src(cfg.BUILD_OUTPUT + '/dist/**/*')
+    .pipe(gulp.dest(RELEASE_OUTPUT));
 });
 
 // Build for release and copy to distribution folder
-gulp.task('release', [ 'clean.release', 'build', 'uglify', 'minify' ], function() {
-  return gulp.src(cfg.BUILD_OUTPUT + '/dist/**/*')
-    .pipe(gulp.dest(RELEASE_OUTPUT));
+gulp.task('release', function(cb) {
+  runSequence(
+    [ 'build', 'clean.release' ],
+    [ 'uglify', 'minify' ],
+    'copy.release',
+    cb
+  );
 });
 
 // Default task is for development

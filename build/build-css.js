@@ -1,7 +1,7 @@
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 var livereload = require('gulp-livereload');
-var minifyCss = require('gulp-minify-css');
+var cssnano = require('gulp-cssnano');
 var rename = require('gulp-rename');
 var watch = require('gulp-watch');
 var replace = require('gulp-replace');
@@ -55,7 +55,7 @@ gulp.task('watch.css', function() {
 gulp.task('minify', function() {
   var cssOutput = path.join(BUILD_OUTPUT, FILE_NAME);
   return gulp.src(cssOutput)
-    .pipe(minifyCss())
+    .pipe(cssnano())
     .pipe(rename(MINIFIED_FILE_NAME))
     .pipe(gulp.dest(BUILD_OUTPUT));
 });
