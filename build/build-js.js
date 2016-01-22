@@ -26,7 +26,7 @@ var VENDOR_LIBS = [
   'bluebird', 'classnames', 'falcor', 'falcor-http-datasource', 'get-size', 'history', 'load-script', 'lodash', 
   'md5', 'moment', 'react', 'react-bootstrap', 'react-dom', 'react-dropzone', 'react-redux', 'react-router', 
   'react-gemini-scrollbar', 'redux', 'redux-actions', 'redux-form', 'redux-logger', 'redux-promise-middleware', 
-  'redux-router', 'redux-thunk', 'validate.js', 'video.js', 'xhr',
+  'redux-router', 'redux-thunk', 'validate.js', 'xhr',
   
   // Node libs that are shimmed by browserify
   'url', 'querystring'
