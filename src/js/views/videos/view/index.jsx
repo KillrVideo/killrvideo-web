@@ -29,17 +29,13 @@ class ViewVideo extends Component {
       this.props.moreLikeThisActions.load(VideoPreviewList.queries.preview());
     }
   }
-      
-  recordPlayback() {
-    // TODO: record playback stats
-    console.log('Playback started!');
-  }
     
   render() {
     const {
       videoId, 
       viewVideo: { details, comments, addedComments, moreLikeThis, rating }, 
-      currentUser: { isLoggedIn }, 
+      currentUser: { isLoggedIn },
+      recordPlayback,
       showMoreComments,
       rateVideo,
       addComment,
@@ -51,7 +47,7 @@ class ViewVideo extends Component {
       <div>
         <Row>
           <Col md={7} xs={12} id="view-video-embed">
-            <VideoPlayer videoDetails={details} onPlaybackStarted={() => this.recordPlayback()} />
+            <VideoPlayer videoDetails={details} onPlaybackStarted={() => recordPlayback([ [ 'stats', 'views' ] ])} />
           </Col>
           <Col md={5} xs={12} id="view-video-details">
             <VideoDetails details={details} comments={comments} addedComments={addedComments} isLoggedIn={isLoggedIn}
@@ -95,6 +91,7 @@ ViewVideo.propTypes = {
   // Actions
   load: PropTypes.func.isRequired,
   unload: PropTypes.func.isRequired,
+  recordPlayback: PropTypes.func.isRequired,
   showMoreComments: PropTypes.func.isRequired,
   addComment: PropTypes.func.isRequired,
   addAnotherComment: PropTypes.func.isRequired,
@@ -113,6 +110,7 @@ function mapDispatchToProps(dispatch) {
   return {
     load: bindActionCreators(Actions.load, dispatch),
     unload: bindActionCreators(Actions.unload, dispatch),
+    recordPlayback: bindActionCreators(Actions.recordPlayback, dispatch),
     showMoreComments: bindActionCreators(Actions.showMoreComments, dispatch),
     rateVideo: bindActionCreators(Actions.rateVideo, dispatch),
     addComment: bindActionCreators(Actions.addComment, dispatch),

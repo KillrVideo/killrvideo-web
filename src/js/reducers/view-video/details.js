@@ -39,8 +39,10 @@ function details(state = defaultVideoDetails, action) {
           location: action.payload.location
         }
       };
-      
+    
+    case ActionTypes.RECORD_PLAYBACK.SUCCESS:
     case RatingActionTypes.RATE_VIDEO.SUCCESS:
+      // Merge in any new data about the video
       return {
         ...state,
         video: {

@@ -23,7 +23,7 @@
     "express-session": "^1.12.1",
     "falcor-express": "^0.1.2",
     "falcor-json-graph": "^1.1.7",
-    "falcor-router": "^0.2.11",
+    "falcor-router": "^0.2.12",
     "gulp": "^3.9.0",
     "gulp-babel": "^6.1.0",
     "gulp-cached": "^1.1.0",

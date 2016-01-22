@@ -24,7 +24,7 @@ export function unload() {
   };
 };
 
-export { updateVideoLocation } from './details';
+export { updateVideoLocation, recordPlayback } from './details';
 export { showMoreComments } from './comments';
 export { addComment, addAnotherComment } from './added-comments';
 export { moreLikeThis } from './more-like-this';
