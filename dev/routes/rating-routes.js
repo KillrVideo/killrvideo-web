@@ -22,34 +22,146 @@ const ratingsByVideoIdStore = _(getVideos())
     return acc;
   }, {});
 
+const ratingsByUsedIdStore = {};
+
 /**
  * Route definitions for video ratings.
  */
 const routes = [
   {
     // Ratings data is handled by ratings routes
-    route: 'videosById[{keys:videoIds}].rating',
+    route: 'videosById[{keys:videoIds}].rating["count", "total"]',
     get(pathSet) {
-      const videosById = _(pathSet.videoIds)
-        .reduce((acc, videoId) => {
-          acc[videoId] = { rating: $ref([ 'ratingsByVideoId', videoId ]) };
-          return acc;
-        }, {});
-      return { jsonGraph: { videosById } };
+      const ratingProps = pathSet[3];
+      
+      let pathValues = [];
+      pathSet.videoIds.forEach(videoId => {
+        const rating = ratingsByVideoIdStore[videoId];
+        ratingProps.forEach(prop => {
+          pathValues.push({ 
+            path: [ 'videosById', videoId, 'rating', prop ], 
+            value: isUndefined(rating) ? 0 : rating[prop] 
+          });
+        });
+      });
+      
+      return pathValues;
     }
   },
   {
-    // Ratings by video
-    route: 'ratingsByVideoId[{keys:videoIds}]["count", "total"]',
+    // Ratings the current user has given to videos
+    route: 'usersById[{keys:userIds}].ratings[{keys:videoIds}].rating',
     get(pathSet) {
-      const ratingsProps = pathSet[2];
-      const ratingsByVideoId = _(pathSet.videoIds)
-        .reduce((acc, videoId) => {
-          let ratings = ratingsByVideoIdStore[videoId];
-          acc[videoId] = isUndefined(ratings) ? $atom(null) : pick(ratings, ratingsProps);
-          return acc;
-        }, {});
-      return { jsonGraph: { ratingsByVideoId } };
+      let pathValues = [];
+      
+      const loggedInUserId = this.requestContext.getUserId();
+      
+      pathSet.userIds.forEach(userId => {
+        // Only allowed to retrieve ratings for the currently logged in user
+        if (isUndefined(loggedInUserId) || userId !== loggedInUserId) {
+          pathValues.push({
+            path: [ 'usersById', userId, 'ratings' ],
+            value: $error('Not authorized')
+          });
+          
+          return;
+        }
+        
+        let storedRatings = ratingsByUsedIdStore[userId];
+        if (isUndefined(storedRatings)) {
+          storedRatings = {};
+          ratingsByUsedIdStore[userId] = storedRatings;
+        }
+        
+        pathSet.videoIds.forEach(videoId => {
+          const rating = storedRatings[videoId];
+          pathValues.push({
+            path: [ 'usersById', userId, 'ratings', videoId, 'rating' ],
+            value: isUndefined(rating) ? $atom() : rating
+          });
+        });
+      });
+      
+      return pathValues;
+    }
+  },
+  {
+    route: 'videosById[{keys:videoIds}].rate',
+    call(callPath, args) {
+      const [ rating ] = args;
+      
+      let pathValues = [];
+      if (callPath.videoIds.length !== 1) {
+        callPath.videoIds.forEach(videoId => {
+          pathValues.push({
+            path: [ 'videosById', videoId, 'rateErrors' ],
+            value: $error('Cannot rate more than one video at a time.')
+          });
+        });
+        return pathValues;
+      }
+            
+      const videoId = callPath.videoIds[0];
+      
+      // Get current user
+      const userId = this.requestContext.getUserId();
+      if (isUndefined(userId)) {
+        pathValues.push({
+          path: [ 'videosById', videoId, 'rateErrors' ],
+          value: $error('Not currently logged in')
+        });
+        return pathValues;
+      }
+      
+      // Sanity check on rating value
+      if (rating < 1 || rating > 5) {
+        pathValues.push({
+          path: [ 'videosById', videoId, 'rateErrors' ],
+          value: $error(`Invalid rating ${rating}`)
+        });
+        return pathValues;
+      }
+      
+      // Sanity check on whether alredy rated
+      let userRating = ratingsByUsedIdStore[userId];
+      if (isUndefined(userRating)) {
+        userRating = {};
+        ratingsByUsedIdStore[userId] = userRating;
+      }
+      
+      if (!isUndefined(userRating[videoId])) {
+        pathValues.push({
+          path: [ 'videosById', videoId, 'rateErrors' ],
+          value: $error('Already rated')
+        });
+        return pathValues;
+      }
+      
+      // Modify the stored rating by video Id
+      let storedRating = ratingsByVideoIdStore[videoId];
+      if (isUndefined(rating)) {
+        storedRating = { count: 0, total: 0 }
+        ratingsByVideoIdStore[videoId] = storedRating;
+      }
+      
+      // Increment ratings to account for new rating
+      storedRating.count += 1;
+      storedRating.total += rating;
+      
+      // Store by user also
+      userRating[videoId] = rating;
+      
+      // Include in response
+      pathValues.push({
+        path: [ 'videosById', videoId, 'rating' ],
+        invalidated: true
+      });
+      pathValues.push({
+        path: [ 'usersById', userId, 'ratings', videoId ],
+        invalidated: true
+      });
+      
+      return pathValues;
     }
   }
 ];

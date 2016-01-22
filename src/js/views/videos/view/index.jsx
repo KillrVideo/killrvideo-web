@@ -38,9 +38,10 @@ class ViewVideo extends Component {
   render() {
     const {
       videoId, 
-      viewVideo: { details, comments, addedComments, moreLikeThis }, 
+      viewVideo: { details, comments, addedComments, moreLikeThis, rating }, 
       currentUser: { isLoggedIn }, 
       showMoreComments,
+      rateVideo,
       addComment,
       addAnotherComment,
       moreLikeThisActions
@@ -54,6 +55,7 @@ class ViewVideo extends Component {
           </Col>
           <Col md={5} xs={12} id="view-video-details">
             <VideoDetails details={details} comments={comments} addedComments={addedComments} isLoggedIn={isLoggedIn}
+                          ratingEnabled={rating.ratingEnabled} currentUserRating={rating.currentUserRating} rateVideo={rateVideo}
                           showMoreComments={() => showMoreComments(ViewVideo.queries.comments())} />
             <VideoAddComment addedComments={addedComments} isLoggedIn={isLoggedIn} addAnotherComment={addAnotherComment}
                              onSubmit={vals => addComment(vals.comment, ViewVideo.queries.comments())} />
@@ -112,6 +114,7 @@ function mapDispatchToProps(dispatch) {
     load: bindActionCreators(Actions.load, dispatch),
     unload: bindActionCreators(Actions.unload, dispatch),
     showMoreComments: bindActionCreators(Actions.showMoreComments, dispatch),
+    rateVideo: bindActionCreators(Actions.rateVideo, dispatch),
     addComment: bindActionCreators(Actions.addComment, dispatch),
     addAnotherComment: bindActionCreators(Actions.addAnotherComment, dispatch),
     moreLikeThisActions: bindActionCreators(Actions.moreLikeThis, dispatch)

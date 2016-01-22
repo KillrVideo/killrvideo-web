@@ -7,7 +7,7 @@ const GET_VIDEO = 'viewVideo/GET_VIDEO';
 export const ActionTypes = {
   GET_VIDEO: createActionTypeConstants(GET_VIDEO),
   RESET_VIDEO: 'viewVideo/RESET_VIDEO',
-  UPDATE_VIDEO_LOCATION: 'viewVideo.UPDATE_VIDEO_LOCATION'
+  UPDATE_VIDEO_LOCATION: 'viewVideo/UPDATE_VIDEO_LOCATION'
 };
 
 // Get video details

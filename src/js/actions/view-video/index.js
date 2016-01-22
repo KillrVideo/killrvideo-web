@@ -1,5 +1,6 @@
 import { getVideo, resetVideo } from './details';
 import { getComments, unloadComments } from './comments';
+import { getCurrentUserRating } from './rating';
 import { resetAddComment } from './added-comments';
 
 export function load(videoQueries, commentQueries) {
@@ -9,6 +10,9 @@ export function load(videoQueries, commentQueries) {
     
     // Get comments
     dispatch(getComments(commentQueries));
+    
+    // Get current user rating
+    dispatch(getCurrentUserRating());
   };
 };
 
@@ -24,3 +28,4 @@ export { updateVideoLocation } from './details';
 export { showMoreComments } from './comments';
 export { addComment, addAnotherComment } from './added-comments';
 export { moreLikeThis } from './more-like-this';
+export { rateVideo } from './rating';

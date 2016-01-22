@@ -1,4 +1,5 @@
 import { ActionTypes } from 'actions/view-video/details';
+import { ActionTypes as RatingActionTypes } from 'actions/view-video/rating'; 
 
 // Default state for the video's details
 const defaultVideoDetails = {
@@ -36,6 +37,15 @@ function details(state = defaultVideoDetails, action) {
         video: {
           ...state.video,
           location: action.payload.location
+        }
+      };
+      
+    case RatingActionTypes.RATE_VIDEO.SUCCESS:
+      return {
+        ...state,
+        video: {
+          ...state.video,
+          ...action.payload
         }
       };
   }

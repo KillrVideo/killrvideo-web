@@ -36,7 +36,7 @@ const routes = [
     // The currently logged in user info
     route: 'currentUser',
     get(pathSet) {
-      const userId = this.requestContext.getUserId();;
+      const userId = this.requestContext.getUserId();
       if (isUndefined(userId)) {
         return [
           { path: [ 'currentUser' ], value: $atom() }

@@ -16,6 +16,9 @@ class VideoDetails extends Component {
     const {
       details: { isLoading, video },
       isLoggedIn,
+      ratingEnabled,
+      currentUserRating,
+      rateVideo,
       comments,
       addedComments,
       showMoreComments
@@ -38,7 +41,8 @@ class VideoDetails extends Component {
         </Row>
         
         { /* Star ratings and sharing */ }
-        <VideoRatingSharing video={video} ratingEnabled={isLoggedIn} />
+        <VideoRatingSharing video={video} isLoggedIn={isLoggedIn} ratingEnabled={ratingEnabled} 
+                            currentUserRating={currentUserRating} rateVideo={rateVideo} />
         
         { /* Author and Tags */ }
         <Row>
@@ -92,9 +96,12 @@ VideoDetails.propTypes = {
   comments: PropTypes.object.isRequired,
   addedComments: PropTypes.object.isRequired,
   isLoggedIn: PropTypes.bool.isRequired,
+  ratingEnabled: PropTypes.bool.isRequired,
+  currentUserRating: PropTypes.number.isRequired,
   
   // Actions
-  showMoreComments: PropTypes.func.isRequired
+  showMoreComments: PropTypes.func.isRequired,
+  rateVideo: PropTypes.func.isRequired
 };
 
 export default VideoDetails;
