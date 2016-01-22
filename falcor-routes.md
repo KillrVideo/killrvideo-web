@@ -52,9 +52,10 @@ Call Routes List
 - `currentUser.logout()`
 - `currentUser.register(firstName, lastName, email, password)`
 - `currentUser.videos.addYouTube(youTubeVideoId, name, description, tags)`
-- `currentUser.videos.addUploaded(uploadUrl, name, description, tags`
+- `currentUser.videos.addUploaded(uploadUrl, name, description, tags)`
 - `videosById[{ key:uuid }].comments.add(comment)`
 - `videosById[{ key:uuid }].rate(newRating)`
+- `videosById[{ key:uuid }].recordPlayback()`
 
 All Routes Tree
 ---------------
@@ -127,6 +128,7 @@ All Routes Tree
 - `.locationType`
 - `.status`
 - `.statusDate`
+- `.recordPlayback()`
 - `.stats`
   - `.views`
 - `.rate(newRating)`
