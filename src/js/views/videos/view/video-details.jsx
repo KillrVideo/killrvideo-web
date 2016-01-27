@@ -21,7 +21,8 @@ class VideoDetails extends Component {
       rateVideo,
       comments,
       addedComments,
-      showMoreComments
+      showMoreComments,
+      pushState
     } = this.props;
     
     // If we're doing an initial load and the video data isn't available yet, just output a placeholder
@@ -56,7 +57,7 @@ class VideoDetails extends Component {
             </UserProfileLink>
           </Col>
           <Col xs={7} id="view-video-tags" className="text-right">
-            {video.tags.map(tag => <VideoTagLink tag={tag} key={tag} /> )}
+            {video.tags.map(tag => <VideoTagLink tag={tag} key={tag} pushState={pushState} /> )}
           </Col>
         </Row>
         
@@ -101,7 +102,8 @@ VideoDetails.propTypes = {
   
   // Actions
   showMoreComments: PropTypes.func.isRequired,
-  rateVideo: PropTypes.func.isRequired
+  rateVideo: PropTypes.func.isRequired,
+  pushState: PropTypes.func.isRequired
 };
 
 export default VideoDetails;

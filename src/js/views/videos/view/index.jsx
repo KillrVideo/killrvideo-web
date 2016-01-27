@@ -3,6 +3,7 @@ import { Row, Col } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { isUndefined } from 'lodash';
+import { pushState as routerPushState } from 'redux-router';
 
 import * as Actions from 'actions/view-video';
 import VideoPlayer from './video-player';
@@ -40,7 +41,8 @@ class ViewVideo extends Component {
       rateVideo,
       addComment,
       addAnotherComment,
-      moreLikeThisActions
+      moreLikeThisActions,
+      pushState
    } = this.props;
     
     return (
@@ -52,7 +54,8 @@ class ViewVideo extends Component {
           <Col md={5} xs={12} id="view-video-details">
             <VideoDetails details={details} comments={comments} addedComments={addedComments} isLoggedIn={isLoggedIn}
                           ratingEnabled={rating.ratingEnabled} currentUserRating={rating.currentUserRating} rateVideo={rateVideo}
-                          showMoreComments={() => showMoreComments(ViewVideo.queries.comments())} />
+                          showMoreComments={() => showMoreComments(ViewVideo.queries.comments())}
+                          pushState={pushState} />
             <VideoAddComment addedComments={addedComments} isLoggedIn={isLoggedIn} addAnotherComment={addAnotherComment}
                              onSubmit={vals => addComment(vals.comment, ViewVideo.queries.comments())} />
           </Col>
@@ -95,7 +98,8 @@ ViewVideo.propTypes = {
   showMoreComments: PropTypes.func.isRequired,
   addComment: PropTypes.func.isRequired,
   addAnotherComment: PropTypes.func.isRequired,
-  moreLikeThisActions: PropTypes.object.isRequired
+  moreLikeThisActions: PropTypes.object.isRequired,
+  pushState: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state) {
@@ -115,8 +119,9 @@ function mapDispatchToProps(dispatch) {
     rateVideo: bindActionCreators(Actions.rateVideo, dispatch),
     addComment: bindActionCreators(Actions.addComment, dispatch),
     addAnotherComment: bindActionCreators(Actions.addAnotherComment, dispatch),
-    moreLikeThisActions: bindActionCreators(Actions.moreLikeThis, dispatch)
-  }
+    moreLikeThisActions: bindActionCreators(Actions.moreLikeThis, dispatch),
+    pushState: bindActionCreators(routerPushState, dispatch)
+  };
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewVideo);

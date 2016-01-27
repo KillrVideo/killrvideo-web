@@ -11,5 +11,6 @@ export default (
     <Route path="/search/results" component={Views.Search.Results} />
     <Route path="/view/:videoId" component={Views.Videos.View} />
     <Route path="/videos/add" component={Views.Videos.Add} />
+    <Route path="/chat" component={Views.Chat} />
   </Route>
 );

@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import { reduxForm } from 'redux-form';
 import { validateForm } from 'lib/validation';
 
+import Icon from 'components/shared/icon';
+
 class SearchBox extends Component {
   render() {
     const { fields: { query }, suggestions, handleSubmit } = this.props;
@@ -13,7 +15,7 @@ class SearchBox extends Component {
         <div className="input-group">
           <span className="input-group-btn">
             <button className="btn btn-default" type="submit">
-              <span className="glyphicon glyphicon-search" title="Search"></span><span className="hidden">Search</span>
+              <Icon name="search" title="Search" />
             </button>
           </span>
           <input type="text" {...query} className="form-control" name="query" 
