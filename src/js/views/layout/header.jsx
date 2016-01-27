@@ -75,16 +75,17 @@ class Header extends Component {
       }
     }
   
-    // TODO: Switch to react-bootstrap navbar once brand/header with collapse is implemented
-    // (see https://github.com/react-bootstrap/react-bootstrap/pull/1184)
     return (
       <div id="header">
         <Navbar fixedTop id="navbar-main">
-          <Navbar.Brand>
-            <Link to="/" id="logo">
-              <Image src="killrvideo.png" alt="KillrVideo.com Logo" />
-            </Link>
-          </Navbar.Brand>
+          <Navbar.Header>
+            <Navbar.Brand>
+              <Link to="/" id="logo">
+                <Image src="killrvideo.png" alt="KillrVideo.com Logo" />
+              </Link>
+            </Navbar.Brand>
+            <Navbar.Toggle />
+          </Navbar.Header>
           <Navbar.Collapse>
             <SearchBox onSubmit={vals => this.submitSearch(vals.query)} />
             <Nav navbar pullRight>
