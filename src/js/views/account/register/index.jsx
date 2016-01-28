@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { pushState } from 'redux-router';
+import { routeActions } from 'react-router-redux';
 
 import { Link } from 'react-router';
 import { Row, Col, Alert } from 'react-bootstrap';
@@ -33,7 +33,7 @@ class Register extends Component {
   }
   
   redirectToHomePage() {
-    this.props.pushState(null, '/');
+    this.props.push('/');
   }
   
   render() {
@@ -70,7 +70,7 @@ Register.propTypes = {
   register: PropTypes.func.isRequired,
   registerReset: PropTypes.func.isRequired,
   getCurrentUser: PropTypes.func.isRequired,
-  pushState: PropTypes.func.isRequired
+  push: PropTypes.func.isRequired
 };
 
 // Falcor queries
@@ -87,4 +87,4 @@ function mapStateToProps(state) {
   return { registerState, currentUser };
 }
 
-export default connect(mapStateToProps, { register, registerReset, getCurrentUser, pushState })(Register);
+export default connect(mapStateToProps, { register, registerReset, getCurrentUser, push: routeActions.push })(Register);

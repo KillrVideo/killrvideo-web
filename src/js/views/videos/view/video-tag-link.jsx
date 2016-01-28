@@ -6,11 +6,17 @@ import Icon from 'components/shared/icon';
 
 class VideoTagLink extends Component {
   gotoSearch() {
-    this.props.pushState(null, '/search/results', { query: this.props.tag });
+    this.props.push({
+      pathname: '/search/results',
+      query: { q: this.props.tag }
+    });
   }
   
   gotoChat() {
-    this.props.pushState(null, '/chat', { room: this.props.tag });
+    this.props.push({
+      pathname: '/chat', 
+      query: { room: this.props.tag }
+    });
   }
   
   render() {
@@ -38,7 +44,7 @@ class VideoTagLink extends Component {
 // Prop validation
 VideoTagLink.propTypes = {
   tag: PropTypes.string.isRequired,
-  pushState: PropTypes.func.isRequired
+  push: PropTypes.func.isRequired
 };
 
 export default VideoTagLink;

@@ -9,10 +9,8 @@ export const ActionTypes = {
   ADD_ANOTHER_COMMENT: 'viewVideo/ADD_ANOTHER_COMMENT'
 };
 
-export function addComment(comment, commentQueries) {
+export function addComment(videoId, comment, commentQueries) {
   return (dispatch, getState) => {
-    const { router: { params: { videoId } } } = getState();
-    
     commentQueries = commentQueries.map(q => [ 'addedComments', 0, ...q ]);
     const promise = model.call([ 'videosById', videoId, 'comments', 'add' ], [ comment ], [], commentQueries)
       .then(response => response.json.videosById[videoId].comments.addedComments[0]);

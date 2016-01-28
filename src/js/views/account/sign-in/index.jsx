@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { pushState } from 'redux-router';
+import { routeActions } from 'react-router-redux';
 
 import { Row, Col, Panel, Alert } from 'react-bootstrap';
 import SignInForm from './sign-in-form';
@@ -28,7 +28,7 @@ class SignIn extends Component {
   }
   
   redirectToHomePage() {
-    this.props.pushState(null, '/');
+    this.props.push('/');
   }
   
   render() {
@@ -60,7 +60,7 @@ SignIn.propTypes = {
   login: PropTypes.func.isRequired,
   loginReset: PropTypes.func.isRequired,
   getCurrentUser: PropTypes.func.isRequired,
-  pushState: PropTypes.func.isRequired
+  push: PropTypes.func.isRequired
 };
 
 // Falcor queries
@@ -77,4 +77,4 @@ function mapStateToProps(state) {
   return { loginState, currentUser };
 }
 
-export default connect(mapStateToProps, { login, loginReset, getCurrentUser, pushState })(SignIn);
+export default connect(mapStateToProps, { login, loginReset, getCurrentUser, push: routeActions.push })(SignIn);

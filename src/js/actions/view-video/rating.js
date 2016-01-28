@@ -18,10 +18,8 @@ export const ActionTypes = {
  * Actions
  */
 
-export function rateVideo(rating, videoQueries) {
+export function rateVideo(videoId, rating, videoQueries) {
   return (dispatch, getState) => {
-    const { router: { params: { videoId } } } = getState();
-    
     // Rate the video and if successful, return the rating as the action's payload
     const promise = model.call([ 'videosById', videoId, 'rate' ], [ rating ], [], videoQueries)
       .then(response => response.json.videosById[videoId]);
@@ -38,10 +36,8 @@ export function rateVideo(rating, videoQueries) {
   };
 };
 
-export function getCurrentUserRating() {
+export function getCurrentUserRating(videoId) {
   return (dispatch, getState) => {
-    const { router: { params: { videoId } } } = getState();
-    
     const promise = model.get([ 'currentUser', 'ratings', videoId, 'rating' ])
       .then(response => isUndefined(response) ? { rating: 0 } : response.json.currentUser.ratings[videoId]);
       

@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import { reducer as form } from 'redux-form';
-import { routerStateReducer as router } from 'redux-router';
+import { routeReducer as routing } from 'react-router-redux';
 import * as ActionTypes from 'actions';
 
 // Reducers in other files
@@ -22,7 +22,7 @@ function whatIsThis(state = { visible: false }, action) {
 }
 
 const rootReducer = combineReducers({
-  router,
+  routing,
   form,
   whatIsThis,
   authentication,

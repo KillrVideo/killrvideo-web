@@ -13,10 +13,8 @@ export const ActionTypes = {
 };
 
 // Get video details
-export function getVideo(videoQueries) {
+export function getVideo(videoId, videoQueries) {
   return (dispatch, getState) => {
-    const { router: { params: { videoId } } } = getState();
-    
     const queryRoot = [ 'videosById', videoId ];
     videoQueries = videoQueries.map(q => [ ...queryRoot, ...q ]);
     
@@ -45,10 +43,8 @@ export const resetVideo = createAction(ActionTypes.RESET_VIDEO);
 export const updateVideoLocation = createAction(ActionTypes.UPDATE_VIDEO_LOCATION, location => ({ location }));
 
 // Record playbacks
-export function recordPlayback(videoQueries) {
+export function recordPlayback(videoId, videoQueries) {
   return (dispatch, getState) => {
-    const { router: { params: { videoId } } } = getState();
-    
     const promise = model.call([ 'videosById', videoId, 'recordPlayback' ], [], [], videoQueries)
       .then(response => response.json.videosById[videoId]);
     
