@@ -1,3 +1,5 @@
+import classNames from 'classnames';
+
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 
@@ -9,8 +11,10 @@ class Footer extends Component {
       sampleData = <li><Link to="/sampledata">Add Sample Data</Link></li>
     }
     
+    const footerClass = classNames('small', this.props.className);
+    
     return (
-      <footer className="small">
+      <footer className={footerClass}>
         <div className="container">
           <ul className="list-inline pull-left">
             {sampleData}
@@ -25,7 +29,8 @@ class Footer extends Component {
 }
 
 Footer.propTypes = {
-  dev: PropTypes.bool
+  dev: PropTypes.bool,
+  className: PropTypes.string
 };
 
 export default Footer;

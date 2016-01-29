@@ -9,9 +9,9 @@ class Layout extends Component {
         <Header />
         <div id="body-wrapper">
           {this.props.children}
-          <div id="push-footer"></div>
+          <div id="push-footer" className="hidden-xs"></div>
         </div>
-        <Footer />
+        <Footer className="hidden-xs" />
       </div>
     );
   }
