@@ -64,7 +64,7 @@ class AddVideo extends Component {
     }
     
     return (
-      <div id="video-add">
+      <div id="video-add" className="body-content container">
         <Row>
           <Col sm={6} smPush={columnPush}>
             <h3><em>Add</em> Video</h3>

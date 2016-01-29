@@ -42,7 +42,7 @@ class SearchResults extends Component {
     const { searchTerm, isLoading, data, moreDataOnServer, currentPageIndex, pagingConfig, nextPageDisabled, previousPageDisabled } = this.props;
         
     return (
-      <div>
+      <div className="body-content container">
         <h3 className="section-divider">
           <span><em>{searchTerm}</em> Videos</span>
         </h3>

@@ -38,24 +38,26 @@ class Register extends Component {
   
   render() {
     return (
-      <Row>
-        <Col md={6} mdOffset={3}>
-          <h2>Register</h2>
-          
-          <Alert bsStyle="info" className={this.props.registerState.wasSuccessful ? 'hidden' : undefined}>
-            Register for an account to upload and comment on videos.
-          </Alert>
-          
-          <ErrorAlert errors={this.props.registerState.errors} />
-          
-          <Alert bsStyle="success" className={this.props.registerState.wasSuccessful ? undefined : 'hidden'}>
-            Your account has been created successfully. <Link to="/" className="alert-link">Click here</Link> to return to the home page.
-          </Alert>
-          
-          <RegistrationForm onSubmit={vals => this.props.register(vals.firstName, vals.lastName, vals.email, vals.password)}
-                            hideForm={this.props.registerState.wasSuccessful} />
-        </Col>
-      </Row>
+      <div className="body-content container">
+        <Row>
+          <Col md={6} mdOffset={3}>
+            <h2>Register</h2>
+            
+            <Alert bsStyle="info" className={this.props.registerState.wasSuccessful ? 'hidden' : undefined}>
+              Register for an account to upload and comment on videos.
+            </Alert>
+            
+            <ErrorAlert errors={this.props.registerState.errors} />
+            
+            <Alert bsStyle="success" className={this.props.registerState.wasSuccessful ? undefined : 'hidden'}>
+              Your account has been created successfully. <Link to="/" className="alert-link">Click here</Link> to return to the home page.
+            </Alert>
+            
+            <RegistrationForm onSubmit={vals => this.props.register(vals.firstName, vals.lastName, vals.email, vals.password)}
+                              hideForm={this.props.registerState.wasSuccessful} />
+          </Col>
+        </Row>
+      </div>
     );
   }
 }

@@ -46,7 +46,7 @@ class ViewVideo extends Component {
    } = this.props;
     
     return (
-      <div>
+      <div className="body-content container">
         <Row>
           <Col md={7} xs={12} id="view-video-embed">
             <VideoPlayer videoDetails={details} onPlaybackStarted={() => recordPlayback([ [ 'stats', 'views' ] ])} />
