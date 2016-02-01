@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Row, Col, Button } from 'react-bootstrap';
 import { isUndefined } from 'lodash';
-import { pushState } from 'react-router';
+import { routeActions } from 'react-router-redux';
 
 import { load, unload, showMoreComments, videosNextPage, videosPreviousPage } from 'actions/account-info';
 import Icon from 'components/shared/icon';
@@ -27,7 +27,7 @@ class AccountInfo extends Component {
   }
   
   gotoAddVideo() {
-    this.props.pushState(null, '/videos/add');
+    this.props.push('/videos/add');
   }
   
   render() {
@@ -80,7 +80,7 @@ AccountInfo.propTypes = {
   loadMoreComments: PropTypes.func.isRequired, 
   videosNextPage: PropTypes.func.isRequired, 
   videosPreviousPage: PropTypes.func.isRequired,
-  pushState: PropTypes.func.isRequired
+  push: PropTypes.func.isRequired
 };
 
 // Falcor queries
@@ -91,9 +91,9 @@ AccountInfo.queries = {
 };
 
 // Map redux state to component props
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
   return {
-    userId: state.router.params.userId,
+    userId: ownProps.params.userId,
     accountInfo: state.accountInfo
   };
 }
@@ -105,5 +105,5 @@ export default connect(mapStateToProps, {
   showMoreComments, 
   videosNextPage, 
   videosPreviousPage, 
-  pushState 
+  push: routeActions.push 
 })(AccountInfo);
