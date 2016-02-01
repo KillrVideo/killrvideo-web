@@ -20,7 +20,7 @@ class Home extends Component {
     }
     
     return (
-      <div>
+      <div className="body-content container">
         <VideoPreviewList title="Recent Videos" {...recentVideos} {...recentVideosActions} />
         {recommendedVideosList}
         {userVideosList}

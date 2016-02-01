@@ -38,33 +38,39 @@ class VideoRatingSharing extends Component {
     };
   }
   
+  ratingEnabled() {
+    return this.props.isLoggedIn && this.props.ratingEnabled;
+  }
+  
   proposeRating(rating) {
-    if (this.props.ratingEnabled) {
+    if (this.ratingEnabled()) {
       this.setState({ proposedRating: rating });
     }
-  }
-
-  rate(rating) {
-    // TODO: Record ratings
-    console.log('Rated ' + rating);
   }
   
   getStar(starValue, currentRating) {
     return (
       <StarRating starValue={starValue} currentRating={currentRating} proposedRating={this.state.proposedRating}
                   onMouseOver={e => this.proposeRating(starValue)} onMouseOut={e => this.proposeRating(0)}
-                  onClick={e => this.rate(starValue)} key={starValue} />
+                  onClick={e => this.props.rateVideo(starValue, VideoRatingSharing.queries.video())} key={starValue} />
     );
   }
   
   render() {
-    const averageRating = this.props.video.rating
-      ? (this.props.video.rating.total / this.props.video.rating.count)
-      : 0;
+    let averageRating = 0;
+    if (this.props.video.rating) {
+      let { total, count } = this.props.video.rating;
+      averageRating = total / count;
+    }
+    
+    // Use the user's rating for the video in the star display if they've rated it, otherwise use the average
+    const currentRating = this.props.currentUserRating > 0
+      ? this.props.currentUserRating
+      : averageRating;
       
     const ratingClasses = classNames({
       'video-rating': true,
-      'video-rating-enabled': this.props.ratingEnabled
+      'video-rating-enabled': this.ratingEnabled()
     });
     
     return (
@@ -80,7 +86,7 @@ class VideoRatingSharing extends Component {
         <Col xs={6} sm={5}>
           <div className="video-rating-stars">
             <span className={ratingClasses}>
-              {range(1, 6).map(starValue => this.getStar(starValue, averageRating))}
+              {range(1, 6).map(starValue => this.getStar(starValue, currentRating))}
             </span>
           </div>
         </Col>
@@ -108,7 +114,12 @@ VideoRatingSharing.queries = {
 // Prop validation
 VideoRatingSharing.propTypes = {
   video: PropTypes.object.isRequired,
-  ratingEnabled: PropTypes.bool.isRequired
+  isLoggedIn: PropTypes.bool.isRequired,
+  ratingEnabled: PropTypes.bool.isRequired,
+  currentUserRating: PropTypes.number.isRequired,
+  
+  // Actions
+  rateVideo: PropTypes.func.isRequired
 };
 
 export default VideoRatingSharing;

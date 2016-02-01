@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { range } from 'lodash';
-import { pushState } from 'redux-router';
+import { routeActions } from 'react-router-redux';
 
 import { Alert, Row, Col, Button } from 'react-bootstrap';
 import { Link } from 'react-router';
@@ -12,13 +12,13 @@ import VideoPreview from 'components/videos/video-preview';
 
 class SearchResults extends Component {
   componentDidMount() {
-    this.props.searchFor(this.props.query, SearchResults.queries.preview());
+    this.props.searchFor(this.props.searchTerm, SearchResults.queries.preview());
   }
   
   componentDidUpdate(prevProps) {
-    // If the search query changes, do a new search
-    if (this.props.query !== prevProps.query) {
-      this.props.searchFor(this.props.query, SearchResults.queries.preview());
+    // If the search term changes, do a new search
+    if (this.props.searchTerm !== prevProps.searchTerm) {
+      this.props.searchFor(this.props.searchTerm, SearchResults.queries.preview());
     }
   }
   
@@ -27,7 +27,7 @@ class SearchResults extends Component {
   }
   
   gotoVideo(videoId) {
-    this.props.pushState(null, `/view/${videoId}`);
+    this.props.push(`/view/${videoId}`);
   }
   
   nextPage() {
@@ -39,12 +39,12 @@ class SearchResults extends Component {
   }
   
   render() {
-    const { query, isLoading, data, moreDataOnServer, currentPageIndex, pagingConfig, nextPageDisabled, previousPageDisabled } = this.props;
+    const { searchTerm, isLoading, data, moreDataOnServer, currentPageIndex, pagingConfig, nextPageDisabled, previousPageDisabled } = this.props;
         
     return (
-      <div>
+      <div className="body-content container">
         <h3 className="section-divider">
-          <span><em>{query}</em> Videos</span>
+          <span><em>{searchTerm}</em> Videos</span>
         </h3>
         
         <div id="search-results">
@@ -53,7 +53,7 @@ class SearchResults extends Component {
           </h4>
           
           <Alert bsStyle="info" className={moreDataOnServer === false && data.length === 0 ? undefined : 'hidden'}>
-            There are currently no videos for <strong>{query}</strong>. Why don't you <Link to="/videos/add" className="alert-link">add one</Link>?
+            There are currently no videos for <strong>{searchTerm}</strong>. Why don't you <Link to="/videos/add" className="alert-link">add one</Link>?
           </Alert>
           
           <Row>
@@ -100,8 +100,8 @@ SearchResults.queries = {
 
 // Prop validation
 SearchResults.propTypes = {
-  // From redux router
-  query: PropTypes.string.isRequired,
+  // From react router
+  searchTerm: PropTypes.string.isRequired,
   
   // From redux search state
   isLoading: PropTypes.bool.isRequired,
@@ -117,15 +117,14 @@ SearchResults.propTypes = {
   nextPageClick: PropTypes.func.isRequired,
   previousPageClick: PropTypes.func.isRequired,
   unload: PropTypes.func.isRequired,
-  pushState: PropTypes.func.isRequired
+  push: PropTypes.func.isRequired
 };
 
-function mapStateToProps(state) {
-  const { search: { results }, router: { location: { query: { query } } } } = state;
+function mapStateToProps(state, ownProps) {
   return {
-    query,
-    ...results
+    searchTerm: ownProps.location.query.q,
+    ...state.search.results
   };
 }
 
-export default connect(mapStateToProps, { searchFor, nextPageClick, previousPageClick, unload, pushState })(SearchResults);
+export default connect(mapStateToProps, { searchFor, nextPageClick, previousPageClick, unload, push: routeActions.push })(SearchResults);

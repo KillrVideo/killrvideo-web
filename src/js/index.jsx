@@ -1,14 +1,13 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
-import { ReduxRouter } from 'redux-router';
-import configureStore from 'stores/configure-store';
 
-const store = configureStore();
+import router from 'router';
+import store from 'stores/redux-store';
 
 render(
   <Provider store={store}>
-    <ReduxRouter /> 
+    {router}
   </Provider>,
   document.getElementById('killrvideo')
 );

@@ -1,14 +1,18 @@
 import { getVideo, resetVideo } from './details';
 import { getComments, unloadComments } from './comments';
+import { getCurrentUserRating } from './rating';
 import { resetAddComment } from './added-comments';
 
-export function load(videoQueries, commentQueries) {
+export function load(videoId, videoQueries, commentQueries) {
   return dispatch => {
     // Get the video
-    dispatch(getVideo(videoQueries));
+    dispatch(getVideo(videoId, videoQueries));
     
     // Get comments
-    dispatch(getComments(commentQueries));
+    dispatch(getComments(videoId, commentQueries));
+    
+    // Get current user rating
+    dispatch(getCurrentUserRating(videoId));
   };
 };
 
@@ -20,7 +24,8 @@ export function unload() {
   };
 };
 
-export { updateVideoLocation } from './details';
+export { updateVideoLocation, recordPlayback } from './details';
 export { showMoreComments } from './comments';
 export { addComment, addAnotherComment } from './added-comments';
 export { moreLikeThis } from './more-like-this';
+export { rateVideo } from './rating';

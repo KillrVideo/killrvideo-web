@@ -15,6 +15,7 @@ Get Routes List
 - `currentUser[ 'userId', 'email', 'firstName', 'lastName' ]`
 - `currentUser.comments[{ range }][ 'commentId', 'comment', 'addedDate' ]`
 - `currentUser.comments[{ range }].video[ 'videoId', 'name', 'previewImageLocation' ]`
+- `currentUser.ratings[{ key:uuid }].rating`
 - `currentUser.videos[{ range }][ 'videoId', 'name', 'previewImageLocation', 'addedDate' ]`
 - `currentUser.videos[{ range }].stats.views`
 - `currentUser.videos[{ range }].author[ 'firstName', 'lastName' ]`
@@ -51,8 +52,10 @@ Call Routes List
 - `currentUser.logout()`
 - `currentUser.register(firstName, lastName, email, password)`
 - `currentUser.videos.addYouTube(youTubeVideoId, name, description, tags)`
-- `currentUser.videos.addUploaded(uploadUrl, name, description, tags`
+- `currentUser.videos.addUploaded(uploadUrl, name, description, tags)`
 - `videosById[{ key:uuid }].comments.add(comment)`
+- `videosById[{ key:uuid }].rate(newRating)`
+- `videosById[{ key:uuid }].recordPlayback()`
 
 All Routes Tree
 ---------------
@@ -87,6 +90,8 @@ All Routes Tree
     - `.videoId`
     - `.name`
     - `.previewImageLocation`
+- `.ratings[{ key:uuid }]`
+  - `.rating`
 - `.videos`
   - `.addYouTube(youTubeVideoId, name, description, tags)`
   - `.addUploaded(uploadUrl, name description, tags)`
@@ -123,8 +128,10 @@ All Routes Tree
 - `.locationType`
 - `.status`
 - `.statusDate`
+- `.recordPlayback()`
 - `.stats`
   - `.views`
+- `.rate(newRating)`
 - `.rating`
   - `.count`
   - `.total`

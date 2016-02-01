@@ -34,34 +34,36 @@ class AccountInfo extends Component {
     const { userId, accountInfo: { user, comments, videos }, showMoreComments, videosNextPage, videosPreviousPage } = this.props;
     
     return (
-      <Row>
-        <Col md={5}>
-          <h3>
-            <Icon name="info-circle" /> Profile
-          </h3>
-          
-          <UserProfile user={user} />
-          
-          <h3>
-            <Icon name="comments" /> Latest Comments
-          </h3>
-          
-          <UserComments comments={comments} showMoreComments={showMoreComments} />
-        </Col>
-        <Col md={7}>
-          <h3>
-            <Icon name="video-camera" /> {isUndefined(userId) ? 'My' : undefined} Videos
-          </h3>
-          
-          <p className={isUndefined(userId) ? undefined : 'hidden'}>
-            <Button bsStyle="success" onClick={() => this.gotoAddVideo()}>
-              <Icon name="plus-circle" /> Add a Video
-            </Button>
-          </p>
-          
-          <UserVideos videos={videos} nextPage={videosNextPage} previousPage={videosPreviousPage} />
-        </Col>
-      </Row>
+      <div className="body-content container">
+        <Row>
+          <Col md={5}>
+            <h3>
+              <Icon name="info-circle" /> Profile
+            </h3>
+            
+            <UserProfile user={user} />
+            
+            <h3>
+              <Icon name="comments" /> Latest Comments
+            </h3>
+            
+            <UserComments comments={comments} showMoreComments={showMoreComments} />
+          </Col>
+          <Col md={7}>
+            <h3>
+              <Icon name="video-camera" /> {isUndefined(userId) ? 'My' : undefined} Videos
+            </h3>
+            
+            <p className={isUndefined(userId) ? undefined : 'hidden'}>
+              <Button bsStyle="success" onClick={() => this.gotoAddVideo()}>
+                <Icon name="plus-circle" /> Add a Video
+              </Button>
+            </p>
+            
+            <UserVideos videos={videos} nextPage={videosNextPage} previousPage={videosPreviousPage} />
+          </Col>
+        </Row>
+      </div>
     );
   }
 }

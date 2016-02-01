@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
-import { pushState } from 'redux-router';
+import { routeActions } from 'react-router-redux';
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 
 import { toggleWhatIsThis } from 'actions';
@@ -23,12 +23,15 @@ class Header extends Component {
   componentWillReceiveProps(nextProps) {
     // Send user to the home page on logout
     if (this.props.currentUser.isLoggedIn === true && nextProps.currentUser.isLoggedIn === false) {
-      this.props.pushState(null, '/');
+      this.props.push('/');
     }
   }
   
-  submitSearch(query) {
-    this.props.pushState(null, '/search/results', { query });
+  submitSearch(q) {
+    this.props.push({ 
+      pathname: '/search/results', 
+      query: { q }
+    });
   }
     
   render() {
@@ -47,10 +50,10 @@ class Header extends Component {
         
         loggedInMenu = (
           <NavDropdown eventKey={4} title={menuTitle} id="loggedin-user">
-            <MenuItem eventKey={4.1} onSelect={e => this.props.pushState(null, '/account/info')}>
+            <MenuItem eventKey={4.1} onSelect={e => this.props.push('/account/info')}>
               <Icon name="cog" fixedWidth /> My Account
             </MenuItem>
-            <MenuItem eventKey={4.2} onSelect={e => this.props.pushState(null, '/videos/add')}>
+            <MenuItem eventKey={4.2} onSelect={e => this.props.push('/videos/add')}>
               <Icon name="video-camera" fixedWidth /> Add a Video
             </MenuItem>
             <MenuItem divider />
@@ -63,28 +66,29 @@ class Header extends Component {
       } else {
         // Buttons for logging in or registering the site
         signIn = (
-          <NavItem eventKey={2} href="#" onSelect={e => this.props.pushState(null, '/account/signin')} className="text-uppercase">
+          <NavItem eventKey={2} href="#" onSelect={e => this.props.push('/account/signin')} className="text-uppercase">
             Sign in
           </NavItem>
         );
         register = (
-          <NavItem eventKey={3} href="#" onSelect={e => this.props.pushState(null, '/account/register')} className="bg-success text-uppercase">
+          <NavItem eventKey={3} href="#" onSelect={e => this.props.push('/account/register')} className="bg-success text-uppercase">
             Register
           </NavItem>
         );
       }
     }
   
-    // TODO: Switch to react-bootstrap navbar once brand/header with collapse is implemented
-    // (see https://github.com/react-bootstrap/react-bootstrap/pull/1184)
     return (
       <div id="header">
         <Navbar fixedTop id="navbar-main">
-          <Navbar.Brand>
-            <Link to="/" id="logo">
-              <Image src="killrvideo.png" alt="KillrVideo.com Logo" />
-            </Link>
-          </Navbar.Brand>
+          <Navbar.Header>
+            <Navbar.Brand>
+              <Link to="/" id="logo">
+                <Image src="killrvideo.png" alt="KillrVideo.com Logo" />
+              </Link>
+            </Navbar.Brand>
+            <Navbar.Toggle />
+          </Navbar.Header>
           <Navbar.Collapse>
             <SearchBox onSubmit={vals => this.submitSearch(vals.query)} />
             <Nav navbar pullRight>
@@ -114,7 +118,7 @@ Header.propTypes = {
   toggleWhatIsThis: PropTypes.func.isRequired,
   getCurrentUser: PropTypes.func.isRequired,
   logout: PropTypes.func.isRequired,
-  pushState: PropTypes.func.isRequired
+  push: PropTypes.func.isRequired
 };
 
 // Falcor queries
@@ -135,4 +139,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { toggleWhatIsThis, getCurrentUser, logout, pushState })(Header);
+export default connect(mapStateToProps, { toggleWhatIsThis, getCurrentUser, logout, push: routeActions.push })(Header);

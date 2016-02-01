@@ -130,7 +130,8 @@
   margin-bottom: 1em;
 }
 
-#view-video-tags > a {
+#view-video-tags > .label {
+  cursor: pointer;
   margin-left: 0.2em;
 }
 

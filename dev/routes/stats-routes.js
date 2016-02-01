@@ -18,31 +18,37 @@ const viewsByVideoIdStore = _(getVideos())
 const routes = [
   {
     // Views data is handled by stats routes
-    route: 'videosById[{keys:videoIds}].stats',
-    get(pathSet) {
-      let pathValues = [];
-      
-      pathSet.videoIds.forEach(videoId => {
-        pathValues.push({
-          path: [ 'videosById', videoId, 'stats' ],
-          value: $ref([ 'statsByVideoId', videoId ])
-        });
-      });
-      
-      return pathValues;
-    }
-  },
-  {
-    // Views by video
-    route: 'statsByVideoId[{keys:videoIds}]["views"]',
+    route: 'videosById[{keys:videoIds}].stats["views"]',
     get(pathSet) {
       let pathValues = [];
       
       pathSet.videoIds.forEach(videoId => {
         const views = viewsByVideoIdStore[videoId];
         pathValues.push({
-          path: [ 'statsByVideoId', videoId, 'views' ],
+          path: [ 'videosById', videoId, 'stats', 'views' ],
           value: isUndefined(views) ? 0 : views
+        });
+      });
+            
+      return pathValues;
+    }
+  },
+  {
+    // Record video playback stats
+    route: 'videosById[{keys:videoIds}].recordPlayback',
+    call(callPath, args) {
+      let pathValues = [];
+      
+      callPath.videoIds.forEach(videoId => {
+        if (isUndefined(viewsByVideoIdStore[videoId])){
+          viewsByVideoIdStore[videoId] = 0;
+        }
+        
+        viewsByVideoIdStore[videoId] += 1;
+        
+        pathValues.push({
+          path: [ 'videosById', videoId, 'stats', 'views' ],
+          invalidated: true
         });
       });
       

@@ -16,9 +16,13 @@ class VideoDetails extends Component {
     const {
       details: { isLoading, video },
       isLoggedIn,
+      ratingEnabled,
+      currentUserRating,
+      rateVideo,
       comments,
       addedComments,
-      showMoreComments
+      showMoreComments,
+      push
     } = this.props;
     
     // If we're doing an initial load and the video data isn't available yet, just output a placeholder
@@ -38,7 +42,8 @@ class VideoDetails extends Component {
         </Row>
         
         { /* Star ratings and sharing */ }
-        <VideoRatingSharing video={video} ratingEnabled={isLoggedIn} />
+        <VideoRatingSharing video={video} isLoggedIn={isLoggedIn} ratingEnabled={ratingEnabled} 
+                            currentUserRating={currentUserRating} rateVideo={rateVideo} />
         
         { /* Author and Tags */ }
         <Row>
@@ -52,7 +57,7 @@ class VideoDetails extends Component {
             </UserProfileLink>
           </Col>
           <Col xs={7} id="view-video-tags" className="text-right">
-            {video.tags.map(tag => <VideoTagLink tag={tag} key={tag} /> )}
+            {video.tags.map(tag => <VideoTagLink tag={tag} key={tag} push={push} /> )}
           </Col>
         </Row>
         
@@ -92,9 +97,13 @@ VideoDetails.propTypes = {
   comments: PropTypes.object.isRequired,
   addedComments: PropTypes.object.isRequired,
   isLoggedIn: PropTypes.bool.isRequired,
+  ratingEnabled: PropTypes.bool.isRequired,
+  currentUserRating: PropTypes.number.isRequired,
   
   // Actions
-  showMoreComments: PropTypes.func.isRequired
+  showMoreComments: PropTypes.func.isRequired,
+  rateVideo: PropTypes.func.isRequired,
+  push: PropTypes.func.isRequired
 };
 
 export default VideoDetails;
