@@ -1,4 +1,5 @@
 import { connect } from 'react-redux';
+import classNames from 'classnames';
 
 import React, { Component, PropTypes } from 'react';
 import { Row, Col, Tabs, Tab } from 'react-bootstrap';
@@ -19,30 +20,27 @@ class Chat extends Component {
   }
   
   render() {
-    // Only mobile, hide content that isn't for the currently active tab
-    const messageClass = this.state.activeTab === 1 ? undefined : 'hidden-xs';
-    const peopleClass = this.state.activeTab === 2 ? undefined : 'hidden-xs';
+    const { activeTab } = this.state;
+    
+    // Mark the content div that's active based on the active tab
+    const messagesClass = classNames('chat-tab-content', { active: activeTab === 1 });
+    const usersClass = classNames('chat-tab-content', { active: activeTab === 2 });
     
     return (
       <div className="body-content container">
         {/* Tabs for mobile (extra small screens) only */}
-        <Row className="visible-xs-block">
-          <Col xs={12}>
-            <Tabs activeKey={this.state.activeTab} onSelect={eventKey => this.tabSelected(eventKey)}>
-              <Tab eventKey={1} title={<Icon name="comment" />}></Tab>
-              <Tab eventKey={2} title={<Icon name="users" />}></Tab>
-            </Tabs>
-          </Col>
-        </Row>
+        <Tabs id="chat-tabs" activeKey={this.state.activeTab} onSelect={eventKey => this.tabSelected(eventKey)}>
+          <Tab eventKey={1} title={<Icon name="comment" />}></Tab>
+          <Tab eventKey={2} title={<Icon name="users" />}></Tab>
+        </Tabs>
         
-        <Row>
-          <Col sm={8} md={9} lg={10} className={messageClass}>
-            Chat messages here
-          </Col>
-          <Col sm={4} md={3} lg={2} className={peopleClass}>
-            People here
-          </Col>
-        </Row>
+        <div id="chat-messages" className={messagesClass}>
+          Chat messages here
+        </div>
+        
+        <div id="chat-users" className={usersClass}>
+          Users here
+        </div>
       </div>
     );
   }
