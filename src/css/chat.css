@@ -1,33 +1,53 @@
 #body-wrapper.chat {
   height: 100%;
-  padding-bottom: 15px;
+  padding-top: 50px;    /* Leave room for header */
 }
 
 #body-wrapper.chat > .body-content {
   height: 100%;
+  padding-top: 0;
+  padding-bottom: 0;
   display: flex;
   flex-flow: column nowrap;
-  padding-top: 65px;    /* Leave room for 50px header */
-  padding-bottom: 0;
 }
 
-#chat-tabs > ul {
+#chat-tabs {
+  display: flex;
+  flex-flow: row nowrap;
+  background-color: #222;
+  box-shadow: 0 1px 5px #ccc; 
+}
+
+#chat-tabs > li {
+  flex: 1;
+  text-align: center;
+  float: none;
+  margin: 0;
+}
+
+#chat-tabs > li > a {
+  background-color: #222;
+  color: #999;
+}
+
+#chat-tabs > li.active > a {
+  color: #fff;
+  border-bottom: 3px solid #fff;
+}
+
+#chat-content {
+  flex: 1;
+  margin: 0;
+  padding-top: 15px;
+  padding-bottom: 15px;
   display: flex;
   flex-flow: row nowrap;
 }
 
-#chat-tabs > ul > li {
-  float: none;
-  flex-grow: 1;
-  text-align: center;
-}
-
 .chat-tab-content {
+  flex: 1;
   display: none;
-  flex-grow: 1;
-  border: 1px solid #ddd;
-  border-top-style: none;
-  padding: 15px;
+  border: 1px solid #ccc;
 }
 
 .chat-tab-content.active {
@@ -37,28 +57,27 @@
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) {
   #body-wrapper.chat {
-    padding-bottom: 65px; /* Leave room for 50px footer */
+    padding-bottom: 50px; /* Leave room for footer */
   }
-  
-  #body-wrapper.chat > .body-content {
-    flex-flow: row nowrap;
-  }
-  
+    
   #chat-tabs {
     display: none;
   }
   
+  #chat-content {
+    margin: 0 auto;
+  }
+    
   .chat-tab-content {
     display: block;
-    border-style: solid;
   }
   
   #chat-messages {
     margin-right: 15px;
-    flex-grow: 4;
+    flex: 4;
   }
   
   #chat-users {
-    flex-grow: 1;
+    flex: 1;
   }
 }
