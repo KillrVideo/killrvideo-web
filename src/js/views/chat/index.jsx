@@ -2,8 +2,11 @@ import { connect } from 'react-redux';
 import classNames from 'classnames';
 
 import React, { Component, PropTypes } from 'react';
-import { Row, Col, Nav, NavItem } from 'react-bootstrap';
+import { Row, Col, Nav, NavItem, Button } from 'react-bootstrap';
+import GeminiScrollbar from 'react-gemini-scrollbar';
 import Icon from 'components/shared/icon';
+import Input from 'components/shared/input';
+import UserProfileImage from 'components/users/user-profile-image';
 
 // Main chat UI
 class Chat extends Component {
@@ -40,12 +43,40 @@ class Chat extends Component {
         </div>
         
         <div id="chat-content" className="container">
+          { /* Chat messages content pane */ }
           <div id="chat-messages" className={messagesClass}>
-            Chat messages here
+            <div id="chat-messages-window">
+              <GeminiScrollbar>
+                <ul id="chat-messages-list" className="list-unstyled">
+                  <li className="chat-message clearfix">
+                    <UserProfileImage email="luke.tillman@datastax.com" className="img-circle" />
+                    <div className="chat-message-header">
+                      Luke Tillman <small>1:35 PM</small>
+                    </div>
+                    <div className="chat-message-body">
+                      Ut porta nulla nibh, et egestas mi lacinia eget. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+                    </div>
+                  </li>
+                </ul>
+              </GeminiScrollbar>
+            </div>
+            
+            <Input type="text" id="chat-message-input" placeholder="Enter a chat message" 
+                   buttonAfter={<Button bsStyle="primary">Send</Button>} />
           </div>
           
+          {/* Chat users content pane */}
           <div id="chat-users" className={usersClass}>
-            Users here
+            <GeminiScrollbar>
+              <ul id="chat-users-list" className="list-unstyled">
+                <li>Duy Hai Doan</li>
+                <li>Jon Haddad</li>
+                <li>Luke Tillman</li>
+                <li>Patrick McFadin</li>
+                <li>Rachel Pedreschi</li>
+                <li>Rebecca Mills</li>
+              </ul>
+            </GeminiScrollbar>
           </div>
          </div>
       </div>
