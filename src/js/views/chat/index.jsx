@@ -1,12 +1,15 @@
 import { connect } from 'react-redux';
 import classNames from 'classnames';
+import { joinRoom, getMessages, sendMessage, leaveRoom } from 'actions/chat';
 
 import React, { Component, PropTypes } from 'react';
-import { Row, Col, Nav, NavItem, Button } from 'react-bootstrap';
+import { Row, Col, Nav, NavItem } from 'react-bootstrap';
 import GeminiScrollbar from 'react-gemini-scrollbar';
 import Icon from 'components/shared/icon';
-import Input from 'components/shared/input';
-import UserProfileImage from 'components/users/user-profile-image';
+
+import ChatMessagesList from './chat-messages-list';
+import ChatMessageInput from './chat-message-input';
+import ChatUsersList from './chat-users-list';
 
 // Main chat UI
 class Chat extends Component {
@@ -18,13 +21,29 @@ class Chat extends Component {
     };
   }
   
+  componentDidMount() {
+    this.props.joinRoom(this.props.roomName, Chat.queries.message(), Chat.queries.user());
+  }
+  
+  componentDidUpdate(prevProps) {
+    // If room changes, leave old room and join new room
+    if (this.props.roomName !== prevProps.roomName) {
+      this.props.leaveRoom(prevProps.roomName);
+      this.props.joinRoom(this.props.roomName, Chat.queries.message(), Chat.queries.user());
+    }
+  }
+  
+  componentWillUnmount() {
+    this.props.leaveRoom(this.props.roomName);
+  }
+  
   tabSelected(eventKey) {
     this.setState({ activeTab: eventKey });
   }
   
   render() {
     const { activeTab } = this.state;
-    const { roomName } = this.props;
+    const { roomName, users, messageHistory, messages } = this.props;
     
     // Mark the content div that's active based on the active tab
     const messagesClass = classNames('chat-tab-content', { active: activeTab === 1 });
@@ -47,35 +66,17 @@ class Chat extends Component {
           <div id="chat-messages" className={messagesClass}>
             <div id="chat-messages-window">
               <GeminiScrollbar>
-                <ul id="chat-messages-list" className="list-unstyled">
-                  <li className="chat-message clearfix">
-                    <UserProfileImage email="luke.tillman@datastax.com" className="img-circle" />
-                    <div className="chat-message-header">
-                      Luke Tillman <small>1:35 PM</small>
-                    </div>
-                    <div className="chat-message-body">
-                      Ut porta nulla nibh, et egestas mi lacinia eget. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
-                    </div>
-                  </li>
-                </ul>
+                <ChatMessagesList messageHistory={messageHistory} messages={messages} getMessages={this.props.getMessages} />
               </GeminiScrollbar>
             </div>
             
-            <Input type="text" id="chat-message-input" placeholder="Enter a chat message" 
-                   buttonAfter={<Button bsStyle="primary">Send</Button>} />
+            <ChatMessageInput sendMessage={this.props.sendMessage} />
           </div>
           
           {/* Chat users content pane */}
           <div id="chat-users" className={usersClass}>
             <GeminiScrollbar>
-              <ul id="chat-users-list" className="list-unstyled">
-                <li>Duy Hai Doan</li>
-                <li>Jon Haddad</li>
-                <li>Luke Tillman</li>
-                <li>Patrick McFadin</li>
-                <li>Rachel Pedreschi</li>
-                <li>Rebecca Mills</li>
-              </ul>
+              <ChatUsersList users={users} />
             </GeminiScrollbar>
           </div>
          </div>
@@ -84,16 +85,42 @@ class Chat extends Component {
   }
 }
 
+// Falcor queries
+Chat.queries = {
+  message() {
+    return ChatMessagesList.queries.message();
+  },
+  
+  user() {
+    return ChatUsersList.queries.user();
+  }
+};
+
 // Prop validation
 Chat.propTypes = {
-  roomName: PropTypes.string.isRequired
+  // State
+  roomName: PropTypes.string.isRequired,
+  users: PropTypes.object.isRequired,
+  messageHistory: PropTypes.object.isRequired,
+  messages: PropTypes.object.isRequired,
+  
+  // Actions
+  joinRoom: PropTypes.func.isRequired,
+  getMessages: PropTypes.func.isRequired,
+  sendMessage: PropTypes.func.isRequired,
+  leaveRoom: PropTypes.func.isRequired
 };
 
 // Map redux state to props
 function mapStateToProps(state, ownProps) {
+  const { chat: { users, messageHistory, messages } } = state;
+  
   return {
-    roomName: ownProps.location.query.room
+    roomName: ownProps.location.query.room,
+    users,
+    messageHistory,
+    messages
   };
 }
 
-export default connect(mapStateToProps, {})(Chat);
+export default connect(mapStateToProps, { joinRoom, getMessages, sendMessage, leaveRoom })(Chat);

@@ -11,6 +11,7 @@ import search from './search';
 import accountInfo from './account-info';
 import addVideo from './add-video';
 import uploadStatus from './upload-status';
+import chat from './chat';
 
 // Handle what is this UI state
 function whatIsThis(state = { visible: false }, action) {
@@ -31,7 +32,8 @@ const rootReducer = combineReducers({
   viewVideo,
   accountInfo,
   addVideo,
-  uploadStatus
+  uploadStatus,
+  chat
 });
 
 export default rootReducer;
