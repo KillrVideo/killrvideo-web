@@ -9,6 +9,7 @@ import suggestionsRoutes from './routes/suggestions-routes';
 import searchRoutes from './routes/search-routes';
 import configRoutes from './routes/configuration-routes';
 import uploadRoutes from './routes/upload-routes';
+import chatRoutes from './routes/chat-routes';
 
 // Route definitions
 const routes = [
@@ -20,7 +21,8 @@ const routes = [
   ...suggestionsRoutes,
   ...searchRoutes,
   ...configRoutes,
-  ...uploadRoutes
+  ...uploadRoutes,
+  ...chatRoutes
 ];
 
 // The actual router class

@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import moment from 'moment';
 
 import React, { Component, PropTypes } from 'react';
 import UserProfileImage from 'components/users/user-profile-image';
@@ -45,7 +46,7 @@ ChatMessagesList.queries = {
   message() {
     return [
       [ 'author', [ 'firstName', 'lastName', 'email' ] ],
-      [ 'message', 'addedDate' ]
+      [ [ 'message', 'addedDate' ] ]
     ];
   }
 };

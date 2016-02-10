@@ -3,6 +3,7 @@ import { createActionTypeConstants } from './promises';
 import { createPagedActions } from './paged';
 import model from 'stores/falcor-model';
 import { isUndefined, values } from 'lodash';
+import { Promise } from 'lib/promise';
 
 /**
  * Action Type Constants
@@ -26,33 +27,45 @@ export const ActionTypes = {
 
 const messageHistoryActions = createPagedActions(state => state.chat.messageHistory);
 
-export const joinRoom = createAction(JOIN_ROOM, (roomName, messageQueries, userQueries) => {
-  // Paths to get on the chat room
-  const thisPaths = [
-    [ 'users', 'length' ]
-  ];
-  
-  const chatRoomPath = [ 'chatRooms', roomName ];
-  
-  const promise = model.call([ ...chatRoomPath, 'join' ], [], [], thisPaths).then(response => {
-    // TODO: Open socket for notifications
-    
-    // Get initial message history
-    messageHistoryActions.getInitialPage([ ...chatRoomPath, 'messages' ], messageQueries);
-    
-    // Get all users in the chat room
-    const userRange = { length: response.json.chatRooms[roomName].users.length };
-    userQueries = userQueries.map(q => [ ...chatRoomPath, 'users', userRange, ...q ]);
-    return model.get(...userQueries).then(userResponse => {
-      return isUndefined(userResponse) ? [] : values(response.json);
+export function joinRoom(roomName, messageQueries, userQueries) {
+  return dispatch => {
+    let startJoinRoom;
+    const promise = new Promise(resolve => { startJoinRoom = resolve; }).then(() => {
+      // Paths to get on the chat room
+      const thisPaths = [
+        [ 'users', 'length' ]
+      ];
+      
+      const chatRoomPath = [ 'chatRooms', roomName ];
+      
+      return model.call([ ...chatRoomPath, 'join' ], [], [], thisPaths).then(response => {
+        // TODO: Open socket for notifications
+        
+        // Get initial message history
+        dispatch(messageHistoryActions.getInitialPage([ ...chatRoomPath, 'messages' ], messageQueries));
+        
+        // Get all users in the chat room
+        const userRange = { length: response.json.chatRooms[roomName].users.length };
+        userQueries = userQueries.map(q => [ ...chatRoomPath, 'users', userRange, q ]);
+        return model.get(...userQueries).then(userResponse => {
+          return isUndefined(userResponse) ? [] : values(userResponse.json.chatRooms[roomName].users);
+        });
+      });
     });
-  });
-  
-  return {
-    promise,
-    data: { promise }
+    
+    // Dispatch join room action with promise that hasn't started yet
+    dispatch({
+      type: JOIN_ROOM,
+      payload: {
+        promise,
+        data: { promise }
+      }
+    });
+    
+    // Start the promise
+    startJoinRoom();
   };
-});
+};
 
 export function getMessages(messageQueries) {
   return messageHistoryActions.nextPageClick(messageQueries);
