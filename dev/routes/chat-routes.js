@@ -36,7 +36,8 @@ function getChatRoomData(roomName) {
   const messagesStartIdx = (roomName.length * 4) % comments.length;
   const numberOfMessages = roomName.length * 11;
   
-  let messages = range(0, numberOfMessages).map(i => {
+  let addedDate = moment();
+  const messages = range(0, numberOfMessages).map(i => {
     // Pick out the chat message content from the sample comment data
     const idx = (messagesStartIdx + i) % comments.length;
     const message = comments[idx];
@@ -45,23 +46,20 @@ function getChatRoomData(roomName) {
     const userIdx = idx % users.length;
     const author = userIds[userIdx];
     
-    // Pick a time for the message
+    // Pick a date for the message
     const periodIdx = message.length % addedDatePeriods.length;
     const period = addedDatePeriods[periodIdx];
     const intervalLength = message.length % 24;
-    const addedDate = moment().subtract(intervalLength, period).toISOString();
+    addedDate = addedDate.subtract(intervalLength, period);
     
     return {
       messageId: uuid.v4(),
       message,
-      addedDate,
-      author
+      author,
+      addedDate: addedDate.toISOString()
     };
   });
   
-  // Ensure messages are ordered by added date (from oldest message to latest)
-  messages = sortBy(messages, m => moment(m.addedDate).toDate());
-    
   // Create a sample message history and current user list
   const sampleRoomData = {
     users,

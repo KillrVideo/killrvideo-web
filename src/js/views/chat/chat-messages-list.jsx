@@ -1,16 +1,32 @@
 import classNames from 'classnames';
 import moment from 'moment';
+import { _ } from 'lodash';
 
 import React, { Component, PropTypes } from 'react';
 import UserProfileImage from 'components/users/user-profile-image';
 import LoadingSpinner from 'components/shared/loading-spinner';
 
-function renderMessage(message) {
-  return (
-    <li className="chat-message clearfix">
+function renderMessage(output, message, index, allMessages) {
+  // See if we need to add a date header because we've changed days between messages
+  let currentMessageAddedDate = moment(message.addedDate);
+  let prevMessageAddedDate = index > 0
+    ? moment(allMessages[index - 1].addedDate)
+    : currentMessageAddedDate;
+    
+  if (currentMessageAddedDate.isSame(prevMessageAddedDate, 'day') === false) {
+    output.push(
+      <li className="chat-message-date chat-message clearfix" key={currentMessageAddedDate.format('YYYYMMDD')}>
+        <h4 className='section-divider'><span>{currentMessageAddedDate.format('dddd, MMMM Do YYYY')}</span></h4>
+      </li>
+    );
+  }
+  
+  // Add element for current message
+  output.push(
+    <li className="chat-message clearfix" key={message.messageId}>
       <UserProfileImage email={message.author.email} className="img-circle" />
       <div className="chat-message-header">
-        {message.author.firstName} {message.author.lastName} <small>{message.addedDate}</small>
+        {message.author.firstName} {message.author.lastName} &#8226; <small>{currentMessageAddedDate.format('LT')}</small>
       </div>
       <div className="chat-message-body">
         {message.message}
@@ -31,11 +47,8 @@ class ChatMessagesList extends Component {
           <LoadingSpinner />
         </li>
         
-        { /* Show message history first */ }
-        {messageHistory.data.map(renderMessage)}
-        
-        {/* Then show any new messages since we've been in the chat room */}
-        {messages.data.map(renderMessage)}
+        { /* Show message history first, followed by new messages since we've been in the chat room */ }
+        { _(messageHistory.data).concat(messages.data).transform(renderMessage, []).value()}
       </ul>
     );
   }
@@ -46,7 +59,7 @@ ChatMessagesList.queries = {
   message() {
     return [
       [ 'author', [ 'firstName', 'lastName', 'email' ] ],
-      [ [ 'message', 'addedDate' ] ]
+      [ [ 'messageId', 'message', 'addedDate' ] ]
     ];
   }
 };

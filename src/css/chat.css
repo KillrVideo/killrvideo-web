@@ -73,6 +73,13 @@
 
 .chat-message {
   padding-left: 45px;
+  padding-top: 15px;
+}
+
+.chat-message.chat-message-date {
+  padding-left: 0;
+  text-align: center;
+  color: #777;
 }
 
 .chat-message > img {
