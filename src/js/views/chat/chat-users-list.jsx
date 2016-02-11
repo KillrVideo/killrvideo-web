@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import GeminiScrollbar from 'react-gemini-scrollbar';
 import LoadingSpinner from 'components/shared/loading-spinner';
 
 class ChatUsersList extends Component {
@@ -6,12 +7,14 @@ class ChatUsersList extends Component {
     const { users } = this.props;
 
     return (
-      <ul id="chat-users-list" className="list-unstyled">
-        <li className={users.isLoading ? undefined : 'hidden'} key="loading">
-          <LoadingSpinner />
-        </li>
-        {users.data.map(user => <li key={user.userId}>{user.firstName} {user.lastName}</li>)}
-      </ul>
+      <GeminiScrollbar>
+        <ul id="chat-users-list" className="list-unstyled">
+          <li className={users.isLoading ? undefined : 'hidden'} key="loading">
+            <LoadingSpinner />
+          </li>
+          {users.data.map(user => <li key={user.userId}>{user.firstName} {user.lastName}</li>)}
+        </ul>
+      </GeminiScrollbar>
     );
   }
 }

@@ -5,7 +5,6 @@ import { joinRoom, getMessages, sendMessage, leaveRoom } from 'actions/chat';
 
 import React, { Component, PropTypes } from 'react';
 import { Row, Col, Nav, NavItem } from 'react-bootstrap';
-import GeminiScrollbar from 'react-gemini-scrollbar';
 import Icon from 'components/shared/icon';
 
 import ChatMessagesList from './chat-messages-list';
@@ -66,9 +65,7 @@ class Chat extends Component {
           { /* Chat messages content pane */ }
           <div id="chat-messages" className={messagesClass}>
             <div id="chat-messages-window">
-              <GeminiScrollbar>
-                <ChatMessagesList messages={messages.data} isLoading={messages.isLoading} getMessages={this.props.getMessages} />
-              </GeminiScrollbar>
+              <ChatMessagesList messages={messages.data} isLoading={messages.isLoading} getMessages={this.props.getMessages} />
             </div>
             
             <ChatMessageInput isSending={messages.isSending} sendMessage={this.props.sendMessage} />
@@ -76,9 +73,7 @@ class Chat extends Component {
           
           {/* Chat users content pane */}
           <div id="chat-users" className={usersClass}>
-            <GeminiScrollbar>
-              <ChatUsersList users={users} />
-            </GeminiScrollbar>
+            <ChatUsersList users={users} />
           </div>
          </div>
       </div>

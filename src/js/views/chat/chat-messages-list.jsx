@@ -3,12 +3,9 @@ import moment from 'moment';
 import { transform } from 'lodash';
 
 import React, { Component, PropTypes } from 'react';
+import GeminiScrollbar from 'react-gemini-scrollbar';
 import UserProfileImage from 'components/users/user-profile-image';
 import LoadingSpinner from 'components/shared/loading-spinner';
-
-function getMessages(messageHistory, messages) {
-  
-}
 
 function renderMessage(output, message, index, allMessages) {
   const previousMessage = index > 0 ? allMessages[index - 1] : { author: {} };
@@ -46,20 +43,47 @@ function renderMessage(output, message, index, allMessages) {
 }
 
 class ChatMessagesList extends Component {
+  constructor(props) {
+    super(props);
+    
+    this._scrollbarComponent = null;
+    this._shouldScroll = true;
+  }
+  
+  componentWillUpdate(nextProps) {
+    // See if we should scroll after this render
+    if (this.props.messages !== nextProps.messages && this._scrollbarComponent) {
+      // Scroll to latest message if they're at the bottom of the message list already
+      const scrollableEl = this._scrollbarComponent.scrollbar.getViewElement();
+      this._shouldScroll = scrollableEl.scrollTop + scrollableEl.clientHeight === scrollableEl.scrollHeight;
+    } else {
+      this._shouldScroll = false;
+    }
+  }
+  
+  componentDidUpdate(prevProps) {
+    // When messages change, scroll to the bottom if necessary
+    if (this._shouldScroll) {
+      const scrollableEl = this._scrollbarComponent.scrollbar.getViewElement();
+      scrollableEl.scrollTop = scrollableEl.scrollHeight;
+    }
+  }
+  
   render() {
     const { isLoading, messages } = this.props;
     
     const loadingClasses = classNames('chat-message', 'clearfix', { 'hidden': !isLoading });
     
     return (
-      <ul id="chat-messages-list" className="list-unstyled">
-        <li className={loadingClasses} key="loading">
-          <LoadingSpinner />
-        </li>
-        
-        { /* Show message history first, followed by new messages since we've been in the chat room */ }
-        {transform(messages, renderMessage, [])}
-      </ul>
+      <GeminiScrollbar ref={c => this._scrollbarComponent = c}>
+        <ul id="chat-messages-list" className="list-unstyled">
+          <li className={loadingClasses} key="loading">
+            <LoadingSpinner />
+          </li>
+          
+          {transform(messages, renderMessage, [])}
+        </ul>
+      </GeminiScrollbar>
     );
   }
 }
