@@ -5,7 +5,7 @@ import getVideos from '../data/videos';
 
 // Generate ratings for initial sample videos based on the video id
 const ratingsByVideoIdStore = _(getVideos())
-  .pluck('videoId')
+  .map('videoId')
   .reduce((acc, videoId) => {
     // Use last 5 "digits" of video id as the number of 1...5 star ratings where each "digit" is the number of ratings for a given  
     // star level (i.e. the last "digit" is the number of 5 star ratings, second to last is number of 4 star ratings, etc)

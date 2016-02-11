@@ -56,6 +56,7 @@ app.get('/*', (req, res) => {
 
 // Log errors
 app.use((err, req, res, next) => {
+  console.log('Error handler!');
   console.error(err);
   next(err);
 });

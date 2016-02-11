@@ -10,10 +10,10 @@ import getUsers from '../data/users';
 
 
 // Array of all initial user ids
-const userIds = _(getUsers()).pluck('userId').value();
+const userIds = _(getUsers()).map('userId').value();
 
 // Create an index of the data
-const videosByIdStore = _(getVideos()).indexBy('videoId').mapValues(video => {
+const videosByIdStore = _(getVideos()).keyBy('videoId').mapValues(video => {
   // Use the video id to generate an index in the collection of sample users and add to the video
   var authorIdx = getIntFromPartOfUuid(video.videoId, 0, 2, userIds.length);
   video.author = userIds[authorIdx];
@@ -70,9 +70,9 @@ const routes = [
       // Figure out the most recent video ids
       const videoIdsByDate = _(videosByIdStore)
         .values()
-        .select(v => v.location !== null)
-        .sortByOrder(vid => moment(vid.addedDate).toDate(), 'desc')
-        .pluck('videoId')
+        .filter(v => v.location !== null)
+        .orderBy([ vid => moment(vid.addedDate).toDate() ], [ 'desc' ])
+        .map('videoId')
         .take(MAX_RECENT_VIDEOS)
         .value();
       
@@ -100,7 +100,7 @@ const routes = [
         }
         
         videosForUser = _(videosForUser)
-          .sortByOrder([ v => moment(v.addedDate).toDate() ], [ 'desc' ])
+          .orderBy([ v => moment(v.addedDate).toDate() ], [ 'desc' ])
           .value();
         
         pathSet.indicies.forEach(idx => {

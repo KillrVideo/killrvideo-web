@@ -6,9 +6,9 @@ import moment from 'moment';
 import getUsers from '../data/users';
 
 // Some stores
-const usersByIdStore = _(getUsers()).indexBy('userId').value();
+const usersByIdStore = _(getUsers()).keyBy('userId').value();
 const userCredentialsStore = _(getUsers())
-  .indexBy('email')
+  .keyBy('email')
   .mapValues(u => _(u).pick('userId').merge({ password: 'password' }).value())
   .value();
 

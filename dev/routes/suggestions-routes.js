@@ -19,7 +19,7 @@ const routes = [
         // Use the video Id to generate a start index in the videos array
         const videos = getVideos();
         const startIdx = getIntFromPartOfUuid(videoId, 2, 2, videos.length);
-        const relatedVideos = _(videos).pluck('videoId').slice(startIdx).take(MAX_RELATED_VIDEOS).value();
+        const relatedVideos = _(videos).map('videoId').slice(startIdx).take(MAX_RELATED_VIDEOS).value();
         
         pathSet.indicies.forEach(idx => {
           pathValues.push({
@@ -52,7 +52,7 @@ const routes = [
         // Use the user id to generate a start index in the videos array
         const videos = getVideos();
         const startIdx = getIntFromPartOfUuid(userId, 0, 2, videos.length);
-        const suggestedVideos = _(videos).pluck('videoId').slice(startIdx).take(MAX_SUGGESTED_VIDEOS).value();
+        const suggestedVideos = _(videos).map('videoId').slice(startIdx).take(MAX_SUGGESTED_VIDEOS).value();
         
         pathSet.indicies.forEach(idx => {
           pathValues.push({

@@ -6,7 +6,7 @@ import getVideos from '../data/videos';
 
 // Generate stats for initial sample videos based on the video id
 const viewsByVideoIdStore = _(getVideos())
-  .pluck('videoId')
+  .map('videoId')
   .reduce((acc, videoId) => {
     acc[videoId] = getIntFromPartOfUuid(videoId, videoId.length - 11, 10, 10000);
     return acc;

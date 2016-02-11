@@ -10,7 +10,7 @@ import getComments from '../data/comments';
 
 // Arrays of all initial comment text and user ids
 const commentText = getComments();
-const userIds = _(getUsers()).pluck('userId').value();
+const userIds = _(getUsers()).map('userId').value();
 
 // Generate comments for all the initial videos
 const commentsByVideoIdStore = _(getVideos())
@@ -194,8 +194,8 @@ const routes = [
       pathSet.userIds.forEach(userId => {
         // Slow to scan all comments by id, but will get the job done
         const commentsByUser = _(commentsByVideoIdStore).values().flatten()
-          .where({ author: userId })
-          .sortByOrder([ c => moment(c.addedDate).toDate() ], [ 'desc' ])
+          .filter({ author: userId })
+          .orderBy([ c => moment(c.addedDate).toDate() ], [ 'desc' ])
           .value();
                 
         getIndexesFromRanges(pathSet.indexRanges).forEach(idx => {
