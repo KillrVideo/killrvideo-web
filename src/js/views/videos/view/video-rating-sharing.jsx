@@ -58,7 +58,7 @@ class VideoRatingSharing extends Component {
   
   render() {
     let averageRating = 0;
-    if (this.props.video.rating) {
+    if (this.props.video.rating && this.props.video.rating.count > 0) {
       let { total, count } = this.props.video.rating;
       averageRating = total / count;
     }
