@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import { ActionTypes } from 'actions/chat';
 import { createPagedReducer } from './paged';
+import { sortBy } from 'lodash';
 
 // Default state for users in the chat room
 const defaultUsersState = {
@@ -21,7 +22,7 @@ function users(state = defaultUsersState, action) {
       return {
         ...state,
         isLoading: false,
-        data: [ ...action.payload ]
+        data: sortBy(action.payload, [ 'firstName', 'lastName' ])
       };
       
     case ActionTypes.JOIN_ROOM.FAILURE:
