@@ -1,19 +1,21 @@
 import classNames from 'classnames';
 import moment from 'moment';
-import { _ } from 'lodash';
+import { transform } from 'lodash';
 
 import React, { Component, PropTypes } from 'react';
 import UserProfileImage from 'components/users/user-profile-image';
 import LoadingSpinner from 'components/shared/loading-spinner';
 
+function getMessages(messageHistory, messages) {
+  
+}
+
 function renderMessage(output, message, index, allMessages) {
+  const previousMessage = index > 0 ? allMessages[index - 1] : { author: {} };
+  
   // See if we need to add a date header because we've changed days between messages
-  let currentMessageAddedDate = moment(message.addedDate);
-  let prevMessageAddedDate = index > 0
-    ? moment(allMessages[index - 1].addedDate)
-    : currentMessageAddedDate;
-    
-  if (currentMessageAddedDate.isSame(prevMessageAddedDate, 'day') === false) {
+  const currentMessageAddedDate = moment(message.addedDate);
+  if (currentMessageAddedDate.isSame(previousMessage.addedDate, 'day') === false || index === 0) {
     output.push(
       <li className="chat-message-date chat-message clearfix" key={currentMessageAddedDate.format('YYYYMMDD')}>
         <h4 className='section-divider'><span>{currentMessageAddedDate.format('dddd, MMMM Do YYYY')}</span></h4>
@@ -21,13 +23,21 @@ function renderMessage(output, message, index, allMessages) {
     );
   }
   
-  // Add element for current message
-  output.push(
-    <li className="chat-message clearfix" key={message.messageId}>
-      <UserProfileImage email={message.author.email} className="img-circle" />
+  let profileImage, header;
+  if (previousMessage.author.email !== message.author.email) {
+    profileImage = <UserProfileImage email={message.author.email} className="img-circle" />;
+    header = (
       <div className="chat-message-header">
         {message.author.firstName} {message.author.lastName} &#8226; <small>{currentMessageAddedDate.format('LT')}</small>
       </div>
+    );
+  }
+  
+  // Add element for current message
+  output.push(
+    <li className="chat-message clearfix" key={message.messageId}>
+      {profileImage}
+      {header}
       <div className="chat-message-body">
         {message.message}
       </div>
@@ -37,9 +47,9 @@ function renderMessage(output, message, index, allMessages) {
 
 class ChatMessagesList extends Component {
   render() {
-    const { messageHistory, messages } = this.props;
+    const { isLoading, messages } = this.props;
     
-    const loadingClasses = classNames('chat-message', 'clearfix', { 'hidden': !messageHistory.isLoading });
+    const loadingClasses = classNames('chat-message', 'clearfix', { 'hidden': !isLoading });
     
     return (
       <ul id="chat-messages-list" className="list-unstyled">
@@ -48,7 +58,7 @@ class ChatMessagesList extends Component {
         </li>
         
         { /* Show message history first, followed by new messages since we've been in the chat room */ }
-        { _(messageHistory.data).concat(messages.data).transform(renderMessage, []).value()}
+        {transform(messages, renderMessage, [])}
       </ul>
     );
   }
@@ -66,8 +76,8 @@ ChatMessagesList.queries = {
 
 // Prop validation
 ChatMessagesList.propTypes = {
-  messageHistory: PropTypes.object.isRequired,
-  messages: PropTypes.object.isRequired,
+  isLoading: PropTypes.bool.isRequired,
+  messages: PropTypes.arrayOf(PropTypes.object).isRequired,
   getMessages: PropTypes.func.isRequired
 };
 

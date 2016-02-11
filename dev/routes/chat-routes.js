@@ -58,7 +58,7 @@ function getChatRoomData(roomName) {
       author,
       addedDate: addedDate.toISOString()
     };
-  });
+  }).reverse(); // Reverse so messages are in order from oldest -> newest
   
   // Create a sample message history and current user list
   const sampleRoomData = {
@@ -163,6 +163,8 @@ const routes = [
       
       pathSet.roomNames.forEach(roomName => {
         const chatRoomData = getChatRoomData(roomName);
+        
+        // Return a reference starting from the latest message Id
         const latestMessageId = chatRoomData.messages[chatRoomData.messages.length - 1].messageId;
         pathValues.push({
           path: [ 'chatRooms', roomName, 'messages' ],

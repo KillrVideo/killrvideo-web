@@ -10,7 +10,7 @@ class ChatUsersList extends Component {
         <li className={users.isLoading ? undefined : 'hidden'} key="loading">
           <LoadingSpinner />
         </li>
-        {users.data.map(user => <li>{user.firstName} {user.lastName}</li>)}
+        {users.data.map(user => <li key={user.userId}>{user.firstName} {user.lastName}</li>)}
       </ul>
     );
   }
@@ -19,7 +19,7 @@ class ChatUsersList extends Component {
 ChatUsersList.queries = {
   user() {
     return [
-      [ 'firstName', 'lastName' ]
+      [ 'userId', 'firstName', 'lastName' ]
     ];
   }
 };

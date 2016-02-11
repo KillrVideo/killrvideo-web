@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import classNames from 'classnames';
+import { createSelector } from 'reselect';
 import { joinRoom, getMessages, sendMessage, leaveRoom } from 'actions/chat';
 
 import React, { Component, PropTypes } from 'react';
@@ -43,7 +44,7 @@ class Chat extends Component {
   
   render() {
     const { activeTab } = this.state;
-    const { roomName, users, messageHistory, messages } = this.props;
+    const { roomName, users, messages } = this.props;
     
     // Mark the content div that's active based on the active tab
     const messagesClass = classNames('chat-tab-content', { active: activeTab === 1 });
@@ -66,11 +67,11 @@ class Chat extends Component {
           <div id="chat-messages" className={messagesClass}>
             <div id="chat-messages-window">
               <GeminiScrollbar>
-                <ChatMessagesList messageHistory={messageHistory} messages={messages} getMessages={this.props.getMessages} />
+                <ChatMessagesList messages={messages.data} isLoading={messages.isLoading} getMessages={this.props.getMessages} />
               </GeminiScrollbar>
             </div>
             
-            <ChatMessageInput sendMessage={this.props.sendMessage} />
+            <ChatMessageInput isSending={messages.isSending} sendMessage={this.props.sendMessage} />
           </div>
           
           {/* Chat users content pane */}
@@ -101,7 +102,6 @@ Chat.propTypes = {
   // State
   roomName: PropTypes.string.isRequired,
   users: PropTypes.object.isRequired,
-  messageHistory: PropTypes.object.isRequired,
   messages: PropTypes.object.isRequired,
   
   // Actions
@@ -111,16 +111,58 @@ Chat.propTypes = {
   leaveRoom: PropTypes.func.isRequired
 };
 
-// Map redux state to props
-function mapStateToProps(state, ownProps) {
-  const { chat: { users, messageHistory, messages } } = state;
-  
-  return {
-    roomName: ownProps.location.query.room,
-    users,
-    messageHistory,
-    messages
-  };
-}
+// Some selectors for mapping redux state to props
+const usersSelector = state => state.chat.users;
+const isSendingSelector = state => state.chat.messages.sending;
+const isLoadingSelector = state => state.chat.messageHistory.isLoading;
+const roomNameSelector = (state, props) => props.location.query.room;
+
+const messagesDataSelector = state => state.chat.messages.data;
+const messageHistoryDataSelector = state => state.chat.messageHistory.data;
+const allMessagesDataSelector = createSelector(
+  messagesDataSelector,
+  messageHistoryDataSelector,
+  (messages, messageHistory) => {
+    const allMessages = [];
+
+    // Display history in reverse order
+    for (let i = messageHistory.length - 1; i >= 0; i--) {
+      allMessages.push(messageHistory[i]);
+    }
+    
+    // Display new messages in order
+    for (let i = 0; i < messages.length; i++) {
+      allMessages.push(messages[i]);
+    }
+    
+    return allMessages;
+  }
+);
+
+const messagesSelector = createSelector(
+  allMessagesDataSelector,
+  isSendingSelector,
+  isLoadingSelector,
+  (data, isSending, isLoading) => {
+    return {
+      data,
+      isSending,
+      isLoading
+    };
+  }
+);
+
+const mapStateToProps = createSelector(
+  roomNameSelector,
+  usersSelector,
+  messagesSelector,
+  (roomName, users, messages) => {
+    return {
+      roomName,
+      users,
+      messages
+    };
+  }
+);
 
 export default connect(mapStateToProps, { joinRoom, getMessages, sendMessage, leaveRoom })(Chat);
