@@ -6,6 +6,7 @@ import { getIndexesFromRanges } from './util';
 
 import getUsers from '../data/users';
 import getComments from '../data/comments';
+import { getPubSub } from '../chat-handler';
 
 const addedDatePeriods = [
   'hours', 'minutes', 'seconds'
@@ -112,6 +113,10 @@ const routes = [
         invalidated: true
       });
       
+      // Notify room of join using our simulated pubSub
+      const pubSub = getPubSub(roomName);
+      pubSub.notifyJoined(userId);
+      
       return pathValues;
     }
   },
@@ -151,6 +156,10 @@ const routes = [
         path: [ 'chatRooms', roomName ],
         invalidated: true
       });
+      
+      // Notify room user left using our simulated pubSub
+      const pubSub = getPubSub(roomName);
+      pubSub.notifyLeft(userId);
       
       return pathValues;
     }

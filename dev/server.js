@@ -1,12 +1,15 @@
 import express from 'express';
+import { Server } from 'http';
 import vhost from 'vhost';
 import cors from 'cors';
 import { dataSourceRoute } from 'falcor-express';
 import bodyParser from 'body-parser';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
+import SocketIO from 'socket.io';
 
 import KillrVideoRouter from './router';
+import { handleConnection } from './chat-handler';
 import RequestContext from './request-context';
 import config from './config';
 
@@ -65,10 +68,15 @@ app.use((err, req, res, next) => {
 const listenPort = process.env.PORT || 3000;
 app.locals.port = listenPort;
 
-// Start the server
-const server = app.listen(listenPort, function() {
-  const host = server.address().address;
-  const port = server.address().port;
+// Create the server
+const http = Server(app);
 
-  console.log(`Listening at http://${host}:${port}`);
+// Listen for websocket connections
+const io = SocketIO(http);
+io.on('connection', handleConnection);
+
+// Start the server
+http.listen(listenPort, () => {
+  const address = http.address();
+  console.log(`Listening at http://${address.address}:${address.port}`);
 });

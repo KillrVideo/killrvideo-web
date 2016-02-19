@@ -43,6 +43,7 @@
     "nodemon": "^1.8.1",
     "resolve": "^1.1.6",
     "run-sequence": "^1.1.4",
+    "socket.io": "^1.4.5",
     "uuid": "^2.0.1",
     "vhost": "^3.0.2",
     "vinyl-source-stream": "^1.1.0",
@@ -77,6 +78,7 @@
     "redux-promise-middleware": "^2.3.1",
     "redux-thunk": "^1.0.0",
     "reselect": "^2.0.3",
+    "socket.io-client": "^1.4.5",
     "validate.js": "^0.9.0",
     "xhr": "^2.2.0"
   }

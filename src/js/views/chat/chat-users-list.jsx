@@ -22,7 +22,7 @@ class ChatUsersList extends Component {
 ChatUsersList.queries = {
   user() {
     return [
-      [ 'userId', 'firstName', 'lastName' ]
+      [ [ 'userId', 'firstName', 'lastName' ] ]
     ];
   }
 };
