@@ -97,7 +97,7 @@
   color: #aaa;
 }
 
-#chat-messages > .form-group {
+#chat-messages .form-group {
   margin-bottom: 0;
 }
 

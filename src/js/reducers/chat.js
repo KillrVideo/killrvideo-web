@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import { ActionTypes } from 'actions/chat';
 import { createPagedReducer } from './paged';
 import { uniqBy, sortBy, findIndex, pullAt } from 'lodash';
+import moment from 'moment';
 
 // Default state for users in the chat room
 const defaultUsersState = {
@@ -69,7 +70,6 @@ const defaultMessagesState = {
   _promise: null,
   _socket: null,
   
-  sending: false,
   data: []
 };
 
@@ -93,19 +93,15 @@ function messages(state = defaultMessagesState, action) {
     case ActionTypes.LEAVE_ROOM:
       return defaultMessagesState;
       
-    case ActionTypes.SEND_MESSAGE.LOADING:
-      return {
-        ...state,
-        sending: true
-      };
-      
-    case ActionTypes.SEND_MESSAGE.SUCCESS:
-    case ActionTypes.SEND_MESSAGE.FAILURE:
-      // TODO: Handle message send failures
-      return {
-        ...state,
-        sending: false
-      };
+    case ActionTypes.NEW_MESSAGE.SUCCESS:
+      let idx = findIndex(state.data, { messageId: action.payload.messageId });
+      if (idx === -1) {
+        let newData = sortBy([ ...state.data, action.payload ], m => moment(m.addedDate).toDate());
+        return {
+          ...state,
+          data: newData
+        };
+      }
   }
   
   return state;

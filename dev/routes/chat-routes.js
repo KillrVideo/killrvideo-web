@@ -270,6 +270,58 @@ const routes = [
       
       return pathValues;
     }
+  },
+  {
+    // Send a new chat message
+    route: 'chatRooms[{keys:roomNames}].sendMessage',
+    call(callPath, args) {
+      const [ messageBody ] = args;
+      
+      let pathValues = [];
+      
+      // Sanity check
+      if (callPath.roomNames.length !== 1) {
+        return callPath.roomNames.map(roomName => ({ 
+          path: [ 'chatRooms', roomName ], 
+          value: $error('Can only send a message to one chat room at a time') 
+        }));
+      }
+      
+      const roomName = callPath.roomNames[0];
+      
+      // Get current user
+      const userId = this.requestContext.getUserId();
+      if (isUndefined(userId)) {
+        pathValues.push({
+          path: [ 'chatRooms', roomName ],
+          value: $error('Not currently logged in')
+        });
+        return pathValues;
+      }
+      
+      // Add a new message to the chat room data
+      const roomData = getChatRoomData(roomName);
+      const newMessage = {
+        messageId: uuid.v4(),
+        message: messageBody,
+        author: userId,
+        addedDate: moment().toISOString()
+      };
+      roomData.messages.push(newMessage);
+      
+      // Create some pathValues for the new message
+      const messagePath = [ 'chatRooms', roomName, 'messagesById', newMessage.messageId ];
+      pathValues.push({ path: [ ...messagePath, 'messageId' ], value: newMessage.messageId });
+      pathValues.push({ path: [ ...messagePath, 'message' ], value: newMessage.message });
+      pathValues.push({ path: [ ...messagePath, 'author' ], value: $ref([ 'usersById', newMessage.author ]) });
+      pathValues.push({ path: [ ...messagePath, 'addedDate' ], value: newMessage.addedDate });
+      
+      // Let everyone know about the new message via our simulated pub-sub
+      const pubSub = getPubSub(roomName);
+      pubSub.notifyMessage(newMessage.messageId, pathValues);
+      
+      return pathValues;
+    }
   }
 ];
 

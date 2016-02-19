@@ -50,7 +50,7 @@ export function joinRoom(roomName, messageQueries, userQueries) {
           .then(pathValues => {
             // Merge any pathValues provided into the falcor model cache
             if (pathValues) {
-              return model.withoutDataSource().set(pathValues);
+              return model.withoutDataSource().set(...pathValues);
             }
           })
           .return(message)
@@ -130,14 +130,21 @@ export function getMessages(messageQueries) {
   return messageHistoryActions.nextPageClick(messageQueries);
 };
 
-export const sendMessage = createAction(ActionTypes.SEND_MESSAGE, (roomName, message) => {
-  const promise = model.call([ 'chatRooms', roomName, 'sendMessage' ], [ message ]).then(response => response);
-  
-  return {
-    promise,
-    data: { promise }
+export function sendMessage(roomName, message) {
+  return dispatch => {
+    const promise = model.call([ 'chatRooms', roomName, 'sendMessage' ], [ message ]).then(response => response);
+    
+    dispatch({
+      type: SEND_MESSAGE,
+      payload: { 
+        promise,
+        data: { promise }
+      }
+    });
+    
+    return promise;
   };
-});
+}
 
 export function leaveRoom(roomName) {
   return (dispatch, getState) => {

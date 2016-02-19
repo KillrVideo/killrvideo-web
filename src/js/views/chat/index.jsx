@@ -68,7 +68,7 @@ class Chat extends Component {
               <ChatMessagesList messages={messages.data} isLoading={messages.isLoading} getMessages={this.props.getMessages} />
             </div>
             
-            <ChatMessageInput isSending={messages.isSending} sendMessage={this.props.sendMessage} />
+            <ChatMessageInput onSubmit={vals => this.props.sendMessage(roomName, vals.message)} />
           </div>
           
           {/* Chat users content pane */}

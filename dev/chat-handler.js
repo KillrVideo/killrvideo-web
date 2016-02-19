@@ -44,7 +44,6 @@ class ChatRoomPubSub {
   
   _publish(message) {
     const msg = JSON.stringify(message);
-    console.log('Publishing %s', msg);
     for (let socketId in this._sockets) {
       let socket = this._sockets[socketId];
       socket.send(msg);
