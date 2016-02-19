@@ -12,7 +12,8 @@ function renderMessage(output, message, index, allMessages) {
   
   // See if we need to add a date header because we've changed days between messages
   const currentMessageAddedDate = moment(message.addedDate);
-  if (currentMessageAddedDate.isSame(previousMessage.addedDate, 'day') === false || index === 0) {
+  const addDateHeader = currentMessageAddedDate.isSame(previousMessage.addedDate, 'day') === false || index === 0;
+  if (addDateHeader) {
     output.push(
       <li className="chat-message-date chat-message clearfix" key={currentMessageAddedDate.format('YYYYMMDD')}>
         <h4 className='section-divider'><span>{currentMessageAddedDate.format('dddd, MMMM Do YYYY')}</span></h4>
@@ -20,8 +21,10 @@ function renderMessage(output, message, index, allMessages) {
     );
   }
   
+  // If the message is not the same author as the previous message or we just output a date header,
+  // include a header with the user's profile picture, name, and the message's time
   let profileImage, header;
-  if (previousMessage.author.email !== message.author.email) {
+  if (previousMessage.author.email !== message.author.email || addDateHeader === true) {
     profileImage = <UserProfileImage email={message.author.email} className="img-circle" />;
     header = (
       <div className="chat-message-header">
