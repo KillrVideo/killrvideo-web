@@ -45,6 +45,14 @@ Get Routes List
 - `search[{ key:query=term }].stats.views`
 - `search[{ key:query=term }].author[ 'firstName', 'lastName' ]`
 
+### Chat Room as Root
+- `chatRooms[{ key:string }].users.length`
+- `chatRooms[{ key:string }].users[{ range }][ 'userId', 'firstName', 'lastName' ]`
+- `chatRooms[{ key:string }].messages[{ range }].author[ 'firstName', 'lastName', 'email' ]`
+- `chatRooms[{ key:string }].messages[{ range }][ 'messageId', 'message', 'addedDate' ]`
+- `chatRooms[{ key:string }].messagesById[{ key:uuid }].author[ 'firstName', 'lastName', 'email' ]`
+- `chatRooms[{ key:string }].messagesById[{ key:uuid }][ 'messageId', 'message', 'addedDate' ]`
+
 Call Routes List
 ----------------
 
@@ -56,6 +64,9 @@ Call Routes List
 - `videosById[{ key:uuid }].comments.add(comment)`
 - `videosById[{ key:uuid }].rate(newRating)`
 - `videosById[{ key:uuid }].recordPlayback()`
+- `chatRooms[{ key:string }].join()`
+- `chatRooms[{ key:string }].leave()`
+- `chatRooms[{ key:string }].sendMessage(messageBody)`
 
 All Routes Tree
 ---------------
@@ -191,3 +202,22 @@ All Routes Tree
 - `.author`
   - `.firstName`
   - `.lastName`
+
+### `chatRooms[{ key:string }]`
+- `.messages[{ range }]`
+  - `.messageId`
+  - `.message`
+  - `.addedDate`
+  - `.author`
+    - `.firstName`
+    - `.lastName`
+    - `.email`
+- `.users`
+  - `[{ range }]`
+    - `.userId`
+    - `.firstName`
+    - `.lastName`
+  - `.length`
+- `.join()`
+- `.leave()`
+- `.sendMessage(messageBody)`
