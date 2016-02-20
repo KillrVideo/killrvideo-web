@@ -1,6 +1,5 @@
-import classNames from 'classnames';
 import moment from 'moment';
-import { transform } from 'lodash';
+import { transform, debounce } from 'lodash';
 
 import React, { Component, PropTypes } from 'react';
 import GeminiScrollbar from 'react-gemini-scrollbar';
@@ -50,38 +49,71 @@ class ChatMessagesList extends Component {
     super(props);
     
     this._scrollbarComponent = null;
-    this._shouldScroll = true;
+    this._scroll = {
+      to: null,
+      previousScrollTop: null,
+      previousScrollHeight: null
+    };
+    
+    this.handleScroll = debounce(() => this.getMoreMessages(), 250);
   }
   
   componentWillUpdate(nextProps) {
     // See if we should scroll after this render
     if (this.props.messages !== nextProps.messages && this._scrollbarComponent) {
-      // Scroll to latest message if they're at the bottom of the message list already
       const scrollableEl = this._scrollbarComponent.scrollbar.getViewElement();
-      this._shouldScroll = scrollableEl.scrollTop + scrollableEl.clientHeight === scrollableEl.scrollHeight;
+      
+      // Was this additional chat history added to the beginning of the messages array?
+      if (this.props.messages.length > 0 && this.props.messages[0] !== nextProps.messages[0]) {
+        // Scroll to the same position in the message list after the new messages are added
+        this._scroll.to = 'position';
+        this._scroll.previousScrollTop = scrollableEl.scrollTop;
+        this._scroll.previousScrollHeight = scrollableEl.scrollHeight;
+      } else {
+        // Scroll to latest message if they're at the bottom of the message list already
+        this._scroll.to = scrollableEl.scrollTop + scrollableEl.clientHeight === scrollableEl.scrollHeight
+          ? 'bottom'
+          : null; 
+      }
     } else {
-      this._shouldScroll = false;
+      this._scroll.to = null;
     }
   }
   
   componentDidUpdate(prevProps) {
-    // When messages change, scroll to the bottom if necessary
-    if (this._shouldScroll) {
+    // When messages change, scroll if necessary
+    if (this._scroll.to !== null) {
       const scrollableEl = this._scrollbarComponent.scrollbar.getViewElement();
-      scrollableEl.scrollTop = scrollableEl.scrollHeight;
+      
+      switch(this._scroll.to) {
+        case 'bottom':
+          scrollableEl.scrollTop = scrollableEl.scrollHeight;
+          break;
+        case 'position':
+          scrollableEl.scrollTop = (scrollableEl.scrollHeight - this._scroll.previousScrollHeight) + this._scroll.previousScrollTop;
+          break;
+      }
+    }
+  }
+  
+  getMoreMessages() {
+    if (this._scrollbarComponent) {
+      const scrollableEl = this._scrollbarComponent.scrollbar.getViewElement();
+      // If we're getting close to scrolling to the top, load more message history if we're not already loading
+      if (scrollableEl.scrollTop < 100 && this.props.isLoading === false) {
+        this.props.getMessages(ChatMessagesList.queries.message());
+      }
     }
   }
   
   render() {
     const { isLoading, messages } = this.props;
     
-    const loadingClasses = classNames('chat-message', 'clearfix', { 'hidden': !isLoading });
-    
     return (
-      <GeminiScrollbar ref={c => this._scrollbarComponent = c}>
+      <GeminiScrollbar ref={c => this._scrollbarComponent = c} onScroll={() => this.handleScroll()}>
         <ul id="chat-messages-list" className="list-unstyled">
-          <li className={loadingClasses} key="loading">
-            <LoadingSpinner />
+          <li className="chat-message clearfix" key="loading">
+            <LoadingSpinner hidden={!isLoading} />
           </li>
           
           {transform(messages, renderMessage, [])}
