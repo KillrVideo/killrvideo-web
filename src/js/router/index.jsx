@@ -7,6 +7,7 @@ export default (
     <Route path="/" component={Views.Layout}>
       <IndexRoute component={Views.Home} />
       <Route path="/account/signin" component={Views.Account.SignIn} />
+      <Route path="/account/signout" component={Views.Account.SignOut} />
       <Route path="/account/register" component={Views.Account.Register} />
       <Route path="/account/info(/:userId)" component={Views.Account.Info} />
       <Route path="/search/results" component={Views.Search.Results} />

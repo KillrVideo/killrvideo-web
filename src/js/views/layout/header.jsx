@@ -5,7 +5,7 @@ import { routeActions } from 'react-router-redux';
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 
 import { toggleWhatIsThis } from 'actions';
-import { getCurrentUser, logout } from 'actions/authentication';
+import { getCurrentUser } from 'actions/authentication';
 import Image from 'components/shared/image';
 import Icon from 'components/shared/icon';
 import UserProfileImage from 'components/users/user-profile-image';
@@ -19,14 +19,7 @@ class Header extends Component {
       this.props.getCurrentUser(Header.queries.currentUser());
     }
   }
-  
-  componentWillReceiveProps(nextProps) {
-    // Send user to the home page on logout
-    if (this.props.currentUser.isLoggedIn === true && nextProps.currentUser.isLoggedIn === false) {
-      this.props.push('/');
-    }
-  }
-  
+    
   submitSearch(q) {
     this.props.push({ 
       pathname: '/search/results', 
@@ -57,7 +50,7 @@ class Header extends Component {
               <Icon name="video-camera" fixedWidth /> Add a Video
             </MenuItem>
             <MenuItem divider />
-            <MenuItem eventKey={4.3} onSelect={e => this.props.logout()}>
+            <MenuItem eventKey={4.3} onSelect={e => this.props.push('/account/signout')}>
               <Icon name="sign-out" fixedWidth /> Sign Out
             </MenuItem>
           </NavDropdown>
@@ -117,7 +110,6 @@ Header.propTypes = {
   // Actions
   toggleWhatIsThis: PropTypes.func.isRequired,
   getCurrentUser: PropTypes.func.isRequired,
-  logout: PropTypes.func.isRequired,
   push: PropTypes.func.isRequired
 };
 
@@ -139,4 +131,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { toggleWhatIsThis, getCurrentUser, logout, push: routeActions.push })(Header);
+export default connect(mapStateToProps, { toggleWhatIsThis, getCurrentUser, push: routeActions.push })(Header);
