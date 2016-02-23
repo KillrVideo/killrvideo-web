@@ -2,33 +2,36 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { routeActions } from 'react-router-redux';
 
-import { Row, Col, Panel, Alert } from 'react-bootstrap';
+import { Row, Col, Panel, Alert, Button } from 'react-bootstrap';
 import SignInForm from './sign-in-form';
 import ErrorAlert from 'components/shared/error-alert';
-import { login, loginReset, getCurrentUser } from 'actions/authentication';
+import { login, loginReset } from 'actions/authentication';
 
 class SignIn extends Component {
   componentWillMount() {
-    // If already logged in when first loaded, just redirect to home page
-    if (this.props.currentUser.isFromServer && this.props.currentUser.isLoggedIn) {
-      this.redirectToHomePage();
-    } else {
-      this.props.getCurrentUser(SignIn.queries.currentUser());
-    }
-    
     // Reset page when loading
     this.props.loginReset();
   }
   
   componentWillReceiveProps(nextProps) {
-    // Redirect to home page once logged in
-    if (nextProps.currentUser.isLoggedIn) {
-      this.redirectToHomePage();
+    // Redirect once logged in
+    if (this.props.isLoggedIn === false && nextProps.isLoggedIn === true) {
+      const { location: { state } } = this.props;
+      if (state && state.redirectAfterLogin) {
+        this.props.push(state.redirectAfterLogin);
+      } else {
+        this.props.push('/');
+      }
     }
   }
   
-  redirectToHomePage() {
-    this.props.push('/');
+  redirectToRegister() {
+    // Redirect and pass along any state in case we need to redirect after login
+    const { location: { state } } = this.props;
+    this.props.push({
+      pathname: '/account/register',
+      state
+    });
   }
   
   render() {
@@ -44,6 +47,14 @@ class SignIn extends Component {
               <ErrorAlert errors={this.props.loginState.errors} />
               
               <SignInForm onSubmit={vals => this.props.login(vals.email, vals.password)} />
+              
+              <div className="section-divider text-center muted">
+                <span>New to KillrVideo?</span>
+              </div>
+              
+              <Button bsStyle="default" block onClick={() => this.redirectToRegister()}>
+                Register for an Account
+              </Button>
             </Panel>
           </Col>
         </Row>
@@ -56,27 +67,26 @@ class SignIn extends Component {
 SignIn.propTypes = {
   // State from redux
   loginState: PropTypes.object.isRequired,
-  currentUser: PropTypes.object.isRequired,
+  isLoggedIn: PropTypes.bool.isRequired,
+  
+  // From react-router
+  location: PropTypes.object.isRequired,
   
   // Actions
   login: PropTypes.func.isRequired,
   loginReset: PropTypes.func.isRequired,
-  getCurrentUser: PropTypes.func.isRequired,
   push: PropTypes.func.isRequired
 };
 
-// Falcor queries
-SignIn.queries = {
-  currentUser() {
-    return [
-      [ 'userId' ]
-    ];
-  }
-};
-
 function mapStateToProps(state) {
-  let { authentication: { login: loginState, currentUser } } = state;
-  return { loginState, currentUser };
+  let { 
+    authentication: { 
+      login: loginState, 
+      currentUser: { isLoggedIn } 
+    } 
+  } = state;
+  
+  return { loginState, isLoggedIn };
 }
 
-export default connect(mapStateToProps, { login, loginReset, getCurrentUser, push: routeActions.push })(SignIn);
+export default connect(mapStateToProps, { login, loginReset, push: routeActions.push })(SignIn);

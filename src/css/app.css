@@ -16,15 +16,13 @@ h1 em, h2 em, h3 em, h4 em, h5 em, h6 em,
   font-style: normal;
 }
 
-h1.section-divider, h2.section-divider, h3.section-divider, h4.section-divider, h5.section-divider, h6.section-divider,
-.h1.section-divider, .h2.section-divider, .h3.section-divider, .h4.section-divider, .h5.section-divider, .h6.section-divider {
+.section-divider {
   border-top: 1px solid #dedede;
   margin-top: 31.5px;
   margin-bottom: 0;
 }
 
-h1.section-divider > span, h2.section-divider > span, h3.section-divider > span, h4.section-divider > span, h5.section-divider > span, h6.section-divider > span,
-.h1.section-divider > span, .h2.section-divider > span, .h3.section-divider > span, .h4.section-divider > span, .h5.section-divider > span, .h6.section-divider > span {
+.section-divider > span {
   position: relative;
   top: -0.6em;
   background-color: #FFF;

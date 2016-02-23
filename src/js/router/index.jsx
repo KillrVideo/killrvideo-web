@@ -1,6 +1,7 @@
 import React from 'react';
 import { Router, IndexRoute, Route, browserHistory } from 'react-router';
 import * as Views from 'views';
+import { checkAuthentication } from './check-authentication';
 
 export default (
   <Router history={browserHistory}>
@@ -12,8 +13,8 @@ export default (
       <Route path="/account/info(/:userId)" component={Views.Account.Info} />
       <Route path="/search/results" component={Views.Search.Results} />
       <Route path="/view/:videoId" component={Views.Videos.View} />
-      <Route path="/videos/add" component={Views.Videos.Add} />
-      <Route path="/chat" component={Views.Chat} wrapperClassName="chat" />
+      <Route path="/videos/add" component={Views.Videos.Add} onEnter={checkAuthentication} />
+      <Route path="/chat" component={Views.Chat} wrapperClassName="chat" onEnter={checkAuthentication} />
     </Route>
   </Router>
 );

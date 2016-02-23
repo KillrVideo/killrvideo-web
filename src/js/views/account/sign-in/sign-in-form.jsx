@@ -14,7 +14,7 @@ class SignInForm extends Component {
       <form role="form" onSubmit={handleSubmit}>
         <Input {...email} id="signin-email" type="email" placeholder="Enter email address" label="Email address" focusOnMount />
         <Input {...password} id="signin-password" type="password" placeholder="Password" label="Password" />
-        <Button type="submit" bsStyle="primary" disabled={submitting}>
+        <Button type="submit" bsStyle="primary" block disabled={submitting}>
           <Icon name="cog" animate="spin" className={submitting ? undefined : 'hidden'} /> Sign In
         </Button>
       </form>
@@ -39,5 +39,6 @@ const constraints = {
 export default reduxForm({
   form: 'signIn',
   fields: [ 'email', 'password' ],
+  touchOnBlur: false,
   validate: vals => validateForm(vals, constraints)
 })(SignInForm);
