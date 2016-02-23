@@ -33,7 +33,8 @@ class ViewVideo extends Component {
     
   render() {
     const {
-      videoId, 
+      videoId,
+      location,
       viewVideo: { details, comments, addedComments, moreLikeThis, rating }, 
       currentUser: { isLoggedIn },
       recordPlayback,
@@ -57,7 +58,7 @@ class ViewVideo extends Component {
                           showMoreComments={() => showMoreComments(ViewVideo.queries.comments())} push={push} />
                           
             <VideoAddComment addedComments={addedComments} isLoggedIn={isLoggedIn} addAnotherComment={addAnotherComment}
-                             onSubmit={vals => addComment(vals.comment, ViewVideo.queries.comments())} />
+                             location={location} onSubmit={vals => addComment(vals.comment, ViewVideo.queries.comments())} />
           </Col>
         </Row>
         <VideoPreviewList title="More Videos Like This" {...moreLikeThis} {...moreLikeThisActions}  />
@@ -84,8 +85,9 @@ ViewVideo.queries = {
 
 // Prop validation
 ViewVideo.propTypes = {
-  // From the router parameter (based on URL)
+  // From react-router
   videoId: PropTypes.string.isRequired,
+  location: PropTypes.object.isRequired,
   
   // From redux
   viewVideo: PropTypes.object.isRequired,
@@ -106,6 +108,7 @@ function mapStateToProps(state, ownProps) {
   return {
     currentUser: state.authentication.currentUser,
     videoId: ownProps.params.videoId,
+    location: ownProps.location,
     viewVideo: state.viewVideo
   };
 }

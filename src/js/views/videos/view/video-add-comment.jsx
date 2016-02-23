@@ -35,13 +35,25 @@ class VideoAddComment extends Component {
       invalid, 
       handleSubmit,
       isLoggedIn,
-      addedComments: { commentAdded, isLoading }
+      addedComments: { commentAdded, isLoading },
+      location: { pathname, search }
     } = this.props;
     
     const formClasses = classNames({
       inProgress: comment.active || comment.dirty,
       hidden: !isLoggedIn || commentAdded
     });
+    
+    // Data for where to send a user if they aren't signed in or registered yet
+    const redirectAfterLogin = { pathname, search };
+    const registerLinkTo = {
+      pathname: '/account/register',
+      state: { redirectAfterLogin }
+    };
+    const signInLinkTo = {
+      pathname: '/account/signin',
+      state: { redirectAfterLogin }
+    };
     
     return (
       <div className="video-add-comment">
@@ -50,7 +62,7 @@ class VideoAddComment extends Component {
         </Alert>
         
         <Alert bsStyle="warning" className={isLoggedIn ? 'small hidden' : 'small'}>
-          You must <Link to="/account/register" className="alert-link">register</Link> or <Link to="/account/signin" className="alert-link">sign in</Link> first
+          You must <Link to={registerLinkTo} className="alert-link">register</Link> or <Link to={signInLinkTo} className="alert-link">sign in</Link> first
           to post comments.
         </Alert>
         
@@ -75,9 +87,12 @@ VideoAddComment.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   invalid: PropTypes.bool.isRequired,
   resetForm: PropTypes.func.isRequired,
+  
   // Passed in
   isLoggedIn: PropTypes.bool.isRequired,
   addedComments: PropTypes.object.isRequired,
+  location: PropTypes.object.isRequired,
+  
   // Actions
   addAnotherComment: PropTypes.func.isRequired
 };
