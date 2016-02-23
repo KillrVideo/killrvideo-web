@@ -1,8 +1,8 @@
 import { createAction } from 'redux-actions';
 import { createActionTypeConstants } from './promises';
 import { createPagedActions } from './paged';
-import model from 'stores/falcor-model';
-import { isUndefined, values } from 'lodash';
+import { model, falcorValues } from 'stores/falcor-model';
+import { isUndefined } from 'lodash';
 import { Promise } from 'lib/promise';
 import IO from 'socket.io-client';
 
@@ -96,7 +96,7 @@ export function joinRoom(roomName, messageQueries, userQueries) {
       const userRange = { length: response.json.chatRooms[roomName].users.length };
       const getAllUsersQueries = userQueries.map(q => [ ...chatRoomPath, 'users', userRange, ...q ]);
       return model.get(...getAllUsersQueries).then(userResponse => {
-        return isUndefined(userResponse) ? [] : values(userResponse.json.chatRooms[roomName].users);
+        return isUndefined(userResponse) ? [] : falcorValues(userResponse.json.chatRooms[roomName].users);
       });
     });
     

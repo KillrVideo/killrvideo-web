@@ -1,6 +1,6 @@
 import { createAction } from 'redux-actions';
-import model from 'stores/falcor-model';
-import { isUndefined, values } from 'lodash';
+import { model, falcorValues } from 'stores/falcor-model';
+import { isUndefined, get } from 'lodash';
 
 /**
  * Paging action constants
@@ -75,27 +75,23 @@ function getInitialPage(selectPagedState, queryRoot, queries) {
     dispatch(request(listId));
     
     // Add paging range to queries
-    queries = queries.map(q => [ { from: 0, length: pagingConfig.recordsPerPage }, ...q ]);
+    queries = queries.map(q => [ ...queryRoot, { from: 0, length: pagingConfig.recordsPerPage }, ...q ]);
     
-    let queryModel = null;
-    model.deref(queryRoot, ...queries)
-      .subscribe(
-        m => { queryModel = m; },
-        null, // TODO: Error handler?
-        () => {
-          // Possible to have null for the query model if no results were found
-          if (queryModel === null) {
-            dispatch(receive(listId, [], false, null));
-            return;
-          }
-          
-          queryModel.get(...queries).then(response => {
-            const data = isUndefined(response) ? [] : values(response.json);
-            const moreDataOnServer = data.length === pagingConfig.recordsPerPage;
-            dispatch(receive(listId, data, moreDataOnServer, queryModel));
-          });
-        }
-      );
+    model.get(...queries).then(response => {
+      const responseRoot = get(response, [ 'json', ...queryRoot ]);
+
+      // Handle empty responses
+      if (isUndefined(responseRoot)) {
+        dispatch(receive(listId, [], false, null));
+        return;
+      }
+      
+      const queryModel = model.deref(responseRoot);
+      const data = falcorValues(responseRoot);
+      const moreDataOnServer = data.length === pagingConfig.recordsPerPage;
+      
+      dispatch(receive(listId, data, moreDataOnServer, queryModel));
+    });
   };
 };
 
@@ -131,7 +127,7 @@ function nextPageClick(selectPagedState, queries) {
     
     queries = queries.map(q => [ { from: data.length, length: pagingConfig.recordsPerRequest }, ...q ]);
     queryModel.get(...queries).then(response => {
-      const newData = isUndefined(response) ? [] : values(response.json);
+      const newData = isUndefined(response) ? [] : falcorValues(response.json);
       const moreDataAvailable = newData.length === pagingConfig.recordsPerRequest;
       dispatch(receive(listId, newData, moreDataAvailable));
       
