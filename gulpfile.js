@@ -7,6 +7,7 @@ require('./build/build-assets');
 require('./build/build-css');
 require('./build/build-js');
 require('./build/build-server');
+require('./build/build-webpack');
 
 var cfg = require('./build/build-config');
 
