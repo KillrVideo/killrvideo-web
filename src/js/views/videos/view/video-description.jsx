@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import getSize from 'get-size';
 
 const AnimationStates = {
   QUEUED: 'QUEUED',
@@ -45,7 +44,7 @@ class VideoDescription extends Component {
       
   toggleExpanded() {
     // Recalculate description size if we're about to animate
-    this._descriptionSize = getSize(this.refs.description).outerHeight;
+    this._descriptionSize = this.refs.description.offsetHeight;
     this.setState({ expanded: !this.state.expanded, animation: AnimationStates.QUEUED });
   }
   

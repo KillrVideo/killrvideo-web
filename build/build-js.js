@@ -23,7 +23,7 @@ var MINIFIED_FILE_NAME = 'killrvideo.min.js';
 
 var VENDOR_LIBS = [
   // Third party libs
-  'bluebird', 'classnames', 'falcor', 'falcor-http-datasource', 'get-size', 'load-script', 'lodash', 
+  'bluebird', 'classnames', 'falcor', 'falcor-http-datasource', 'load-script', 'lodash', 
   'md5', 'moment', 'react', 'react-bootstrap', 'react-dom', 'react-dropzone', 'react-gemini-scrollbar', 
   'react-redux', 'react-router', 'react-router-redux', 'redux', 'redux-actions', 'redux-form', 
   'redux-logger', 'redux-promise-middleware', 'redux-thunk', 'reselect', 'socket.io-client', 'validate.js', 
