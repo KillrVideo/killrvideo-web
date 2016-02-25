@@ -10,6 +10,9 @@ import UserProfile from './user-profile';
 import UserComments from './user-comments';
 import UserVideos from './user-videos';
 
+// Styles needed by the view
+require('account-info.css');
+
 class AccountInfo extends Component {
   componentDidMount() {
     this.props.load(this.props.userId, AccountInfo.queries.user(), AccountInfo.queries.comments(), AccountInfo.queries.videos());

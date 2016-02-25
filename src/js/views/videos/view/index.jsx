@@ -11,6 +11,9 @@ import VideoDetails from './video-details';
 import VideoAddComment from './video-add-comment';
 import VideoPreviewList from 'components/videos/video-preview-list';
 
+// Styles needed by the view
+require('view-video.css');
+
 class ViewVideo extends Component {
   componentDidMount() {
     // Get the video once mounted

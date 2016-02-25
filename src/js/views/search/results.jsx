@@ -10,6 +10,9 @@ import { searchFor, nextPageClick, previousPageClick, unload } from 'actions/sea
 import Icon from 'components/shared/icon';
 import VideoPreview from 'components/videos/video-preview';
 
+// Styles needed by the view
+require('search-results.css');
+
 class SearchResults extends Component {
   componentDidMount() {
     this.props.searchFor(this.props.searchTerm, SearchResults.queries.preview());

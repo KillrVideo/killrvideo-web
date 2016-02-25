@@ -7,6 +7,9 @@ import classNames from 'classnames';
 import Icon from 'components/shared/icon';
 import VideoPreview from './video-preview';
 
+// Styles needed by the component
+require('video-preview-list.css');
+
 class VideoPreviewList extends Component {
   componentDidMount() {
     // Get the initial previews once mounted

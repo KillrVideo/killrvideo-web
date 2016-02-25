@@ -13,6 +13,9 @@ import Icon from 'components/shared/icon'
 
 import { unload } from 'actions/add-video';
 
+// Styles needed by the view
+require('add-video.css');
+
 class AddVideo extends Component {
   componentDidUpdate(prevProps) {
     // If location type changes, reset the form

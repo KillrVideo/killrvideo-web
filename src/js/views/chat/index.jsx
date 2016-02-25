@@ -11,6 +11,9 @@ import ChatMessagesList from './chat-messages-list';
 import ChatMessageInput from './chat-message-input';
 import ChatUsersList from './chat-users-list';
 
+// Styles needed by the view
+require('chat.css');
+
 // Main chat UI
 class Chat extends Component {
   constructor(props) {

@@ -8,6 +8,7 @@ import GeminiScrollbar from 'react-gemini-scrollbar';
 import LoadingSpinner from 'components/shared/loading-spinner';
 import Icon from 'components/shared/icon';
 
+
 class UserComments extends Component {
   render() {
     const { data: comments, isLoading, moreDataOnServer, currentPageIndex, pagingConfig, nextPageDisabled } = this.props.comments;
