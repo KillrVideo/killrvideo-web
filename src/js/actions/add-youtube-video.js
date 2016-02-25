@@ -8,13 +8,22 @@ import { change } from 'redux-form';
 import { createActionTypeConstants } from './promises';
 import getYouTubeClient from 'lib/youtube-client';
 import parseYouTubeVideoId from 'lib/parse-youtube-video-id';
+import { ExtendableError } from 'lib/extendable-error';
 
-// Rejected promises for common errors
-const YOUTUBE_NOT_AVAILABLE = Promise.reject({ youTubeUrl: 'YouTube is currently not available. Please try again later.' });
-YOUTUBE_NOT_AVAILABLE.suppressUnhandledRejections();
+// Custom error classes that have a youTubeUrl property with a failure message
+class YouTubeNotAvailable extends ExtendableError {
+  constructor() {
+    super('YouTube is currently not available. Please try again later.');
+    this.youTubeUrl = this.message;
+  }
+}
 
-const INVALID_YOUTUBE_URL = Promise.reject({ youTubeUrl: 'Could not find a YouTube video at this URL' });
-INVALID_YOUTUBE_URL.suppressUnhandledRejections();
+class InvalidYouTubeUrl extends ExtendableError {
+  constructor() {
+    super('Could not find a YouTube video at this URL');
+    this.youTubeUrl = this.message;
+  }
+}
 
 /**
  * Action type constants
@@ -36,10 +45,12 @@ export const ActionTypes = {
  * Private helper functions
  */
 function lookupYouTubeVideo(youtube) {
-  return youtube.videos.list({ part: 'snippet', id: this.videoId })
+  // The YouTube client uses its own Promise library, so wrap with Promise.resolve to convert to bluebird promise
+  return Promise.resolve(youtube.videos.list({ part: 'snippet', id: this.videoId }))
+    .catchThrow(new YouTubeNotAvailable())
     .then(response => {
       if (isUndefined(response.result) || isUndefined(response.result.items) || response.result.items.length !== 1) {
-        return INVALID_YOUTUBE_URL;
+        throw new InvalidYouTubeUrl();
       }
     
       // Return the video details
@@ -47,7 +58,7 @@ function lookupYouTubeVideo(youtube) {
         videoId: this.videoId,
         snippet: response.result.items[0].snippet 
       }; 
-    }, () => YOUTUBE_NOT_AVAILABLE);
+    });
 }
 
 function updateForm(videoDetails) {
@@ -107,7 +118,7 @@ export function validateYouTubeUrl(youTubeUrl) {
     
     // Create a promise representing looking up the video Id with the YouTube client API
     const promise = getYouTubeClient()
-      .catchReturn(YOUTUBE_NOT_AVAILABLE)
+      .catchThrow(new YouTubeNotAvailable())
       .bind({ videoId })
       .then(lookupYouTubeVideo)
       .finally(() => allowValidationPromise);   // Will wait for allowValidationPromise to resolve before passing through success/failure
