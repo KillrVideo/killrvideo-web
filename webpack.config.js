@@ -12,7 +12,7 @@ var cssDependencies = new Set([
 var Paths = {
   JS: path.resolve(__dirname, 'src/js'),
   CSS: path.resolve(__dirname, 'src/css'),
-  BUILD_OUTPUT: path.resolve(__dirname, 'out/dist/webpack')
+  BUILD_OUTPUT: path.resolve(__dirname, 'out/dist')
 };
 
 // Export Webpack configuration
@@ -30,7 +30,7 @@ module.exports = {
   },
   output: {
     path: Paths.BUILD_OUTPUT,
-    filename: 'killrvideo.js'
+    filename: './js/killrvideo.js'
   },
   module: {
     loaders: [
@@ -48,7 +48,7 @@ module.exports = {
     // Split vendor files into separate bundle
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
-      filename: 'vendor.js'
+      filename: './js/vendor.js'
     }),
     
     // Minify and remove dead code with uglify
@@ -57,7 +57,7 @@ module.exports = {
       screw_ie8: true
     }),
     
-    // Put CSS that's extracted into a file named after the chunk (i.e. killrvideo.css)
-    new ExtractTextPlugin("[name].css")
+    // Put CSS that's extracted into killrvideo.css
+    new ExtractTextPlugin("./css/killrvideo.css", { allChunks: true })
   ]
 };
