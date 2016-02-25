@@ -23,14 +23,11 @@ var MINIFIED_FILE_NAME = 'killrvideo.min.js';
 
 var VENDOR_LIBS = [
   // Third party libs
-  'bluebird', 'classnames', 'falcor', 'falcor-http-datasource', 'load-script', 'lodash', 
+  'bluebird', 'classnames', 'falcor', 'falcor-http-datasource', 'jsUri', 'load-script', 'lodash', 
   'md5', 'moment', 'react', 'react-bootstrap', 'react-dom', 'react-dropzone', 'react-gemini-scrollbar', 
   'react-redux', 'react-router', 'react-router-redux', 'redux', 'redux-actions', 'redux-form', 
   'redux-logger', 'redux-promise-middleware', 'redux-thunk', 'reselect', 'socket.io-client', 'validate.js', 
-  'xhr',
-  
-  // Node libs that are shimmed by browserify
-  'url', 'querystring'
+  'xhr'
 ];
 var VENDOR_FILE_NAME = 'vendor.js';
 var VENDOR_MINIFIED_FILE_NAME = 'vendor.min.js';

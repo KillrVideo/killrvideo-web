@@ -1,4 +1,4 @@
-import { parse } from 'url';
+import Uri from 'jsuri';
 import { isUndefined } from 'lodash';
 
 /**
@@ -7,21 +7,23 @@ import { isUndefined } from 'lodash';
  */
 export default function parseYouTubeVideoId(urlString) {
   try {
-    let url = parse(urlString, true);
-    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    const url = new Uri(urlString);
+    const protocol = url.protocol(); 
+    if (protocol !== 'http' && protocol !== 'https') {
       return;
     }
     
+    const host = url.host();
     let videoId;
-    switch (url.hostname) {
+    switch (host) {
       case 'www.youtube.com':
         // Use the v=XXX part of the query string
-        if (isUndefined(url.query.v)) return;
-        videoId = url.query.v;
+        videoId = url.getQueryParamValue('v');
+        if (!videoId) return;
         break;
       case 'youtu.be':
         // Remove the slash prefix from the path
-        videoId = url.pathname.slice(1);
+        videoId = url.path().slice(1);
         break;
       default:
         return;

@@ -1,7 +1,7 @@
 import { createAction } from 'redux-actions';
 import { isUndefined } from 'lodash';
 import { Promise } from 'lib/promise';
-import { parse as parseUrl, format as formatUrl } from 'url';
+import Uri from 'jsuri';
 import xhr from 'xhr';
 import model from 'stores/falcor-model';
 import { createActionTypeConstants } from './promises';
@@ -84,13 +84,13 @@ function putCurrentChunk(chunkData) {
   this.blockIds.push(blockId);
   
   // Modify some query string params on the destination URL
-  const putUrl = parseUrl(this.destinationUrl, true);
-  putUrl.query.comp = 'block';
-  putUrl.query.blockid = blockId;
+  const putUrl = new Uri(this.destinationUrl)
+    .addQueryParam('comp', 'block')
+    .addQueryParam('blockid', blockId);
   
   // Do the PUT operation to upload the block to Azure Blob storage
   return xhrPut({
-    url: formatUrl(putUrl),
+    url: putUrl.toString(),
     headers: { 'x-ms-blob-type': 'BlockBlob' },
     body: chunkData
   }).then(response => {
@@ -139,12 +139,12 @@ function putBlockList() {
   blockListBody = `<?xml version='1.0' encoding='utf-8'?><BlockList>${blockListBody}</BlockList>`;
       
   // Generate the URL for the block list
-  const putUrl = parseUrl(this.destinationUrl, true);
-  putUrl.query.comp = 'blocklist';
+  const putUrl = new Uri(this.destinationUrl)
+    .addQueryParam('comp', 'blocklist');
   
   // Do the PUT to upload the block list to Azure Blob storage
   return xhrPut({
-    url: formatUrl(putUrl),
+    url: putUrl.toString(),
     headers: { "x-ms-blob-content-type": this.file.type },
     body: blockListBody
   }).then(response => {

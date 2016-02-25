@@ -6,7 +6,6 @@ import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 
 import { toggleWhatIsThis } from 'actions';
 import { getCurrentUser } from 'actions/authentication';
-import Image from 'components/shared/image';
 import Icon from 'components/shared/icon';
 import UserProfileImage from 'components/users/user-profile-image';
 import WhatIsThis from './what-is-this';
@@ -77,7 +76,7 @@ class Header extends Component {
           <Navbar.Header>
             <Navbar.Brand>
               <Link to="/" id="logo">
-                <Image src="killrvideo.png" alt="KillrVideo.com Logo" />
+                <img src="/static/images/killrvideo.png" alt="KillrVideo.com Logo" />
               </Link>
             </Navbar.Brand>
             <Navbar.Toggle />

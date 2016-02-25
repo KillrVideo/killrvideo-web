@@ -1,5 +1,3 @@
-import { stringify } from 'querystring';
-
 import React, { Component, PropTypes } from 'react';
 import { Label, OverlayTrigger, Popover, Button } from 'react-bootstrap';
 import Icon from 'components/shared/icon';
