@@ -1,21 +1,22 @@
 var path = require('path');
 var webpack = require('webpack');
+var packageJson = require('./package.json');
+
+// Dependencies in package.json that are only for CSS purposes
+var cssDependencies = new Set([
+  'bootstrap', 'bootswatch', 'font-awesome' 
+]);
 
 var Paths = {
   APP: path.resolve(__dirname, 'src/js'),
-  BUILD_OUTPUT: path.resolve(__dirname, 'out/webpack')
+  BUILD_OUTPUT: path.resolve(__dirname, 'out/dist/webpack')
 };
 
 module.exports = {
+  devtool: 'source-map',
   entry: {
     app: Paths.APP,
-    vendor: [
-      'bluebird', 'classnames', 'falcor', 'falcor-http-datasource', 'jsuri', 'load-script', 'lodash', 
-      'md5', 'moment', 'react', 'react-bootstrap', 'react-dom', 'react-dropzone', 'react-gemini-scrollbar', 
-      'react-redux', 'react-router', 'react-router-redux', 'redux', 'redux-actions', 'redux-form', 
-      'redux-logger', 'redux-promise-middleware', 'redux-thunk', 'reselect', 'socket.io-client', 'validate.js', 
-      'xhr'
-    ]
+    vendor: Object.keys(packageJson.dependencies).filter(function(dep) { return cssDependencies.has(dep) === false; })
   },
   resolve: {
     extensions: [ '', '.js', '.jsx' ],
@@ -28,19 +29,21 @@ module.exports = {
     filename: 'killrvideo.js'
   },
   plugins: [
-    new webpack.optimize.CommonsChunkPlugin({ 
+    // Split vendor files into separate bundle
+    new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       filename: 'vendor.js'
+    }),
+    // Minify and remove dead code with uglify
+    new webpack.optimize.UglifyJsPlugin({
+      compress: { warnings: false },
+      screw_ie8: true
     })
   ],
   module: {
     loaders: [
       // Babel transpiler (see .babelrc file for presets)
-      {
-        test: /\.jsx?$/,
-        include: Paths.APP,
-        loader: 'babel'
-      }
+      { test: /\.jsx?$/, include: Paths.APP, loader: 'babel' }
     ]
   }
 };
