@@ -11,6 +11,8 @@ import UserProfileImage from 'components/users/user-profile-image';
 import WhatIsThis from './what-is-this';
 import SearchBox from './search-box';
 
+var logoUrl = require('killrvideo.png');
+
 class Header extends Component {
   componentWillMount() {
     // Refresh current user information from server if necessary
@@ -76,7 +78,7 @@ class Header extends Component {
           <Navbar.Header>
             <Navbar.Brand>
               <Link to="/" id="logo">
-                <img src="/static/images/killrvideo.png" alt="KillrVideo.com Logo" />
+                <img src={logoUrl} alt="KillrVideo.com Logo" />
               </Link>
             </Navbar.Brand>
             <Navbar.Toggle />

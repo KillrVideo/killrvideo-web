@@ -3,11 +3,18 @@ import moment from 'moment';
 
 import ViewVideoLink from './view-video-link';
 
+// Placeholder image for videos while being uploaded
+var uploadPreviewUrl = require('upload-preview.png');
+
 // Component for rendering a video preview
 class VideoPreview extends Component {
   render() {
     const v = this.props.preview;
-    const imageStyle = { backgroundImage: `url("${v.previewImageLocation}")` };
+    const previewImageLocation = v.previewImageLocation
+      ? v.previewImageLocation
+      : uploadPreviewUrl;
+      
+    const imageStyle = { backgroundImage: `url("${previewImageLocation}")` };
     return (
       <ViewVideoLink videoId={v.videoId} className="video-preview">
         <div className="video-preview-image" style={imageStyle}></div>

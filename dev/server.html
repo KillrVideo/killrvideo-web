@@ -3,10 +3,15 @@
   <head>
     <link rel="stylesheet" type="text/css" href="/static/css/killrvideo.css" />
     <script src="/static/js/vendor.js" type="text/javascript"></script>
+    <script src="/static/js/killrvideo.js" type="text/javascript"></script>
   </head>
   <body>
-    <!-- App will be rendered here by killrvideo.js script -->
+    <!-- App will be rendered here -->
     <div id="killrvideo"></div>
-    <script src="/static/js/killrvideo.js" type="text/javascript"></script>
+    
+    <script type="text/javascript">
+      var el = document.getElementById('killrvideo');
+      KillrVideo(el);
+    </script>
   </body>
 </html>
