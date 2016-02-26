@@ -1,7 +1,34 @@
 var path = require('path');
+var fs = require('fs');
 var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var packageJson = require('./package.json');
+
+// Plugin to help resolve bootswatch relative paths
+var BootswatchPlugin = {
+  // Apply plugin to the resolver
+  apply: function(resolver) {
+    // Part of the path to bootswatch files
+    var bootswatchPath = 'node_modules' + path.sep + 'bootswatch' + path.sep;
+    
+    // Plugin will process files
+    resolver.plugin('file', function(request, callback) {
+      // Look for requests that are relative paths inside bootswatch
+      if (request.path.indexOf(bootswatchPath) !== -1 && request.request.startsWith('..')) {
+        // Resolve relative to the bootstrap CSS folder instead
+        var newRequest = {
+          path: path.resolve(request.path, '../../bootstrap/dist/css'),
+          request: request.request,
+          query: request.query,
+          directory: request.directory
+        };
+        this.doResolve(['file'], newRequest, callback);
+      } else {
+        callback();
+      }
+    });
+  }
+}
 
 // Dependencies in package.json that are only for CSS purposes
 var cssDependencies = new Set([
@@ -42,13 +69,16 @@ module.exports = {
       { test: /\.jsx?$/, include: Paths.SRC, loader: 'babel' },
       
       // Extract CSS files from third parties with url resolution disabled on the css-loader
-      { test: /\.css$/, include: /node_modules/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader?-url') },
+      // { test: /\.css$/, include: /node_modules/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader?-url') },
       
       // Extract CSS files from our app that are referenced by require('') calls
-      { test: /\.css$/, include: Paths.SRC, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') },
+      { test: /\.css$/, /*include: Paths.SRC,*/ loader: ExtractTextPlugin.extract('style-loader', 'css-loader') },
       
       // Allow PNG images to be required from code
-      { test: /\.png$/, include: Paths.SRC, loader: 'file?name=[path][name].[ext]' }
+      { test: /\.png$/, include: Paths.SRC, loader: 'file?name=[path][name].[ext]' },
+      
+      // Allow font loading (to support third party CSS referencing fonts)
+      { test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d\.\d\.\d)?$/, loader: 'file?name=fonts/[name].[ext]' }
     ]
   },
   plugins: [
@@ -65,6 +95,10 @@ module.exports = {
     }),
     
     // Put CSS that's extracted into killrvideo.css
-    new ExtractTextPlugin("css/killrvideo.css", { allChunks: true })
+    new ExtractTextPlugin("css/killrvideo.css", { allChunks: true }),
+    
+    // Bootswatch references relative paths to fonts that are actually in Bootstrap, so use a special resolver
+    // to help find those files (see resolver implementation above)
+    new webpack.ResolverPlugin([ BootswatchPlugin ])
   ]
 };
