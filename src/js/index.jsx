@@ -14,7 +14,7 @@ require('font-awesome/css/font-awesome.css');
 require('gemini-scrollbar/gemini-scrollbar.css');
 require('app.css');
 
-function KillrVideo(el, opts) {
+export function renderApp(el, opts) {
   render(
     <Provider store={store}>
       {router}
@@ -23,7 +23,4 @@ function KillrVideo(el, opts) {
   );
 };
 
-// This doesn't export things properly with webpack right now (see https://github.com/webpack/webpack/issues/706), so
-// use the old module.exports syntax instead in this one place
-// export default KillrVideo;
-module.exports = KillrVideo;
+export default renderApp;

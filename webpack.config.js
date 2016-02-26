@@ -22,7 +22,7 @@ module.exports = {
   devtool: 'source-map',
   context: Paths.SRC,
   entry: {
-    killrvideo: './js',
+    killrvideo: './webpack.js',
     vendor: Object.keys(packageJson.dependencies).filter(function(dep) { return cssDependencies.has(dep) === false; })
   },
   resolve: {
@@ -33,7 +33,6 @@ module.exports = {
   },
   output: {
     path: Paths.BUILD_OUTPUT,
-    publicPath: '/static/',
     filename: 'js/killrvideo.js',
     library: 'KillrVideo'
   },
