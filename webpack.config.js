@@ -68,9 +68,6 @@ module.exports = {
       // Babel transpiler (see .babelrc file for presets)
       { test: /\.jsx?$/, include: Paths.SRC, loader: 'babel' },
       
-      // Extract CSS files from third parties with url resolution disabled on the css-loader
-      // { test: /\.css$/, include: /node_modules/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader?-url') },
-      
       // Extract CSS files from our app that are referenced by require('') calls
       { test: /\.css$/, /*include: Paths.SRC,*/ loader: ExtractTextPlugin.extract('style-loader', 'css-loader') },
       
