@@ -32,6 +32,7 @@ node_modules
 
 # Build output
 /out
+/dist
 
 # Configuration for the server
 dev/config.js
