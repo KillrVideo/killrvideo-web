@@ -69,7 +69,7 @@ module.exports = {
       { test: /\.jsx?$/, include: Paths.SRC, loader: 'babel' },
       
       // Extract CSS files from our app that are referenced by require('') calls
-      { test: /\.css$/, /*include: Paths.SRC,*/ loader: ExtractTextPlugin.extract('style-loader', 'css-loader') },
+      { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') },
       
       // Allow PNG images to be required from code
       { test: /\.png$/, include: Paths.SRC, loader: 'file?name=[path][name].[ext]' },
