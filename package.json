@@ -2,11 +2,19 @@
   "name": "killrvideo-web",
   "version": "0.0.0",
   "description": "Web UI for the KillrVideo application demo.",
-  "main": "lib/index.js",
+  "main": "src/webpack.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Luke Tillman",
+  "author": "Luke Tillman <luke@luketillman.com> (http://www.luketillman.com)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LukeTillman/killrvideo-web.git"
+  },
+  "files": [
+    "*.md",
+    "dist"
+  ],
   "license": "Apache-2.0",
   "private": true,
   "devDependencies": {
