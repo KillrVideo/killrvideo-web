@@ -68,14 +68,24 @@ module.exports = {
       // Babel transpiler (see .babelrc file for presets)
       { test: /\.jsx?$/, include: Paths.SRC, loader: 'babel' },
       
-      // Extract CSS files from our app that are referenced by require('') calls
-      { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') },
+      // Extract CSS files from our app that are referenced by require('') calls and have assets that are required
+      // in the CSS file append '../' to the URLs (i.e. so fonts required will be calls to ../fonts/[name].[ext])
+      { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader', { publicPath: '../' }) },
       
       // Allow PNG images to be required from code
-      { test: /\.png$/, include: Paths.SRC, loader: 'file?name=[path][name].[ext]' },
+      { 
+        test: /\.png$/, 
+        include: Paths.SRC, 
+        loader: 'file',
+        query: { name: 'images/[name].[ext]' } 
+      },
       
       // Allow font loading (to support third party CSS referencing fonts)
-      { test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d\.\d\.\d)?$/, loader: 'file?name=fonts/[name].[ext]' }
+      { 
+        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d\.\d\.\d)?$/, 
+        loader: 'file',
+        query: { name: 'fonts/[name].[ext]' }
+      }
     ]
   },
   plugins: [
