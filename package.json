@@ -1,0 +1,11 @@
+{
+  "name": "killrvideo-web-server",
+  "version": "0.0.0",
+  "description": "A mocked/sample web server implementation for testing the KillrVideo Web UI (killrvideo-web)",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luke Tillman <luke@luketillman.com> (http://www.luketillman.com)",
+  "license": "Apache-2.0"
+}
