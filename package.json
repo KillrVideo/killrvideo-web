@@ -8,10 +8,12 @@
     "build": "webpack --progress",
     "watch": "npm run build -- --watch",
     "start": "npm-run-all clean watch",
+    "postversion": "npm-run-all push:*",
     "push:commits": "git push",
     "push:tags": "git push --tags",
-    "postversion": "npm-run-all push:*",
-    "release": "release-it"
+    "release": "npm-run-all release:pack release:github",
+    "release:pack": "npm pack",
+    "release:github": "node ./create-github-release.js"
   },
   "author": "Luke Tillman <luke@luketillman.com> (http://www.luketillman.com)",
   "repository": {
@@ -33,6 +35,7 @@
     "css-loader": "^0.23.1",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",
+    "github": "^0.2.4",
     "npm-run-all": "^1.5.1",
     "rimraf": "^2.5.2",
     "style-loader": "^0.13.0",
