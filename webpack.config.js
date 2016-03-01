@@ -44,6 +44,39 @@ var Paths = {
   BUILD_OUTPUT: path.resolve(__dirname, 'dist')
 };
 
+// Plugins for the build
+var plugins = [
+  // Split vendor files into separate bundle
+  new webpack.optimize.CommonsChunkPlugin({
+    name: 'vendor',
+    filename: 'js/vendor.js'
+  }),
+  
+  // Put CSS that's extracted into killrvideo.css
+  new ExtractTextPlugin("css/killrvideo.css", { allChunks: true }),
+  
+  // Bootswatch references relative paths to fonts that are actually in Bootstrap, so use a special resolver
+  // to help find those files (see resolver implementation above)
+  new webpack.ResolverPlugin([ BootswatchPlugin ])
+];
+
+// For production builds (i.e. release builds), add some plugins
+if (process.env.NODE_ENV === 'production') {
+  // Let code know we're in a produciton environment (should get rid of code in react and elsewhere that
+  // uses checks for the environment, thus making bundles smaller)
+  plugins.push(new webpack.DefinePlugin({
+    'process.env': {
+      'NODE_ENV': JSON.stringify('production')
+    }
+  }));
+  
+  // Minify and remove dead code with uglify
+  plugins.push(new webpack.optimize.UglifyJsPlugin({
+    compress: { warnings: false },
+    screw_ie8: true
+  }));
+}
+
 // Export Webpack configuration
 module.exports = {
   devtool: 'source-map',
@@ -88,24 +121,5 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    // Split vendor files into separate bundle
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      filename: 'js/vendor.js'
-    }),
-    
-    // Minify and remove dead code with uglify
-    new webpack.optimize.UglifyJsPlugin({
-      compress: { warnings: false },
-      screw_ie8: true
-    }),
-    
-    // Put CSS that's extracted into killrvideo.css
-    new ExtractTextPlugin("css/killrvideo.css", { allChunks: true }),
-    
-    // Bootswatch references relative paths to fonts that are actually in Bootstrap, so use a special resolver
-    // to help find those files (see resolver implementation above)
-    new webpack.ResolverPlugin([ BootswatchPlugin ])
-  ]
+  plugins: plugins
 };

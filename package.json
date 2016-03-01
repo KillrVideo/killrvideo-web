@@ -11,7 +11,8 @@
     "postversion": "npm-run-all push:*",
     "push:commits": "git push",
     "push:tags": "git push --tags",
-    "release": "npm-run-all release:pack release:github",
+    "release": "npm-run-all release:build release:pack release:github",
+    "release:build": "cross-env NODE_ENV=production npm-run-all clean build",
     "release:pack": "npm pack",
     "release:github": "node ./create-github-release.js"
   },
@@ -32,6 +33,7 @@
     "babel-preset-es2015": "^6.5.0",
     "babel-preset-react": "^6.5.0",
     "babel-preset-stage-0": "^6.5.0",
+    "cross-env": "^1.0.7",
     "css-loader": "^0.23.1",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",
