@@ -41,6 +41,7 @@
     "falcor-express": "^0.1.2",
     "falcor-json-graph": "^1.1.7",
     "falcor-router": "^0.3.0",
+    "killrvideo-web": "https://github.com/LukeTillman/killrvideo-web/releases/download/v1.0.0-beta.1/killrvideo-web-1.0.0-beta.1.tgz",
     "lodash": "^4.5.1",
     "moment": "^2.11.2",
     "socket.io": "^1.4.5",
