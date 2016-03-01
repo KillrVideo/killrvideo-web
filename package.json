@@ -14,7 +14,8 @@
     "release": "npm-run-all release:build release:pack release:github",
     "release:build": "cross-env NODE_ENV=production npm-run-all clean build",
     "release:pack": "npm pack",
-    "release:github": "node ./create-github-release.js"
+    "release:github": "node ./create-github-release.js",
+    "analyze": "webpack --json | webpack-bundle-size-analyzer > webpack-bundle-size-analyzer.log"
   },
   "author": "Luke Tillman <luke@luketillman.com> (http://www.luketillman.com)",
   "repository": {
