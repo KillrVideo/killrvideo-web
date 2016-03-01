@@ -41,7 +41,7 @@ var Paths = {
   JS: path.resolve(__dirname, 'src/js'),
   CSS: path.resolve(__dirname, 'src/css'),
   IMAGES: path.resolve(__dirname, 'src/images'),
-  BUILD_OUTPUT: path.resolve(__dirname, 'out/dist')
+  BUILD_OUTPUT: path.resolve(__dirname, 'dist')
 };
 
 // Export Webpack configuration
