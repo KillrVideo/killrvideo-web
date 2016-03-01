@@ -8,6 +8,9 @@
     "build": "webpack --progress",
     "watch": "npm run build -- --watch",
     "start": "npm-run-all clean watch",
+    "push:commits": "git push",
+    "push:tags": "git push --tags",
+    "postversion": "npm-run-all push:*",
     "release": "release-it"
   },
   "author": "Luke Tillman <luke@luketillman.com> (http://www.luketillman.com)",
