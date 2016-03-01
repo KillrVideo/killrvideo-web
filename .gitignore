@@ -13,9 +13,6 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 
-# Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
-.grunt
-
 # node-waf configuration
 .lock-wscript
 
@@ -30,9 +27,6 @@ node_modules
 .vscode
 /typings
 
-# Build output
-/out
+# Build and package output
 /dist
-
-# Configuration for the server
-dev/config.js
+/*.tgz
