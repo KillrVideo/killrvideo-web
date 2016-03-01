@@ -36,7 +36,7 @@ const app = express();
 app.use(vhost(config.uploadEndpointHost, uploadApp));
 
 // Serve up static build assets
-app.use('/static', express.static(`${__dirname}/../dist`));
+app.use('/static', express.static(`${__dirname}/../node_modules/killrvideo-web/dist`));
 
 // Parse POST body for requests to falcor endpoint
 app.use(bodyParser.urlencoded({ extended: false }));
