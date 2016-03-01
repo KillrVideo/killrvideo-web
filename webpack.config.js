@@ -2,6 +2,8 @@ var path = require('path');
 var fs = require('fs');
 var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var LiveReloadPlugin = require('webpack-livereload-plugin');
+
 var packageJson = require('./package.json');
 
 // Plugin to help resolve bootswatch relative paths
@@ -75,6 +77,9 @@ if (process.env.NODE_ENV === 'production') {
     compress: { warnings: false },
     screw_ie8: true
   }));
+} else {
+  // Allow live reload when doing a dev build with watch
+  plugins.push(new LiveReloadPlugin());
 }
 
 // Export Webpack configuration
