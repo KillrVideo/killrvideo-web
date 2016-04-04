@@ -7,6 +7,7 @@
     "clean": "rimraf out",
     "build:js": "babel src --out-dir out",
     "build:resources": "cpx src/resources/** out/resources --verbose",
+    "build:client": "cpx node_modules/killrvideo-web/dist/** out/resources/static --verbose",
     "nodemon": "nodemon",
     "wait": "wait-on file:out/index.js",
     "serve": "npm-run-all wait nodemon",
@@ -18,7 +19,7 @@
     "url": "https://github.com/LukeTillman/killrvideo-web-server.git"
   },
   "files": [
-    "lib"
+    "out"
   ],
   "license": "Apache-2.0",
   "private": true,
