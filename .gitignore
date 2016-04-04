@@ -31,4 +31,4 @@ node_modules
 src/config.js
 
 # Build output
-lib
+out

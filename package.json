@@ -2,13 +2,13 @@
   "name": "killrvideo-web-server",
   "version": "0.0.0",
   "description": "A mocked/sample web server implementation for testing the KillrVideo Web UI (killrvideo-web)",
-  "main": "lib/index.js",
+  "main": "out/index.js",
   "scripts": {
-    "clean": "rimraf lib",
-    "build:js": "babel src --out-dir lib",
-    "build:html": "cpx src/server.html lib --verbose",
+    "clean": "rimraf out",
+    "build:js": "babel src --out-dir out",
+    "build:html": "cpx src/server.html out/resources/static --verbose",
     "nodemon": "nodemon",
-    "wait": "wait-on file:lib/index.js",
+    "wait": "wait-on file:out/index.js",
     "serve": "npm-run-all wait nodemon",
     "start": "npm-run-all clean --parallel \"build:* -- --watch\" serve"
   },
