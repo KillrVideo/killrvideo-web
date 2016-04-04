@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "rimraf out",
     "build:js": "babel src --out-dir out",
-    "build:html": "cpx src/server.html out/resources/static --verbose",
+    "build:resources": "cpx src/resources/** out/resources --verbose",
     "nodemon": "nodemon",
     "wait": "wait-on file:out/index.js",
     "serve": "npm-run-all wait nodemon",
