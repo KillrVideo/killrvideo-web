@@ -36,7 +36,7 @@ const app = express();
 app.use(vhost(config.uploadEndpointHost, uploadApp));
 
 // Serve up static build assets
-app.use('/static', express.static(`${__dirname}/../node_modules/killrvideo-web/dist`));
+app.use('/static', express.static(`${__dirname}/resources/static`));
 
 // Parse POST body for requests to falcor endpoint
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -54,7 +54,7 @@ app.use('/model.json', dataSourceRoute((req, res) => {
 
 // All other requests serve up the server.html page 
 app.get('/*', (req, res) => {
-  res.sendFile(`${__dirname}/server.html`);
+  res.sendFile(`${__dirname}/resources/static/server.html`);
 });
 
 // Log errors
