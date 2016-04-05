@@ -4,9 +4,9 @@ import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import uuid from 'uuid';
 
 import { getIntFromPartOfUuid, getIndexesFromRanges } from './util';
-import getUsers from '../data/users';
-import getVideos from '../data/videos';
-import getComments from '../data/comments';
+import getUsers from './data/users';
+import getVideos from './data/videos';
+import getComments from './data/comments';
 
 // Arrays of all initial comment text and user ids
 const commentText = getComments();

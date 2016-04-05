@@ -1,7 +1,7 @@
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import { _, isUndefined, pick } from 'lodash';
 
-import getVideos from '../data/videos';
+import getVideos from './data/videos';
 
 // Generate ratings for initial sample videos based on the video id
 const ratingsByVideoIdStore = _(getVideos())

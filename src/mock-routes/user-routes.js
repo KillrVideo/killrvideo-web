@@ -3,7 +3,7 @@ import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import uuid from 'uuid';
 import moment from 'moment';
 
-import getUsers from '../data/users';
+import getUsers from './data/users';
 
 // Some stores
 const usersByIdStore = _(getUsers()).keyBy('userId').value();

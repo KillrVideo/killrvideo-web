@@ -2,7 +2,7 @@ import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import { getIndexesFromRanges } from './util';
 import { _, isUndefined } from 'lodash';
 
-import getVideos from '../data/videos';
+import getVideos from './data/videos';
 
 // Index the sample videos by tag
 const videoIdsByTag = _(getVideos()).reduce((acc, video) => {

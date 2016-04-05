@@ -4,8 +4,8 @@ import moment from 'moment';
 import uuid from 'uuid';
 
 import { getIntFromPartOfUuid } from './util';
-import getVideos from '../data/videos';
-import getUsers from '../data/users';
+import getVideos from './data/videos';
+import getUsers from './data/users';
 
 
 

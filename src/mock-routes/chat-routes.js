@@ -4,8 +4,8 @@ import moment from 'moment';
 import uuid from 'uuid';
 import { getIndexesFromRanges } from './util';
 
-import getUsers from '../data/users';
-import getComments from '../data/comments';
+import getUsers from './data/users';
+import getComments from './data/comments';
 import { getPubSub } from '../chat-handler';
 
 const addedDatePeriods = [

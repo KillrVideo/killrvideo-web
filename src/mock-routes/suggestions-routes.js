@@ -2,7 +2,7 @@ import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import { _, isUndefined } from 'lodash';
 
 import { getIntFromPartOfUuid } from './util';
-import getVideos from '../data/videos';
+import getVideos from './data/videos';
 
 /**
  * Route definitions for suggesting videos
