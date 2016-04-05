@@ -11,7 +11,7 @@ import SocketIO from 'socket.io';
 import KillrVideoRouter from './router';
 import { handleConnection } from './chat-handler';
 import RequestContext from './request-context';
-import config from './config';
+import config from 'config';
 
 // Create an app that will run on a separate domain for simulating CORS uploads
 const uploadApp = express();
@@ -33,7 +33,7 @@ uploadApp.put('/dummyUploadEndpoint/:fileName', cors(), (req, res) => {
 const app = express();
 
 // Run upload app on different domain
-app.use(vhost(config.uploadEndpointHost, uploadApp));
+app.use(vhost(config.get('uploads_endpoint'), uploadApp));
 
 // Serve up static build assets
 app.use('/static', express.static(`${__dirname}/resources/static`));

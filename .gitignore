@@ -27,8 +27,8 @@ node_modules
 .vscode
 /typings
 
-# Configuration for the server
-src/config.js
-
 # Build output
 out
+
+# Local config
+config/local.yaml

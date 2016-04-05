@@ -5,7 +5,9 @@ import { random } from 'lodash';
 import Promise from 'bluebird';
 import moment from 'moment';
 
-import config from '../config';
+import config from 'config';
+
+const uploadEndpointHost = config.get('uploads_endpoint');
 
 const jobsByVideoId = {};
 
@@ -28,7 +30,7 @@ const routes = [
       const req = this.requestContext.request;
       const destination = format({
         protocol: req.protocol,
-        hostname: config.uploadEndpointHost,
+        hostname: uploadEndpointHost,
         port: req.app.locals.port,  // Local is added before server is started in server.js
         pathname: `/dummyUploadEndpoint/${fileName}`
       });
