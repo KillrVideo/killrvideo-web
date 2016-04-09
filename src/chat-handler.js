@@ -1,5 +1,3 @@
-import KillrVideoRouter from './router';
-
 class ChatRoomPubSub {
   constructor() {
     this._sockets = {};
