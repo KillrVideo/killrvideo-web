@@ -2,12 +2,12 @@ import express from 'express';
 import { createServer } from 'http';
 import { dataSourceRoute } from 'falcor-express';
 import bodyParser from 'body-parser';
-import session from 'express-session';
 import SocketIO from 'socket.io';
 import morgan from 'morgan';
 
 import { logErrors } from './middleware/log-errors';
 import { handleErrors } from './middleware/handle-errors';
+import { session } from './middleware/session';
 import KillrVideoRouter from './router';
 import { handleConnection } from './chat-handler';
 import RequestContext from './request-context';
@@ -30,11 +30,7 @@ app.use('/model.json', [
   // Parse POST body for requests to falcor endpoint
   bodyParser.urlencoded({ extended: false }),
   // Session storage
-  session({ 
-    secret: 'KillrVideo Web', 
-    saveUninitialized: false, 
-    resave: false 
-  }),
+  session(),
   // Dispatch to Falcor router
   dataSourceRoute((req, res) => new KillrVideoRouter(new RequestContext(req, res)))
 ]);
@@ -64,5 +60,5 @@ const io = SocketIO(server);
 io.on('connection', handleConnection);
 
 // Start the server
-const listenPort = process.env.PORT || 3000;
-server.listen(listenPort);
+const { host, port } = config.get('web.server');
+server.listen(port, host);
