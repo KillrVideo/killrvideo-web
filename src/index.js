@@ -3,7 +3,6 @@ import { createServer } from 'http';
 import { dataSourceRoute } from 'falcor-express';
 import bodyParser from 'body-parser';
 import session from 'express-session';
-import cookieParser from 'cookie-parser';
 import SocketIO from 'socket.io';
 import morgan from 'morgan';
 
@@ -28,9 +27,6 @@ if (app.get('env') === 'development') {
 
 // Parse POST body for requests to falcor endpoint
 app.use(bodyParser.urlencoded({ extended: false }));
-
-// Cookie parser for auth
-app.use(cookieParser());
 
 // Session for simulating some server-side state if necessary
 app.use(session({ secret: 'KillrVideo Web', saveUninitialized: false, resave: false }));

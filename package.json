@@ -39,7 +39,6 @@
     "bluebird": "^3.3.4",
     "body-parser": "^1.15.0",
     "config": "^1.20.1",
-    "cookie-parser": "^1.4.1",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "falcor-express": "^0.1.2",
