@@ -25,16 +25,19 @@ if (app.get('env') === 'development') {
   app.use(morgan('dev'));
 }
 
-// Parse POST body for requests to falcor endpoint
-app.use(bodyParser.urlencoded({ extended: false }));
-
-// Session for simulating some server-side state if necessary
-app.use(session({ secret: 'KillrVideo Web', saveUninitialized: false, resave: false }));
-
-// Model.json endpoint for Falcor requests
-app.use('/model.json', dataSourceRoute((req, res) => {
-  return new KillrVideoRouter(new RequestContext(req, res));
-}));
+// Falcor requests to model.json
+app.use('/model.json', [
+  // Parse POST body for requests to falcor endpoint
+  bodyParser.urlencoded({ extended: false }),
+  // Session storage
+  session({ 
+    secret: 'KillrVideo Web', 
+    saveUninitialized: false, 
+    resave: false 
+  }),
+  // Dispatch to Falcor router
+  dataSourceRoute((req, res) => new KillrVideoRouter(new RequestContext(req, res)))
+]);
 
 // All other requests serve up the server.html page 
 app.get('/*', (req, res) => {
