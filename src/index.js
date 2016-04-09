@@ -1,7 +1,5 @@
 import express from 'express';
 import { Server } from 'http';
-import vhost from 'vhost';
-import cors from 'cors';
 import { dataSourceRoute } from 'falcor-express';
 import bodyParser from 'body-parser';
 import session from 'express-session';
@@ -13,27 +11,8 @@ import { handleConnection } from './chat-handler';
 import RequestContext from './request-context';
 import config from 'config';
 
-// Create an app that will run on a separate domain for simulating CORS uploads
-const uploadApp = express();
-
-// Allow CORS pre-flight options call
-uploadApp.options('/dummyUploadEndpoint/:fileName', cors());
-
-// Dummy upload file endpoint
-uploadApp.put('/dummyUploadEndpoint/:fileName', cors(), (req, res) => {
-  // Quick way to simulate failures
-  if (req.params.fileName === 'Wildlife.wmv') {
-    res.sendStatus(500);
-  } else {
-    res.sendStatus(201);
-  }
-});
-
-// Create a server for use during development
+// Create the server
 const app = express();
-
-// Run upload app on different domain
-app.use(vhost(config.get('uploads_endpoint'), uploadApp));
 
 // Serve up static build assets
 app.use('/static', express.static(`${__dirname}/resources/static`));

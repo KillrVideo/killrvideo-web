@@ -1,8 +1,5 @@
 # Loaded using https://github.com/lorenwest/node-config
 # Can be overridden by creating a local.yaml file
 
-# The dummy endpoint for uploads
-uploads_endpoint: uploads.localhost.net
-
 # The API key for talking to YouTube
 youtube_api_key: REPLACE_WITH_YOUR_KEY

@@ -1,6 +1,6 @@
 import Router from 'falcor-router';
 
-import routes from './mock-routes';
+import routes from './routes';
 
 // The actual router class
 class KillrVideoRouter extends Router.createClass(routes) {
