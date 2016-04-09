@@ -11,3 +11,10 @@ export function getIndexesFromRanges(ranges) {
   }
   return idxs;
 };
+
+/**
+ * Takes an array of arrays of path values and flattens it.
+ */
+export function flattenPathValues(pathValues) {
+  return [].concat.apply([], pathValues);
+};

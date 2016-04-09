@@ -2,7 +2,8 @@ import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
 import { getClientAsync } from '../services/video-catalog';
 import { uuidToString, stringToUuid, timestampToDate } from '../utils/protobuf-conversions';
-import { getIndexesFromRanges } from '../utils/falcor-utils';
+import { getIndexesFromRanges, flattenPathValues } from '../utils/falcor-utils';
+import { logger } from '../utils/logging';
 
 // All routes supported by the video catalog service
 const routes = [
@@ -40,8 +41,7 @@ const routes = [
             });
           })
           .catch(err => {
-            // TODO: Appropriate logging
-            console.log(err);
+            logger.log('error', 'Error while getting video %d', videoId, err);
             return [
               { path: [ 'videosById', videoId ], value: $error() }
             ]
@@ -49,7 +49,14 @@ const routes = [
       });
       
       // Flatten all path values returned by promies into a single array of path values
-      return Promise.all(getVideoPromises).then(pathValues => [].concat.apply([], pathValues));
+      return Promise.all(getVideoPromises).then(flattenPathValues);
+    }
+  },
+  {
+    // Get recent videos
+    route: 'recentVideos[{ranges:indexRanges}]["videoId", "name", "previewImageLocation", "addedDate" ]',
+    get(pathSet) {
+      
     }
   }
 ];
