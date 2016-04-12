@@ -1,20 +1,20 @@
 /**
- * Converts a JavaScript object representing a google.protobuf.Timestamp into a JavaScript Date. 
+ * Converts a JavaScript object representing a google.protobuf.Timestamp into a JavaScript ISO Date string. 
  */
-export function timestampToDate(timestamp) {
+export function timestampToDateString(timestamp) {
   if (!timestamp.seconds || !timestamp.nanos) {
     throw new Error('Object is not a google.protobuf.Timestamp');
   }
   const millis = (timestamp.seconds * 1000) + Math.trunc(timestamp.nanos / 1000000);
-  return new Date(millis);
+  return new Date(millis).toISOString();
 };
 
 /**
  * Converts a JavaScript Date object into a plain JS object representation that's compatible with
  * google.protobuf.Timestamp.
  */
-export function dateToTimestamp(date) {
-  const millis = date.valueOf();
+export function dateStringToTimestamp(dateString) {
+  const millis = Date.parse(dateString);
   const seconds = Math.trunc(millis / 1000);
   const nanos = (millis % 1000) * 1000000;
   return { seconds, nanos };

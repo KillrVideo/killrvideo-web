@@ -1,7 +1,7 @@
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
 import { getClientAsync } from '../services/video-catalog';
-import { uuidToString, stringToUuid, timestampToDate, dateToTimestamp } from '../utils/protobuf-conversions';
+import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestamp } from '../utils/protobuf-conversions';
 import { getIndexesFromRanges, groupIndexesByPagingState, flattenPathValues } from '../utils/falcor-utils';
 import { logger } from '../utils/logging';
 
@@ -37,7 +37,7 @@ const routes = [
                   return { path, value: uuidToString(response.videoId) };
                 // Convert added date to a Date
                 case 'addedDate':
-                  return { path, value: timestampToDate(response.addedDate) }
+                  return { path, value: timestampToDateString(response.addedDate) }
                 default:
                   return { path, value: response[prop] }
               }
@@ -72,7 +72,7 @@ const routes = [
           let startingVideoToken = EMPTY_LIST_VALUE;
           if (response.videoPreviews.length === 1) {
             // Use video id and added date as token
-            startingVideoToken = `${uuidToString(response.videoPreviews[0].videoId)}_${timestampToDate(response.videoPreviews[0].addedDate).valueOf()}`;
+            startingVideoToken = `${uuidToString(response.videoPreviews[0].videoId)}_${timestampToDateString(response.videoPreviews[0].addedDate)}`;
           }
           return [
             { path: [ 'recentVideos' ], value: $ref([ 'recentVideosList', startingVideoToken ]) }
@@ -110,7 +110,7 @@ const routes = [
       // Parse the token into video id and added date
       const tokenParts = startingVideoToken.split('_');
       const startingVideoId = stringToUuid(tokenParts[0]);
-      const startingAddedDate = dateToTimestamp(new Date(parseInt(tokenParts[1])));
+      const startingAddedDate = dateStringToTimestamp(tokenParts[1]);
       
       // The props to get for the videos
       const videoProps = pathSet[3];
@@ -160,7 +160,7 @@ const routes = [
                   case 'videoId':
                     return { path, value: uuidToString(videoPreview.videoId) };
                   case 'addedDate':
-                    return { path, value: timestampToDate(videoPreview.addedDate) };
+                    return { path, value: timestampToDateString(videoPreview.addedDate) };
                   case 'author':
                     return { path, value: $ref([ 'usersById', uuidToString(videoPreview.userId) ]) };
                   default:
@@ -179,7 +179,7 @@ const routes = [
           });
       });
       
-      return Promise.all(getVideoPromises).then(flattenPathValues);
+      return Promise.all(getPreviewsPromises).then(flattenPathValues);
     }
   }
 ];

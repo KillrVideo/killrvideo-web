@@ -44,7 +44,7 @@
     "express-session": "^1.13.0",
     "falcor-express": "^0.1.2",
     "falcor-json-graph": "^1.1.7",
-    "falcor-router": "^0.3.0",
+    "falcor-router": "^0.4.0",
     "grpc": "^0.13.1",
     "js-yaml": "^3.5.5",
     "killrvideo-web": "https://github.com/LukeTillman/killrvideo-web/releases/download/v1.0.0-beta.1/killrvideo-web-1.0.0-beta.1.tgz",

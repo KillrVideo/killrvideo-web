@@ -55,7 +55,7 @@ export function groupIndexesByPagingState(idxs, pagingStates) {
     newPage = false;
   }
   
-  
+  return results;
 };
 
 /**
