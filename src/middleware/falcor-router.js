@@ -5,6 +5,7 @@ import Promise from 'bluebird';
 import Router from 'falcor-router';
 import { session } from './session';
 import routes from '../routes';
+import PagingStateCache from '../utils/paging-state-cache';
 
 // Tell passport auth how to serialize and deserialize users
 passport.serializeUser(function(user, done) {
@@ -43,6 +44,7 @@ class KillrVideoRouter extends Router.createClass(routes) {
     
     // Save the request for use by routes
     this.req = req;
+    this.pagingStateCache = new PagingStateCache(req);
   }
   
   /**

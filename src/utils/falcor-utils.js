@@ -23,30 +23,23 @@ export function groupIndexesByPagingState(idxs, pagingStates) {
   // Make sure indexes are in order from low to high
   const indexes = idxs.sort((a, b) => { return a - b });
   
-  // Convert paging states object of key-value pairs into an array sorted by starting index
-  const psArray = Object.keys(pagingStates)
-    .map(idxStr => {
-      return { startingIndex: parseInt(idxStr), pagingState: pagingStates[idxStr] };
-    })
-    .sort((a, b) => { return a.startingIndex - b.startingIndex; });
-  
   for (let indexesIdx = 0; indexesIdx < indexes.length; indexesIdx++) {
     let curIdx = indexes[indexesIdx];
     
     // Find the index in paging states that's appropriate for the current index
-    while (psIdx < psArray.length - 1 && curIdx >= psArray[psIdx + 1].startingIndex) {
+    while (psIdx < pagingStates.length - 1 && curIdx >= pagingStates[psIdx + 1].startingIndex) {
       psIdx++;
       newPage = true;
     }
     
     // If this is a new page, add the result object to our results array
     if (newPage === true) {
-      let { startingIndex, pagingState } = psArray[psIdx];
+      let { startingIndex, pagingState } = pagingStates[psIdx];
       results.push({
         startingIndex,
         pagingState,
         indexes: [],
-        isLastAvailablePagingState: (psIdx === psArray.length - 1)
+        isLastAvailablePagingState: (psIdx === pagingStates.length - 1)
       });
     }
     

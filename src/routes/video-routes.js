@@ -11,7 +11,7 @@ const EMPTY_LIST_VALUE = 'NONE';
 // All routes supported by the video catalog service
 const routes = [
   {
-    // Basic video catalog data
+    // Basic video catalog data by video Id
     route: 'videosById[{keys:videoIds}]["videoId", "addedDate", "description", "location", "locationType", "name", "tags", "author"]',
     get(pathSet) {
       // The array of props to get for the video
@@ -56,14 +56,11 @@ const routes = [
     }
   },
   {
-    // Get recent videos
+    // Reference point for the recent videos list
     route: 'recentVideos',
     get(pathSet) {
-      // Reset paging state cached in session
-      let sess = this.req.session;
-      sess.recentVideosPagingStates = {
-        0: ''
-      };
+      // Reset any cached paging state
+      this.pagingStateCache.clearKey('recentVideos');
       
       // Figure out the latest video so we can return a reference to a list that's stable for paging
       return getClientAsync()
@@ -117,7 +114,7 @@ const routes = [
       
       // Get all indexes from the ranges and all available paging states saved in session
       const allIndexes = getIndexesFromRanges(pathSet.indexRanges);
-      let pagingStates = this.req.session.recentVideosPagingStates;
+      let pagingStates = this.pagingStateCache.getKey('recentVideos');
       
       // Group the indexes by the paging state they can use for the query, then do queries      
       const getPreviewsPromises = groupIndexesByPagingState(allIndexes, pagingStates).map(idxsAndPaging => {
@@ -138,7 +135,7 @@ const routes = [
             // Save the paging state to session if necessary
             if (isLastAvailablePagingState && response.pagingState !== '') {
               let nextStartingIndex = indexes[indexes.length - 1] + 1;
-              pagingStates[nextStartingIndex] = response.pagingState;
+              this.pagingStateCache.saveKey('recentVideos', nextStartingIndex, response.pagingState);
             }
           })
           .then(response => {
@@ -180,6 +177,65 @@ const routes = [
       });
       
       return Promise.all(getPreviewsPromises).then(flattenPathValues);
+    }
+  },
+  {
+    // Reference point for list of videos by author (user) Id
+    route: 'usersById[{keys:userIds}].videos',
+    get(pathSet) {
+      // Reset any cached paging state
+      pathSet.userIds.forEach(userId => {
+        this.pagingStateCache.clearKey(`userVideos_${userId}`);
+      });
+      
+      // Figure out the latest video for each user so we can return a reference to a list that's stable for paging
+      return getClientAsync()
+        .then(client => {
+          const getUserVideoPromises = pathSet.userIds.map(userId => {
+            return client.getUserVideoPreviewsAsync({ pageSize: 1 })
+              .then(response => {
+                let startingVideoToken = EMPTY_LIST_VALUE;
+                if (response.videoPreviews.length === 1) {
+                  startingVideoToken = `${uuidToString(response.videoPreviews[0].videoId)}_${timestampToDateString(response.videoPreviews[0].addedDate)}`;
+                }
+                return [
+                  { path: [ 'usersById', userId, 'videos' ], value: $ref([ 'userVideosList', userId, startingVideoToken ]) }
+                ];
+              })
+              .catch(err => {
+                logger.log('error', 'Error while getting user latest video', err);
+                return [
+                  { path: [ 'usersById', userId, 'videos' ], value: $error() }
+                ];
+              });
+          });
+          
+          return Promise.all(getUserVideoPromises).then(flattenPathValues);
+        });
+    }
+  },
+  {
+    // List of videos added by a particular user
+    route: 'userVideosList[{keys:userIds}][{keys:startingVideoTokens}][{ranges:indexRanges}]["videoId", "name", "previewImageLocation", "addedDate", "author"]',
+    get(pathSet) {
+      // TODO: User videos list
+      throw new Error('Not implemented');
+    }
+  },
+  {
+    // Submit a YouTube video to the catalog
+    route: 'usersById[{keys:userIds}].videos.addYouTube',
+    call(callPath, args) {
+      // TODO: Add YouTube video
+      throw new Error('Not implemented');
+    }
+  },
+  {
+    // Submit an uploaded video to the catalog
+    route: 'usersById[{keys:userIds}].videos.addUploaded',
+    call(callPath, args) {
+      // TODO: Add Uploaded video
+      throw new Error('Not implemented');
     }
   }
 ];
