@@ -8,7 +8,7 @@ import { logger } from '../utils/logging';
 const routes = [
   {
     // Number of views for a video by id
-    route: 'statsByVideoId[{keys:videoIds}].views',
+    route: 'videosById[{keys:videoIds}].stats.views',
     get(pathSet) {
       // Convert string keys to uuids for protobuf request
       const videoIds = pathSet.videoIds.map(videoId => stringToUuid(videoId));
@@ -29,26 +29,26 @@ const routes = [
             let stat = statsById.get(videoId);
             if (!stat) {
               // Nope, just return an empty atom
-              return { path: [ 'statsByVideoId', videoId ], value: $atom() };
+              return { path: [ 'videosById', videoId, 'stats' ], value: $atom() };
             }
             
             // Yup, return the number of views
-            return { path: [ 'statsByVideoId', videoId, 'views' ], value: stat.views };
+            return { path: [ 'videosById', videoId, 'stats', 'views' ], value: stat.views };
           });
         })
         .catch(err => {
           logger.log('error', 'Error while getting video stats', err);
           return pathSet.videoIds.map(videoId => {
-            return { path: [ 'statsByVideoId', videoId ], value: $error() };
+            return { path: [ 'videosById', videoId, 'stats' ], value: $error() };
           });
         });
     }
   },
   {
     // Record playback on a video
-    route: 'statsByVideoId[{keys:videoIds}].recordPlayback',
+    route: 'videosById[{keys:videoIds}].stats.recordPlayback',
     call(callPath, args) {
-      // TODO: Need to make sure client follows refs to stats
+      // TODO: Need to update client to call .stats.recordPlayback not just .recordPlayback
       throw new Error('Not implemented');
     }
   }

@@ -12,7 +12,7 @@ const EMPTY_LIST_VALUE = 'NONE';
 const routes = [
   {
     // Basic video catalog data by video Id
-    route: 'videosById[{keys:videoIds}]["videoId", "addedDate", "description", "location", "locationType", "name", "tags", "author", "stats"]',
+    route: 'videosById[{keys:videoIds}]["videoId", "addedDate", "description", "location", "locationType", "name", "tags", "author"]',
     get(pathSet) {
       // The array of props to get for the video
       const videoProps = pathSet[2];
@@ -38,9 +38,6 @@ const routes = [
                 // Author is a reference to a user by id
                 case 'author':
                   return { path, value: $ref([ 'usersById', uuidToString(response.userId) ]) };
-                // Stats are a references to stats by video id
-                case 'stats':
-                  return { path, value: $ref([ 'statsByVideoId', videoId ]) };
                 default:
                   return { path, value: response[prop] }
               }
@@ -164,7 +161,7 @@ const routes = [
                   case 'author':
                     return { path, value: $ref([ 'usersById', uuidToString(videoPreview.userId) ]) };
                   case 'stats':
-                    return { path, value: $ref([ 'statsByVideoId', uuidToString(videoPreview.videoId) ]) };
+                    return { path, value: $ref([ 'videosById', uuidToString(videoPreview.videoId), 'stats' ]) };
                   default:
                     return { path, value: videoPreview[prop] };
                 }
