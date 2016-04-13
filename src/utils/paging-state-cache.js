@@ -44,6 +44,6 @@ export default class PagingStateCache {
       sess[key] = psObject;
     }
     
-    psObject[startIndex] = pagingState;
+    psObject[startingIndex] = pagingState;
   }
 };

@@ -12,7 +12,7 @@ const EMPTY_LIST_VALUE = 'NONE';
 const routes = [
   {
     // Basic video catalog data by video Id
-    route: 'videosById[{keys:videoIds}]["videoId", "addedDate", "description", "location", "locationType", "name", "tags", "author"]',
+    route: 'videosById[{keys:videoIds}]["videoId", "addedDate", "description", "location", "locationType", "name", "tags", "author", "stats"]',
     get(pathSet) {
       // The array of props to get for the video
       const videoProps = pathSet[2];
@@ -29,15 +29,18 @@ const routes = [
                 // Tags need to be wrapped in an atom since they are an array meant to be retrieved together and not by individual index
                 case 'tags':
                   return { path, value: $atom(response.tags) };
-                // Author is a reference to a user by id
-                case 'author':
-                  return { path, value: $ref([ 'usersById', uuidToString(response.userId) ]) };
                 // Video Id we just want the string value
                 case 'videoId':
                   return { path, value: uuidToString(response.videoId) };
                 // Convert added date to a Date
                 case 'addedDate':
-                  return { path, value: timestampToDateString(response.addedDate) }
+                  return { path, value: timestampToDateString(response.addedDate) };
+                // Author is a reference to a user by id
+                case 'author':
+                  return { path, value: $ref([ 'usersById', uuidToString(response.userId) ]) };
+                // Stats are a references to stats by video id
+                case 'stats':
+                  return { path, value: $ref([ 'statsByVideoId', videoId ]) };
                 default:
                   return { path, value: response[prop] }
               }
@@ -85,7 +88,7 @@ const routes = [
   },
   {
     // The recent videos list
-    route: 'recentVideosList[{keys:startingVideoTokens}][{ranges:indexRanges}]["videoId", "name", "previewImageLocation", "addedDate", "author"]',
+    route: 'recentVideosList[{keys:startingVideoTokens}][{ranges:indexRanges}]["videoId", "name", "previewImageLocation", "addedDate", "author", "stats"]',
     get(pathSet) {
       // This should only ever get called with a single starting video token, so do a sanity check
       if (pathSet.startingVideoTokens.length != 1) {
@@ -160,6 +163,8 @@ const routes = [
                     return { path, value: timestampToDateString(videoPreview.addedDate) };
                   case 'author':
                     return { path, value: $ref([ 'usersById', uuidToString(videoPreview.userId) ]) };
+                  case 'stats':
+                    return { path, value: $ref([ 'statsByVideoId', uuidToString(videoPreview.videoId) ]) };
                   default:
                     return { path, value: videoPreview[prop] };
                 }
