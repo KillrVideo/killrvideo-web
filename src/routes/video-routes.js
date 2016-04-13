@@ -1,6 +1,6 @@
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
-import { getClientAsync } from '../services/video-catalog';
+import { getClientAsync, VideoLocationType } from '../services/video-catalog';
 import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestamp } from '../utils/protobuf-conversions';
 import { getIndexesFromRanges, groupIndexesByPagingState, flattenPathValues } from '../utils/falcor-utils';
 import { logger } from '../utils/logging';
@@ -35,6 +35,9 @@ const routes = [
                 // Convert added date to a Date
                 case 'addedDate':
                   return { path, value: timestampToDateString(response.addedDate) };
+                // Convert location type enum to int
+                case 'locationType':
+                  return { path, value: VideoLocationType[response.locationType] };
                 // Author is a reference to a user by id
                 case 'author':
                   return { path, value: $ref([ 'usersById', uuidToString(response.userId) ]) };

@@ -12,3 +12,7 @@ const proto = load({ file: PROTO_PATH, root: PROTO_BASE_PATH }, 'proto', { conve
 // Export a function that will get a client asyncronously
 const getVideoCatalogAsync = () => getClientAsync(proto.killrvideo.video_catalog.VideoCatalogService); 
 export { getVideoCatalogAsync as getClientAsync };
+
+// Export the VideoLocationType enum for lookups/conversion to int
+const VideoLocationType = proto.killrvideo.video_catalog.VideoLocationType;
+export { VideoLocationType };

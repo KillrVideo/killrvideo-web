@@ -1,7 +1,8 @@
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
-import { getClientAsync } from '../services/stats';
+import { getClientAsync } from '../services/ratings';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
+import { flattenPathValues } from '../utils/falcor-utils';
 import { logger } from '../utils/logging';
 
 // Routes handled by the ratings service
@@ -10,14 +11,71 @@ const routes = [
     // Gets a videos ratings stats by video Id
     route: 'videosById[{keys:videoIds}].rating["count", "total"]',
     get(pathSet) {
-      throw new Error('Not implemented');
+      const ratingsProps = pathSet[3];
+      
+      const getRatingsPromises = pathSet.videoIds.map(videoId => {
+        // Get the ratings for each video Id from the ratings service
+        return getClientAsync()
+          .then(client => client.getRatingAsync({ videoId: stringToUuid(videoId) }))
+          .then(response => {
+            // Pull properties from response
+            return ratingsProps.map(prop => {
+              let path = [ 'videosById', videoId, 'rating', prop ];
+              switch(prop) {
+                case 'count':
+                  return { path, value: response.ratingsCount };
+                case 'total':
+                  return { path, value: response.ratingsTotal };
+                default:
+                  throw new Error(`Unexpected property ${prop}`);
+              }
+            });
+          })
+          .catch(err => {
+            logger.log('error', 'Error getting video ratings', err);
+            return [
+              { path: [ 'videosById', videoId, 'rating' ], value: $error() }
+            ];
+          });
+      });
+      
+      return Promise.all(getRatingsPromises).then(flattenPathValues);
     }
   },
   {
     // Gets the rating value a user gave to a video 
     route: 'usersById[{keys:userIds}].ratings[{keys:videoIds}].rating',
     get(pathSet) {
-      throw new Error('Not implemented');
+      const currentUserId = this.getCurrentUserId();
+      const getRatingsPromises = pathSet.userIds.map(userId => {
+        // You're only allowed to see your own ratings
+        if (currentUserId !== userId) {
+          return [
+            { path: [ 'usersById', userId, 'ratings' ], value: $error('Not authorized') } 
+          ];
+        }
+        
+        // Get rating for each video Id specified
+        return pathSet.videoIds.map(videoId => {
+          return getClientAsync()
+            .then(client => client.getUserRatingAsync({ videoId: stringToUuid(videoId), userId: stringToUuid(userId) }))
+            .then(response => {
+              return {
+                path: [ 'usersById', userId, 'ratings', videoId, 'rating' ],
+                value: response.rating
+              };
+            })
+            .catch(err => {
+              logger.log('error', 'Error getting user rating for video', err);
+              return {
+                path: [ 'usersById', userId, 'ratings', videoId, 'rating' ],
+                value: $error()
+              };
+            });
+        });
+      });
+      
+      return Promise.all(getRatingsPromises).then(flattenPathValues);
     }
   },
   {
