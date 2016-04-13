@@ -19,5 +19,8 @@ web:
         - 127.0.0.1
       keyspace: killrvideo_web
       table: express_session
-    
-  
+
+# Logging config
+logging:
+  # Whether or not to do additional logging of falcor requests
+  log_falcor_requests: true
