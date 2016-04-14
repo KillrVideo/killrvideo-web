@@ -1,17 +1,28 @@
 import { logRequests } from './decorators/log-requests';
 import { logErrors } from './decorators/log-errors';
 
-import videoRoutes from './video-routes';
-import userRoutes from './user-routes';
-import statsRoutes from './stats-routes';
+import commentsRoutes from './comments-routes';
 import ratingsRoutes from './ratings-routes';
+import sampleDataRoutes from './sample-data-routes';
+import searchRoutes from './search-routes';
+import statsRoutes from './stats-routes';
+import suggestionsRoutes from './suggestions-routes';
+import uploadsRoutes from './uploads-routes';
+import userRoutes from './user-routes';
+import videoRoutes from './video-routes';
+
 
 // Combine all routes into a single array
 const routes = [
-  ...videoRoutes,
-  ...userRoutes,
+  ...commentsRoutes,
+  ...ratingsRoutes,
+  ...sampleDataRoutes,
+  ...searchRoutes,
   ...statsRoutes,
-  ...ratingsRoutes
+  ...suggestionsRoutes,
+  ...uploadsRoutes,
+  ...userRoutes,
+  ...videoRoutes
 ];
 
 // Wrap routes with decorators
