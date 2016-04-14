@@ -125,7 +125,7 @@ const routes = [
         
         // Create a request object to call the service with
         const getRequest = {
-          pageSize: indexes[indexes.length - 1],
+          pageSize: indexes[indexes.length - 1] + 1,
           startingAddedDate,
           startingVideoId,
           pagingState
