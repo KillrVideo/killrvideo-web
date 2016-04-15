@@ -34,7 +34,12 @@ function getClient(ClientConstructor) {
   let client = clientCache.get(serviceName);
   if (!client) {
     // Create the promise for the client (TODO: Configurable service discovery)
-    const clientInstance = Promise.promisifyAll(new ClientConstructor('localhost:50000', credentials.createInsecure()));
+    let clientInstance = new ClientConstructor('localhost:50000', credentials.createInsecure());
+    
+    // Create async methods on the client that return promises
+    clientInstance = Promise.promisifyAll(clientInstance);
+       
+    // Add Promise to cache
     client = Promise.resolve(clientInstance);
     clientCache.set(serviceName, client);
   }
