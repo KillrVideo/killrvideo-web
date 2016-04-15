@@ -9,6 +9,5 @@ const PROTO_PATH = `statistics/statistics_service.proto`;
 // Load the protobuf files
 const proto = load({ file: PROTO_PATH, root: PROTO_BASE_PATH }, 'proto', { convertFieldsToCamelCase: true });
 
-// Export a function that will get a client asyncronously
-const getStatsAsync = () => getClientAsync(proto.killrvideo.statistics.StatisticsService); 
-export { getStatsAsync as getClientAsync };
+// Export the service constructor
+export default proto.killrvideo.statistics.StatisticsService;

@@ -9,6 +9,5 @@ const PROTO_PATH = `comments/comments_service.proto`;
 // Load the protobuf files
 const proto = load({ file: PROTO_PATH, root: PROTO_BASE_PATH }, 'proto', { convertFieldsToCamelCase: true });
 
-// Export a function that will get a client asyncronously
-const getCommentsAsync = () => getClientAsync(proto.killrvideo.comments.CommentsService); 
-export { getCommentsAsync as getClientAsync };
+// Export the service constructor
+export default proto.killrvideo.comments.CommentsService;

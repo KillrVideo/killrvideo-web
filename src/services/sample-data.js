@@ -9,6 +9,5 @@ const PROTO_PATH = `sample-data/sample_data_service.proto`;
 // Load the protobuf files
 const proto = load({ file: PROTO_PATH, root: PROTO_BASE_PATH }, 'proto', { convertFieldsToCamelCase: true });
 
-// Export a function that will get a client asyncronously
-const getSampleDataAsync = () => getClientAsync(proto.killrvideo.sample_data.SampleDataService); 
-export { getSampleDataAsync as getClientAsync };
+// Export the service constructor
+export default proto.killrvideo.sample_data.SampleDataService;
