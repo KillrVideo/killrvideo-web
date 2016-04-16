@@ -62,3 +62,24 @@ export function flattenPathValues(pathValues) {
  * A constant that can be used to indicate a list is empty.
  */
 export const EMPTY_LIST_VALUE = 'NONE';
+
+function noOp() { }
+
+/**
+ * Returns a function that takes a service response from a paged query and saves the paging state
+ * if necessary.
+ */
+export function savePagingStateIfNecessary(pagingStateGroup, pagingStateCache, pagingStateCacheKey) {
+  // No need to save paging state if not the last available paging state
+  if (pagingStateGroup.isLastAvailablePagingState === false) {
+    return noOp;
+  }
+  
+  return (response) => {
+    // Save paging state from response if necessary
+    if (response.pagingState !== '') {
+      let nextStartingIndex = pagingStateGroup.indexes[pagingStateGroup.indexes.length - 1] + 1;
+      pagingStateCache.saveKey(pagingStateCacheKey, nextStartingIndex, response.pagingState);
+    }
+  };
+}

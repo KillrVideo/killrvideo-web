@@ -2,7 +2,7 @@ import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
 import { COMMENTS_SERVICE } from '../services/comments';
 import { uuidToString, stringToUuid, timestampToDateString } from '../utils/protobuf-conversions';
-import { flattenPathValues, EMPTY_LIST_VALUE, getIndexesFromRanges, groupIndexesByPagingState } from '../utils/falcor-utils';
+import { flattenPathValues, EMPTY_LIST_VALUE, getIndexesFromRanges, groupIndexesByPagingState, savePagingStateIfNecessary } from '../utils/falcor-utils';
 import { logger } from '../utils/logging';
 
 const routes = [
@@ -80,13 +80,7 @@ const routes = [
           
           // Get the comments
           return commentsService.getVideoCommentsAsync(getRequest)
-            .tap(response => {
-              // Save paging state from response if necessary
-              if (isLastAvailablePagingState && response.pagingState !== '') {
-                let nextStartingIndex = indexes[indexes.length - 1] + 1;
-                this.pagingStateCache.saveKey(pagingStateCacheKey, nextStartingIndex, response.pagingState);
-              }
-            })
+            .tap(savePagingStateIfNecessary(idxsAndPaging, this.pagingStateCache, pagingStateCacheKey))
             .then(response => {
               return flattenPathValues(indexes.map(idx => {
                 // Did we get a comment for that index?

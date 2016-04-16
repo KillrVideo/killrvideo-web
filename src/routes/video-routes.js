@@ -2,7 +2,7 @@ import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
 import { VIDEO_CATALOG_SERVICE, VideoLocationType } from '../services/video-catalog';
 import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestamp } from '../utils/protobuf-conversions';
-import { getIndexesFromRanges, groupIndexesByPagingState, flattenPathValues } from '../utils/falcor-utils';
+import { getIndexesFromRanges, groupIndexesByPagingState, flattenPathValues, savePagingStateIfNecessary } from '../utils/falcor-utils';
 import { logger } from '../utils/logging';
 
 // Constant used in routes below to indicate a list is empty
@@ -134,13 +134,7 @@ const routes = [
         
         // Make the request
         return videosService.getLatestVideoPreviewsAsync(getRequest)
-          .tap(response => {
-            // Save the paging state to session if necessary
-            if (isLastAvailablePagingState && response.pagingState !== '') {
-              let nextStartingIndex = indexes[indexes.length - 1] + 1;
-              this.pagingStateCache.saveKey('recentVideos', nextStartingIndex, response.pagingState);
-            }
-          })
+          .tap(savePagingStateIfNecessary(idxsAndPaging, this.pagingStateCache, 'recentVideos'))
           .then(response => {
             const pathValues = indexes.map(idx => {
               // Did we get a video preview at the index we're looking for?
