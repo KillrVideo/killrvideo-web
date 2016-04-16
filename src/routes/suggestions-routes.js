@@ -1,6 +1,6 @@
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
-import { getClientAsync } from '../services/suggested-video';
+import { SUGGESTED_VIDEO_SERVICE } from '../services/suggested-video';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { flattenPathValues, getIndexesFromRanges, groupIndexesByPagingState } from '../utils/falcor-utils';
 import { logger } from '../utils/logging';

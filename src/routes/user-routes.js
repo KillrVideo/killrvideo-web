@@ -1,6 +1,6 @@
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
-import { getClientAsync } from '../services/user-management';
+import { USER_MANAGEMENT_SERVICE } from '../services/user-management';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { flattenPathValues } from '../utils/falcor-utils';
 import { logger } from '../utils/logging';
@@ -27,8 +27,8 @@ const routes = [
     get(pathSet) {
       const userProps = pathSet[2];
       const userIds = pathSet.userIds.map(userId => stringToUuid(userId));
-      return getClientAsync()
-        .then(client => client.getUserProfileAsync({ userIds }))
+      const userManagementService = this.getServiceClient(USER_MANAGEMENT_SERVICE);
+      return userManagementService.getUserProfileAsync({ userIds })
         .then(response => {
           // Put profiles into a map keyed by user Id
           const profilesById = new Map();

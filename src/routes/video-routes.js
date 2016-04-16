@@ -1,6 +1,6 @@
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
-import { getClientAsync, VideoLocationType } from '../services/video-catalog';
+import { VIDEO_CATALOG_SERVICE, VideoLocationType } from '../services/video-catalog';
 import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestamp } from '../utils/protobuf-conversions';
 import { getIndexesFromRanges, groupIndexesByPagingState, flattenPathValues } from '../utils/falcor-utils';
 import { logger } from '../utils/logging';
@@ -17,10 +17,11 @@ const routes = [
       // The array of props to get for the video
       const videoProps = pathSet[2];
       
+      const videosService = this.getServiceClient(VIDEO_CATALOG_SERVICE);
+      
       // Map video ids requested to individual promise requests to the video catalog service
       const getVideoPromises = pathSet.videoIds.map(videoId => {
-        return getClientAsync()
-          .then(client => client.getVideoAsync({ videoId: stringToUuid(videoId) }))
+        return videosService.getVideoAsync({ videoId: stringToUuid(videoId) })
           .then(response => {
             // Turn response into an array of path values
             return videoProps.map(prop => {
@@ -65,9 +66,10 @@ const routes = [
       // Reset any cached paging state
       this.pagingStateCache.clearKey('recentVideos');
       
+      const videosService = this.getServiceClient(VIDEO_CATALOG_SERVICE);
+      
       // Figure out the latest video so we can return a reference to a list that's stable for paging
-      return getClientAsync()
-        .then(client => client.getLatestVideoPreviewsAsync({ pageSize: 1 }))
+      return videosService.getLatestVideoPreviewsAsync({ pageSize: 1 })
         .then(response => {
           let startingVideoToken = EMPTY_LIST_VALUE;
           if (response.videoPreviews.length === 1) {
@@ -115,6 +117,8 @@ const routes = [
       // The props to get for the videos
       const videoProps = pathSet[3];
       
+      const videosService = this.getServiceClient(VIDEO_CATALOG_SERVICE);
+      
       // Get all indexes from the ranges and all available paging states saved in session
       const allIndexes = getIndexesFromRanges(pathSet.indexRanges);
       let pagingStates = this.pagingStateCache.getKey('recentVideos');
@@ -132,8 +136,7 @@ const routes = [
         };
         
         // Make the request
-        return getClientAsync()
-          .then(client => client.getLatestVideoPreviewsAsync(getRequest))
+        return videosService.getLatestVideoPreviewsAsync(getRequest)
           .tap(response => {
             // Save the paging state to session if necessary
             if (isLastAvailablePagingState && response.pagingState !== '') {
@@ -193,30 +196,28 @@ const routes = [
         this.pagingStateCache.clearKey(`userVideos_${userId}`);
       });
       
+      const videosService = this.getServiceClient(VIDEO_CATALOG_SERVICE);
+      
       // Figure out the latest video for each user so we can return a reference to a list that's stable for paging
-      return getClientAsync()
-        .then(client => {
-          const getUserVideoPromises = pathSet.userIds.map(userId => {
-            return client.getUserVideoPreviewsAsync({ pageSize: 1 })
-              .then(response => {
-                let startingVideoToken = EMPTY_LIST_VALUE;
-                if (response.videoPreviews.length === 1) {
-                  startingVideoToken = `${uuidToString(response.videoPreviews[0].videoId)}_${timestampToDateString(response.videoPreviews[0].addedDate)}`;
-                }
-                return [
-                  { path: [ 'usersById', userId, 'videos' ], value: $ref([ 'userVideosList', userId, startingVideoToken ]) }
-                ];
-              })
-              .catch(err => {
-                logger.log('error', 'Error while getting user latest video', err);
-                return [
-                  { path: [ 'usersById', userId, 'videos' ], value: $error() }
-                ];
-              });
+      const getUserVideoPromises = pathSet.userIds.map(userId => {
+        return videosService.getUserVideoPreviewsAsync({ pageSize: 1, userId: stringToUuid(userId) })
+          .then(response => {
+            let startingVideoToken = EMPTY_LIST_VALUE;
+            if (response.videoPreviews.length === 1) {
+              startingVideoToken = `${uuidToString(response.videoPreviews[0].videoId)}_${timestampToDateString(response.videoPreviews[0].addedDate)}`;
+            }
+            return { 
+              path: [ 'usersById', userId, 'videos' ], 
+              value: $ref([ 'userVideosList', userId, startingVideoToken ]) 
+            };
+          })
+          .catch(err => {
+            logger.log('error', 'Error while getting user latest video', err);
+            return  { path: [ 'usersById', userId, 'videos' ], value: $error() };
           });
-          
-          return Promise.all(getUserVideoPromises).then(flattenPathValues);
-        });
+      });
+      
+      return Promise.all(getUserVideoPromises);
     }
   },
   {

@@ -1,6 +1,6 @@
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
-import { getClientAsync } from '../services/ratings';
+import { RATINGS_SERVICE } from '../services/ratings';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { flattenPathValues } from '../utils/falcor-utils';
 import { logger } from '../utils/logging';
@@ -12,11 +12,11 @@ const routes = [
     route: 'videosById[{keys:videoIds}].rating["count", "total"]',
     get(pathSet) {
       const ratingsProps = pathSet[3];
+      const ratingsService = this.getServiceClient(RATINGS_SERVICE);
       
       const getRatingsPromises = pathSet.videoIds.map(videoId => {
         // Get the ratings for each video Id from the ratings service
-        return getClientAsync()
-          .then(client => client.getRatingAsync({ videoId: stringToUuid(videoId) }))
+        return ratingsService.getRatingAsync({ videoId: stringToUuid(videoId) })
           .then(response => {
             // Pull properties from response
             return ratingsProps.map(prop => {
@@ -47,6 +47,7 @@ const routes = [
     route: 'usersById[{keys:userIds}].ratings[{keys:videoIds}].rating',
     get(pathSet) {
       const currentUserId = this.getCurrentUserId();
+      const ratingsService = this.getServiceClient(RATINGS_SERVICE);
       const getRatingsPromises = pathSet.userIds.map(userId => {
         // You're only allowed to see your own ratings
         if (currentUserId !== userId) {
@@ -57,8 +58,7 @@ const routes = [
         
         // Get rating for each video Id specified
         return pathSet.videoIds.map(videoId => {
-          return getClientAsync()
-            .then(client => client.getUserRatingAsync({ videoId: stringToUuid(videoId), userId: stringToUuid(userId) }))
+          return ratingsService.getUserRatingAsync({ videoId: stringToUuid(videoId), userId: stringToUuid(userId) })
             .then(response => {
               return {
                 path: [ 'usersById', userId, 'ratings', videoId, 'rating' ],

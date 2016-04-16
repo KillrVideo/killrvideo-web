@@ -1,6 +1,6 @@
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
-import { getClientAsync } from '../services/stats';
+import { STATS_SERVICE } from '../services/stats';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { logger } from '../utils/logging';
 
@@ -13,9 +13,10 @@ const routes = [
       // Convert string keys to uuids for protobuf request
       const videoIds = pathSet.videoIds.map(videoId => stringToUuid(videoId));
       
+      const statsService = this.getServiceClient(STATS_SERVICE);
+      
       // Make the request
-      return getClientAsync()
-        .then(client => client.getNumberOfPlaysAsync({ videoIds }))
+      return statsService.getNumberOfPlaysAsync({ videoIds })
         .then(response => {
           // Put stats into a map keyed by video id
           const statsById = new Map();

@@ -40,6 +40,7 @@
     "body-parser": "^1.15.0",
     "cassandra-store": "^3.0.0",
     "config": "^1.20.1",
+    "d": "^1.0.0",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "falcor-express": "^0.1.2",

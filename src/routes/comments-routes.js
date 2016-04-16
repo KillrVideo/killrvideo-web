@@ -1,6 +1,6 @@
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
-import { getClientAsync } from '../services/comments';
+import { COMMENTS_SERVICE } from '../services/comments';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { flattenPathValues } from '../utils/falcor-utils';
 import { logger } from '../utils/logging';

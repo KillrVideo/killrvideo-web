@@ -5,6 +5,7 @@ import Promise from 'bluebird';
 import Router from 'falcor-router';
 import { session } from './session';
 import routes from '../routes';
+import { getServiceClient } from '../services';
 import PagingStateCache from '../utils/paging-state-cache';
 
 // Tell passport auth how to serialize and deserialize users
@@ -45,6 +46,20 @@ class KillrVideoRouter extends Router.createClass(routes) {
     // Save the request for use by routes
     this.req = req;
     this.pagingStateCache = new PagingStateCache(req);
+    this.serviceClients = new Map();
+  }
+  
+  /**
+   * Gets a service client for the given service. Client instances are shared for the duration
+   * of a request.
+   */
+  getServiceClient(serviceName) {
+    let client = this.serviceClients.get(serviceName);
+    if (!client) {
+      client = getServiceClient(serviceName);
+      this.serviceClients.set(serviceName, client);
+    }
+    return client;
   }
   
   /**
