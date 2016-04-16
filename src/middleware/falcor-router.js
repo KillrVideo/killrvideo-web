@@ -5,7 +5,7 @@ import Promise from 'bluebird';
 import Router from 'falcor-router';
 import { session } from './session';
 import routes from '../routes';
-import { getServiceClient } from '../services';
+import { getServiceClient } from '../services/factory';
 import PagingStateCache from '../utils/paging-state-cache';
 
 // Tell passport auth how to serialize and deserialize users

@@ -1,6 +1,6 @@
 import path from 'path';
 import { load } from 'grpc';
-import { registerService } from './';
+import { registerService } from './factory';
 
 // Path to .proto definitions (copied to output as part of the build)
 const PROTO_BASE_PATH = path.resolve(__dirname, '..', 'resources/protos');
