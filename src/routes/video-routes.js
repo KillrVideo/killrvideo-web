@@ -94,10 +94,7 @@ const routes = [
     get(pathSet) {
       // This should only ever get called with a single starting video token, so do a sanity check
       if (pathSet.startingVideoTokens.length != 1) {
-        logger.log('error', 'Got request for recent videos with %d starting video tokens', pathSet.startingVideoTokens.length);
-        return pathSet.startingVideoTokens.map(token => {
-          return { path: [ 'recentVideosList', token ], value: $error() };
-        });
+        throw new Error('Requests should only ever have a single starting video token');
       }
       
       const startingVideoToken = pathSet.startingVideoTokens[0];
@@ -129,7 +126,7 @@ const routes = [
         
         // Create a request object to call the service with
         const getRequest = {
-          pageSize: indexes[indexes.length - 1] + 1,
+          pageSize: indexes[indexes.length - 1] - startingIndex + 1,
           startingAddedDate,
           startingVideoId,
           pagingState

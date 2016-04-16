@@ -57,3 +57,8 @@ export function groupIndexesByPagingState(idxs, pagingStates) {
 export function flattenPathValues(pathValues) {
   return [].concat.apply([], pathValues);
 };
+
+/**
+ * A constant that can be used to indicate a list is empty.
+ */
+export const EMPTY_LIST_VALUE = 'NONE';
