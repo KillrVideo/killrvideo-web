@@ -2,7 +2,7 @@ import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
 import { VIDEO_CATALOG_SERVICE, VideoLocationType } from '../services/video-catalog';
 import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestamp } from '../utils/protobuf-conversions';
-import { getIndexesFromRanges, groupIndexesByPagingState, flattenPathValues, savePagingStateIfNecessary } from '../utils/falcor-utils';
+import { getIndexesFromRanges, groupIndexesByPagingState, flattenPathValues, savePagingStateIfNecessary, explodePaths, toEmptyPathValue } from '../utils/falcor-utils';
 import { logger } from '../utils/logging';
 
 // Constant used in routes below to indicate a list is empty
@@ -101,9 +101,7 @@ const routes = [
       
       // If list is empty, no need to go to service
       if (startingVideoToken === EMPTY_LIST_VALUE) {
-        return getIndexesFromRanges(pathSet.indexRanges).map(idx => {
-          return { path: [ 'recentVideosList', startingVideoToken, idx ], value: $atom() };
-        });
+        return explodePaths(pathSet, 2).map(toEmptyPathValue);
       }
       
       // Parse the token into video id and added date

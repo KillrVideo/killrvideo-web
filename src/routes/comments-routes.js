@@ -2,7 +2,7 @@ import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
 import { COMMENTS_SERVICE } from '../services/comments';
 import { uuidToString, stringToUuid, timestampToDateString } from '../utils/protobuf-conversions';
-import { flattenPathValues, EMPTY_LIST_VALUE, getIndexesFromRanges, groupIndexesByPagingState, savePagingStateIfNecessary } from '../utils/falcor-utils';
+import { flattenPathValues, EMPTY_LIST_VALUE, getIndexesFromRanges, groupIndexesByPagingState, savePagingStateIfNecessary, explodePaths, toEmptyPathValue } from '../utils/falcor-utils';
 import { logger } from '../utils/logging';
 
 const routes = [
@@ -52,9 +52,7 @@ const routes = [
       
       // If the token is for an empty list, no need to go ask the service for comments
       if (startingToken === EMPTY_LIST_VALUE) {
-        return getIndexesFromRanges(pathSet.indexRanges).map(idx => {
-          return { path: [ 'commentsByVideo', videoId, startingToken, idx ], value: $atom() };
-        });
+        return explodePaths(pathSet, 3).map(toEmptyPathValue);
       }
       
       // The properties to get for each comment
