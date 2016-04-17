@@ -37,3 +37,12 @@ export function uuidToString(uuid) {
 export function stringToUuid(stringVal) {
   return { value: stringVal };
 };
+
+/**
+ * Returns a function that takes a value and converts it to the integer value for the given enum type.
+ */
+export function enumToInteger(EnumType) {
+  return value => {
+    return EnumType[value];
+  };
+};

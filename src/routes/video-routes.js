@@ -1,12 +1,28 @@
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
 import { VIDEO_CATALOG_SERVICE, VideoLocationType } from '../services/video-catalog';
-import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestamp } from '../utils/protobuf-conversions';
+import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestamp, enumToInteger } from '../utils/protobuf-conversions';
 import { getIndexesFromRanges, groupIndexesByPagingState, flattenPathValues, savePagingStateIfNecessary, explodePaths, toEmptyPathValue } from '../utils/falcor-utils';
+import { convertValues, pickValues, toAtom, toRef, toArray } from '../utils/falcor-conversions';
+import { pipe, prepend, append } from 'ramda';
 import { logger } from '../utils/logging';
 
 // Constant used in routes below to indicate a list is empty
 const EMPTY_LIST_VALUE = 'NONE';
+
+const videoConverter = convertValues({
+  'tags': toAtom,
+  'videoId': uuidToString,
+  'addedDate': timestampToDateString,
+  'locationType': enumToInteger(VideoLocationType),
+  'author': pipe(uuidToString, toArray, prepend('usersById'), toRef),
+  'stats': pipe(uuidToString, toArray, prepend('videosById'), append('stats'), toRef)
+});
+
+const videoPicker = pickValues({
+  'author': 'userId',
+  'stats': 'videoId'
+});
 
 // All routes supported by the video catalog service
 const routes = [
@@ -26,25 +42,8 @@ const routes = [
             // Turn response into an array of path values
             return videoProps.map(prop => {
               const path = [ 'videosById', videoId, prop ];
-              switch(prop) {
-                // Tags need to be wrapped in an atom since they are an array meant to be retrieved together and not by individual index
-                case 'tags':
-                  return { path, value: $atom(response.tags) };
-                // Video Id we just want the string value
-                case 'videoId':
-                  return { path, value: uuidToString(response.videoId) };
-                // Convert added date to a Date
-                case 'addedDate':
-                  return { path, value: timestampToDateString(response.addedDate) };
-                // Convert location type enum to int
-                case 'locationType':
-                  return { path, value: VideoLocationType[response.locationType] };
-                // Author is a reference to a user by id
-                case 'author':
-                  return { path, value: $ref([ 'usersById', uuidToString(response.userId) ]) };
-                default:
-                  return { path, value: response[prop] }
-              }
+              const value = videoConverter(prop, videoPicker(prop, response));
+              return { path, value };
             });
           })
           .catch(err => {
@@ -148,18 +147,8 @@ const routes = [
               const videoPreview = response.videoPreviews[adjustedIdx];
               return videoProps.map(prop => {
                 const path = [ 'recentVideosList', startingVideoToken, idx, prop ];
-                switch (prop) {
-                  case 'videoId':
-                    return { path, value: uuidToString(videoPreview.videoId) };
-                  case 'addedDate':
-                    return { path, value: timestampToDateString(videoPreview.addedDate) };
-                  case 'author':
-                    return { path, value: $ref([ 'usersById', uuidToString(videoPreview.userId) ]) };
-                  case 'stats':
-                    return { path, value: $ref([ 'videosById', uuidToString(videoPreview.videoId), 'stats' ]) };
-                  default:
-                    return { path, value: videoPreview[prop] };
-                }
+                const value = videoConverter(prop, videoPicker(prop, videoPreview));
+                return { path, value };
               });
             });
             

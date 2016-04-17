@@ -84,7 +84,9 @@ export function savePagingStateIfNecessary(pagingStateGroup, pagingStateCache, p
       pagingStateCache.saveKey(pagingStateCacheKey, nextStartingIndex, response.pagingState);
     }
   };
-}
+};
+
+
 
 /**
  * Returns an empty path value (i.e. path with value set to atom) for the specified path.
@@ -97,6 +99,8 @@ export function toEmptyPathValue(path) {
  * Explodes a pathSet to paths at the specified depth of the pathSet and returns the array of paths.
  */
 export function explodePaths(pathSet, depthIdx) {
+  if (!depthIndx) depthIdx = pathSet.length;
+  
   if (depthIdx >= pathSet.length) {
     throw new Error('Depth index is too large');
   }
