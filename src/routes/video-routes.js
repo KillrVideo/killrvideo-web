@@ -2,7 +2,7 @@ import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
 import { VIDEO_CATALOG_SERVICE, VideoLocationType } from '../services/video-catalog';
 import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestamp, enumToInteger } from '../utils/protobuf-conversions';
-import { getIndexesFromRanges, groupIndexesByPagingState, flattenPathValues, savePagingStateIfNecessary, explodePaths, toEmptyPathValue } from '../utils/falcor-utils';
+import { getIndexesFromRanges, groupIndexesByPagingState, flattenPathValues, savePagingStateIfNecessary, explodePaths, toEmptyPathValue, getRequestPages } from '../utils/falcor-utils';
 import { convertValues, pickValues, toAtom, toRef, toArray } from '../utils/falcor-conversions';
 import { pipe, prepend, append } from 'ramda';
 import { logger } from '../utils/logging';
@@ -112,51 +112,28 @@ const routes = [
       const videoProps = pathSet[3];
       
       const videosService = this.getServiceClient(VIDEO_CATALOG_SERVICE);
+      const request = { startingVideoId, startingAddedDate };
       
-      // Get all indexes from the ranges and all available paging states saved in session
-      const allIndexes = getIndexesFromRanges(pathSet.indexRanges);
-      let pagingStates = this.pagingStateCache.getKey('recentVideos');
-      
-      // Group the indexes by the paging state they can use for the query, then do queries      
-      const getPreviewsPromises = groupIndexesByPagingState(allIndexes, pagingStates).map(idxsAndPaging => {
-        const { startingIndex, pagingState, indexes, isLastAvailablePagingState } = idxsAndPaging;
-        
-        // Create a request object to call the service with
-        const getRequest = {
-          pageSize: indexes[indexes.length - 1] - startingIndex + 1,
-          startingAddedDate,
-          startingVideoId,
-          pagingState
-        };
-        
-        // Make the request
-        return videosService.getLatestVideoPreviewsAsync(getRequest)
-          .tap(savePagingStateIfNecessary(idxsAndPaging, this.pagingStateCache, 'recentVideos'))
-          .then(response => {
-            const pathValues = indexes.map(idx => {
-              // Did we get a video preview at the index we're looking for?
-              const adjustedIdx = idx - startingIndex;
-              if (adjustedIdx >= response.videoPreviews.length) {
-                // Nope, just return an empty atom
-                return [
-                  { path: [ 'recentVideosList', startingVideoToken, idx ], value: $atom() }
-                ];
+      const previewsPages = getRequestPages(pathSet.indexRanges, this.pagingStateCache, 'recentVideos');
+      const getPreviewsPromises = previewsPages.map(page => {
+        return page.doRequest(videosService.getLatestVideoPreviewsAsync, request)
+          .then(response => { 
+            const pathValues = page.mapResponse(response.videoPreviews, (preview, idx) => {
+              if (preview === null) {
+                return [ { path: [ 'recentVideosList', startingVideoToken, idx ], value: $atom() } ];
               }
               
-              // Yup, get the properties that were requested
-              const videoPreview = response.videoPreviews[adjustedIdx];
               return videoProps.map(prop => {
                 const path = [ 'recentVideosList', startingVideoToken, idx, prop ];
-                const value = videoConverter(prop, videoPicker(prop, videoPreview));
+                const value = videoConverter(prop, videoPicker(prop, preview));
                 return { path, value };
               });
             });
-            
             return flattenPathValues(pathValues);
           })
           .catch(err => {
             logger.log('error', 'Error while getting latest videos', err);
-            return indexes.map(idx => {
+            return page.mapIndexes(idx => {
               return { path: [ 'recentVideosList', startingVideoToken, idx ], value: $error() }
             });
           });

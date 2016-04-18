@@ -53,6 +53,59 @@ export function groupIndexesByPagingState(idxs, pagingStates) {
   return results;
 };
 
+export function getRequestPages(ranges, pagingStateCache, pagingStateCacheKey) {
+  const pagingGroups = groupIndexesByPagingState(getIndexesFromRanges(ranges), pagingStateCache.getKey(pagingStateCacheKey));
+  return pagingGroups.map(pagingGroup => ({
+    /**
+     * Does a paged request and returns a Promise with the response.
+     */
+    doRequest(requestFn, request) {
+      const { startingIndex, pagingState, indexes, isLastAvailablePagingState } = pagingGroup;
+      const pageSize = indexes[indexes.length - 1] - startingIndex + 1;
+      const pagedRequest = {
+        pageSize, 
+        pagingState
+      };
+      Object.getOwnPropertyNames(request).forEach(prop => { pagedRequest[prop] = request[prop]; });
+      
+      let requestPromise = requestFn(pagedRequest);
+      
+      // Save the paging state if this is the last available paging state
+      if (pagingGroup.isLastAvailablePagingState) {
+        requestPromise = requestPromise.tap(response => {
+          if (response.pagingState !== '') {
+            let nextStartingIndex = startingIndex + pageSize;
+            pagingStateCache.saveKey(pagingStateCacheKey, nextStartingIndex, response.pagingState);
+          }
+        });
+      }
+      return requestPromise;
+    },
+    
+    /**
+     * For each index in the paged request, find the corresponding item in the response array and calls
+     * the supplied mapperFn with the value (could be null) and the index of the request.
+     */
+    mapResponse(responseArray, mapperFn) {
+      return pagingGroup.indexes.map((idx) => {
+        const adjustedIdx = idx - pagingGroup.startingIndex;
+        const item = responseArray.length > adjustedIdx
+          ? responseArray[adjustedIdx]
+          : null;
+        
+        return mapperFn(item, idx);
+      });
+    },
+    
+    /**
+     * Runs the supplied mapper function against all indexes that were requested for this page.
+     */
+    mapIndexes(mapperFn) {
+      return pagingGroup.indexes.map(idx => mapperFn(idx));
+    }
+  }));
+};
+
 /**
  * Takes an array of arrays of path values and flattens it.
  */
@@ -85,8 +138,6 @@ export function savePagingStateIfNecessary(pagingStateGroup, pagingStateCache, p
     }
   };
 };
-
-
 
 /**
  * Returns an empty path value (i.e. path with value set to atom) for the specified path.
