@@ -1,34 +1,25 @@
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
+import R from 'ramda';
+
+const aliasedProp = R.curry((keysMap, key, obj) => {
+  return obj[keysMap[key] || key];
+});
+
+const valueOrConverted = R.curry((valuesMap, key, value) => {
+  let c = valuesMap[key];
+  return c ? c(value) : value;
+});
 
 /**
- * Returns a function that takes a key and a value. For a given key, if the config object provided has that
- * same key, the value will be converted using the function at that key in the config object, otherwise the
- * value is returned as-is. 
+ * Creates a pick function that will pick a specified prop from an object using the supplied
+ * key map to look up values in the object and the specified values map to convert the values
+ * found at the key.
  */
-export function convertValues(config) {
-  return (key, val) => {
-    let converter = config[key];
-    if (converter) { 
-      return converter(val);
-    }
-    return val;
-  };
+export function responsePicker(keysMap, valuesMap) {
+  const prop = aliasedProp(keysMap);
+  const val = valueOrConverted(valuesMap);
+  return (key, obj) => { return val(key, prop(key, obj)); };
 };
-
-/**
- * Returns a function that takes a key and an object. For a given key, if the config object provided has that
- * key, the value of that config key is used as the key instead. The function then returns the value from the
- * object at the given key. 
- */
-export function pickValues(config) {
-  return (key, obj) => {
-    let alias = config[key];
-    if (alias) {
-      key = alias;
-    }
-    return obj[key];
-  };
-}
 
 /**
  * Wraps a value in an atom.

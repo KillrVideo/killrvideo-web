@@ -2,26 +2,21 @@ import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import Promise from 'bluebird';
 import { VIDEO_CATALOG_SERVICE, VideoLocationType } from '../services/video-catalog';
 import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestamp, enumToInteger } from '../utils/protobuf-conversions';
-import { getIndexesFromRanges, groupIndexesByPagingState, flattenPathValues, savePagingStateIfNecessary, explodePaths, toEmptyPathValue, getRequestPages } from '../utils/falcor-utils';
-import { convertValues, pickValues, toAtom, toRef, toArray } from '../utils/falcor-conversions';
+import { flattenPathValues, explodePaths, toEmptyPathValue, getRequestPages, EMPTY_LIST_VALUE } from '../utils/falcor-utils';
+import { responsePicker, toAtom, toRef, toArray } from '../utils/falcor-conversions';
 import { pipe, prepend, append } from 'ramda';
 import { logger } from '../utils/logging';
 
-// Constant used in routes below to indicate a list is empty
-const EMPTY_LIST_VALUE = 'NONE';
-
-const videoConverter = convertValues({
+const pickVideoProp = responsePicker({
+  'author': 'userId',
+  'stats': 'videoId'
+}, {
   'tags': toAtom,
   'videoId': uuidToString,
   'addedDate': timestampToDateString,
   'locationType': enumToInteger(VideoLocationType),
   'author': pipe(uuidToString, toArray, prepend('usersById'), toRef),
   'stats': pipe(uuidToString, toArray, prepend('videosById'), append('stats'), toRef)
-});
-
-const videoPicker = pickValues({
-  'author': 'userId',
-  'stats': 'videoId'
 });
 
 // All routes supported by the video catalog service
@@ -42,7 +37,7 @@ const routes = [
             // Turn response into an array of path values
             return videoProps.map(prop => {
               const path = [ 'videosById', videoId, prop ];
-              const value = videoConverter(prop, videoPicker(prop, response));
+              const value = pickVideoProp(prop, response);
               return { path, value };
             });
           })
@@ -125,7 +120,7 @@ const routes = [
               
               return videoProps.map(prop => {
                 const path = [ 'recentVideosList', startingVideoToken, idx, prop ];
-                const value = videoConverter(prop, videoPicker(prop, preview));
+                const value = pickVideoProp(prop, preview);
                 return { path, value };
               });
             });
