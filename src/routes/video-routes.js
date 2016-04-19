@@ -6,6 +6,8 @@ import { flattenPathValues, explodePaths, toEmptyPathValue, getRequestPages, EMP
 import { responsePicker, getPathValuesFromResponse, toAtom, toRef, toArray } from '../utils/falcor-conversions';
 import { pipe, prepend, append } from 'ramda';
 import { logger } from '../utils/logging';
+import { createGetPipeline } from '../utils/falcor-pipeline';
+import { advanceToDepth, createRequests, doRequests, pickPropsFromResponses } from '../utils/pipeline-functions';
 
 const pickVideoProp = responsePicker({
   'author': 'userId',
@@ -26,27 +28,13 @@ const routes = [
   {
     // Basic video catalog data by video Id
     route: 'videosById[{keys:videoIds}]["videoId", "addedDate", "description", "location", "locationType", "name", "tags", "author"]',
-    get(pathSet) {
-      // The array of props to get for the video
-      const videoProps = pathSet[2];
-      
-      const videosService = this.getServiceClient(VIDEO_CATALOG_SERVICE);
-      
-      // Map video ids requested to individual promise requests to the video catalog service
-      const getVideoPromises = pathSet.videoIds.map(videoId => {
-        return videosService.getVideoAsync({ videoId: stringToUuid(videoId) })
-          .then(mapToVideoById(pathSet))
-          .catch(err => {
-            logger.log('error', 'Error while getting video %d', videoId, err);
-            return [
-              { path: [ 'videosById', videoId ], value: $error() }
-            ]
-          });
-      });
-      
-      // Flatten all path values returned by promies into a single array of path values
-      return Promise.all(getVideoPromises).then(flattenPathValues);
-    }
+    get: createGetPipeline(
+      advanceToDepth(1),
+      createRequests(videoId => ({ videoId: stringToUuid(videoId) })),
+      doRequests(VIDEO_CATALOG_SERVICE, (client, req) => { return client.getVideoAsync(req); }),
+      advanceToDepth(2),
+      pickPropsFromResponses(pickVideoProp)
+    )
   },
   {
     // Reference point for the recent videos list

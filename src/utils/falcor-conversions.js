@@ -44,9 +44,19 @@ export const getPathValuesFromResponse = R.curry((picker, pathSet, response) => 
 export const toAtom = $atom;
 
 /**
+ * Returns whether the given value is an atom.
+ */
+export const isAtom = isSentinel('atom');
+
+/**
  * Wraps a value in an error.
  */
 export const toError = $error;
+
+/**
+ * Returns whether the given value is an error.
+ */
+export const isError = isSentinel('error');
 
 /**
  * Wraps a value in a reference.
@@ -54,8 +64,22 @@ export const toError = $error;
 export const toRef = $ref;
 
 /**
+ * Returns whether the given value is a reference.
+ */
+export const isRef = isSentinel('ref');
+
+/**
  * Wraps a value in an array.
  */
 export function toArray(value) {
   return [ value ];
 };
+
+/**
+ * Helper function to determine if a value is a sentinel.
+ */
+function isSentinel(t) {
+  return val => {
+    return val['$type'] === t;
+  };
+}
