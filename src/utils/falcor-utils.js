@@ -150,7 +150,7 @@ export function toEmptyPathValue(path) {
  * Explodes a pathSet to paths at the specified depth of the pathSet and returns the array of paths.
  */
 export function explodePaths(pathSet, depthIdx) {
-  if (!depthIndx) depthIdx = pathSet.length;
+  if (!depthIdx) depthIdx = pathSet.length - 1;
   
   if (depthIdx >= pathSet.length) {
     throw new Error('Depth index is too large');

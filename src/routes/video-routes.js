@@ -3,7 +3,7 @@ import Promise from 'bluebird';
 import { VIDEO_CATALOG_SERVICE, VideoLocationType } from '../services/video-catalog';
 import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestamp, enumToInteger } from '../utils/protobuf-conversions';
 import { flattenPathValues, explodePaths, toEmptyPathValue, getRequestPages, EMPTY_LIST_VALUE } from '../utils/falcor-utils';
-import { responsePicker, toAtom, toRef, toArray } from '../utils/falcor-conversions';
+import { responsePicker, getPathValuesFromResponse, toAtom, toRef, toArray } from '../utils/falcor-conversions';
 import { pipe, prepend, append } from 'ramda';
 import { logger } from '../utils/logging';
 
@@ -19,6 +19,8 @@ const pickVideoProp = responsePicker({
   'stats': pipe(uuidToString, toArray, prepend('videosById'), append('stats'), toRef)
 });
 
+const mapToVideoById = getPathValuesFromResponse(pickVideoProp);
+
 // All routes supported by the video catalog service
 const routes = [
   {
@@ -33,14 +35,7 @@ const routes = [
       // Map video ids requested to individual promise requests to the video catalog service
       const getVideoPromises = pathSet.videoIds.map(videoId => {
         return videosService.getVideoAsync({ videoId: stringToUuid(videoId) })
-          .then(response => {
-            // Turn response into an array of path values
-            return videoProps.map(prop => {
-              const path = [ 'videosById', videoId, prop ];
-              const value = pickVideoProp(prop, response);
-              return { path, value };
-            });
-          })
+          .then(mapToVideoById(pathSet))
           .catch(err => {
             logger.log('error', 'Error while getting video %d', videoId, err);
             return [

@@ -1,4 +1,5 @@
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
+import { explodePaths } from './falcor-utils';
 import R from 'ramda';
 
 const aliasedProp = R.curry((keysMap, key, obj) => {
@@ -20,6 +21,22 @@ export function responsePicker(keysMap, valuesMap) {
   const val = valueOrConverted(valuesMap);
   return (key, obj) => { return val(key, prop(key, obj)); };
 };
+
+/**
+ * Gets path values from a response that contains a single object. Uses the picker function specified to pick props
+ * from the response object. Picks props for all paths in the exploded paths from the pathSet.
+ */
+export const getPathValuesFromResponse = R.curry((picker, pathSet, response) => {
+  // Assume that the prop requested will be the last value in a path (pathSet and a path should be the same length)
+  const propIdx = pathSet.length - 1;
+  return explodePaths(pathSet).map(path => {
+    let prop = path[propIdx];
+    return {
+      path,
+      value: picker(prop, response)
+    };
+  });
+});
 
 /**
  * Wraps a value in an atom.
