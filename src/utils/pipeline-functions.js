@@ -1,7 +1,11 @@
 import Promise from 'bluebird';
+import R from 'ramda';
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import { logger } from './logging';
 import { isError } from './falcor-conversions';
+
+// Helper function for tapping debug logging into a pipeline
+const debugLog = R.tap(x => console.log(x));
 
 /**
  * Advance the request context to the specified depth.
@@ -90,3 +94,55 @@ export function pickPropsFromResponses(propPicker) {
     return requestContext;
   };
 }
+
+/**
+ * Clears the paging state cache for any keys created for paths to the current depth. The cache keys are derived
+ * from any paths at the current depth.
+ */
+export function clearPagingStateCache() {
+  return requestContext => {
+    let pathValues = requestContext.getPathValues();
+    let pagingStateCache = requestContext.getRouter().pagingStateCache;
+    
+    // Clear keys derived by concating path elements together
+    pathValues.forEach(pv => {
+      let cacheKey = pv.path.join('_');
+      pagingStateCache.clearKey(cacheKey);
+    });
+    
+    return requestContext;
+  };
+};
+
+const EMPTY_LIST_VALUE = R.always('NONE');
+const getPathValues = R.invoker(0, 'getPathValues');
+
+export function createPagingToken(listPath, tokenProps, propPicker) {
+  // responseObj => pathValue => bool
+  const responseListIsEmpty = R.pipe(R.path(listPath), R.isEmpty);
+  
+  // responseObj => [ propVals ]
+  const pickProps = R.juxt(R.map(propPicker, tokenProps));
+  
+  // responseObj => responseList => responseList[0] => [ props ] => strToken
+  const getToken = R.pipe(R.path(listPath), R.head, pickProps, R.join('_'));
+  
+  // Take a RequestContext and return it when finished
+  return R.tap( 
+    // With that request context
+    R.pipe(
+      // Get the path values
+      getPathValues,
+      // Iterate over the path values
+      R.forEach(
+        R.over(R.lensProp('value'), 
+          R.ifElse(
+            responseListIsEmpty,
+            EMPTY_LIST_VALUE,
+            getToken
+          )
+        )
+      )
+    )
+  );
+};

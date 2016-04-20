@@ -4,24 +4,31 @@ import { VIDEO_CATALOG_SERVICE, VideoLocationType } from '../services/video-cata
 import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestamp, enumToInteger } from '../utils/protobuf-conversions';
 import { flattenPathValues, explodePaths, toEmptyPathValue, getRequestPages, EMPTY_LIST_VALUE } from '../utils/falcor-utils';
 import { responsePicker, getPathValuesFromResponse, toAtom, toRef, toArray } from '../utils/falcor-conversions';
-import { pipe, prepend, append } from 'ramda';
+import { pipe, prepend, append, prop, props, path, ifElse, isNil } from 'ramda';
 import { logger } from '../utils/logging';
 import { createGetPipeline } from '../utils/falcor-pipeline';
-import { advanceToDepth, createRequests, doRequests, pickPropsFromResponses } from '../utils/pipeline-functions';
+import { advanceToDepth, createRequests, doRequests, pickPropsFromResponses, clearPagingStateCache, createPagingToken } from '../utils/pipeline-functions';
 
 const pickVideoProp = responsePicker({
-  'author': 'userId',
-  'stats': 'videoId'
-}, {
-  'tags': toAtom,
-  'videoId': uuidToString,
-  'addedDate': timestampToDateString,
-  'locationType': enumToInteger(VideoLocationType),
-  'author': pipe(uuidToString, toArray, prepend('usersById'), toRef),
-  'stats': pipe(uuidToString, toArray, prepend('videosById'), append('stats'), toRef)
+  'tags': pipe(prop('tags'), toAtom),
+  'videoId': pipe(prop('videoId'), uuidToString),
+  'addedDate': pipe(prop('addedDate'), timestampToDateString),
+  'locationType': pipe(prop('locationType'), enumToInteger(VideoLocationType)),
+  'author': pipe(prop('userId'), uuidToString, toArray, prepend('usersById'), toRef),
+  'stats': pipe(prop('videoId'), uuidToString, toArray, prepend('videosById'), append('stats'), toRef)
+});
+
+const pickRecentVideosToken = responsePicker({
+  'recentVideos': (res) => { 
+    return res.videoPreviews.length === 0 
+      ? EMPTY_LIST_VALUE 
+      : `${pickVideoProp('videoId', res.videoPreviews[0])}_${pickVideoProp('addedDate', res.videoPreviews[0])}`; 
+  }
 });
 
 const mapToVideoById = getPathValuesFromResponse(pickVideoProp);
+
+
 
 // All routes supported by the video catalog service
 const routes = [
@@ -39,7 +46,15 @@ const routes = [
   {
     // Reference point for the recent videos list
     route: 'recentVideos',
-    get(pathSet) {
+    get: createGetPipeline(
+      advanceToDepth(0),
+      clearPagingStateCache(),
+      createRequests(() => ({ pageSize: 1 })),
+      doRequests(VIDEO_CATALOG_SERVICE, (client, req) => { return client.getLatestVideoPreviewsAsync(req); }),
+      // pickPropsFromResponses(pickRecentVideosToken)
+      createPagingToken([ 'videoPreviews' ], [ 'videoId', 'addedDate' ], pickVideoProp)
+    )
+    /*(pathSet) {
       // Reset any cached paging state
       this.pagingStateCache.clearKey('recentVideos');
       
@@ -63,7 +78,7 @@ const routes = [
             { path: [ 'recentVideos' ], value: $error() }
           ];
         });
-    }
+    }*/
   },
   {
     // The recent videos list

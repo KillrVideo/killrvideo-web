@@ -3,7 +3,17 @@ import { explodePaths } from './falcor-utils';
 import R from 'ramda';
 
 const aliasedProp = R.curry((keysMap, key, obj) => {
-  return obj[keysMap[key] || key];
+  let keyMap = keysMap[key];
+  switch (typeof keyMap) {
+    case 'undefined':
+      return obj[key];
+    case 'string':
+      return obj[keyMap];
+    case 'function':
+      return keyMap(obj);
+    default:
+      throw new Error(`Unknown keysMap type ${typeof keyMap} for key ${key}`);
+  }
 });
 
 const valueOrConverted = R.curry((valuesMap, key, value) => {
@@ -16,10 +26,15 @@ const valueOrConverted = R.curry((valuesMap, key, value) => {
  * key map to look up values in the object and the specified values map to convert the values
  * found at the key.
  */
-export function responsePicker(keysMap, valuesMap) {
-  const prop = aliasedProp(keysMap);
-  const val = valueOrConverted(valuesMap);
-  return (key, obj) => { return val(key, prop(key, obj)); };
+// (prop, obj) => propVal
+export function responsePicker(theMap) {
+  // If the map has the key passed in, use the function from the map to get the value from the object, otherwise 
+  // just use R.prop to pull the value
+  return R.ifElse(
+    R.has(R.__, theMap),
+    R.converge(R.call, [ R.prop(R.__, theMap), R.nthArg(1) ]),
+    R.prop
+  );
 };
 
 /**

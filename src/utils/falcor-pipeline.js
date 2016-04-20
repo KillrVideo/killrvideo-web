@@ -52,6 +52,16 @@ function executeSteps(steps, requestContext) {
   return requestContext.getPathValues();
 }
 
+function createRequestContext(pathSet, router) {
+  return {
+    pathSet,
+    router,
+    depth: 0,
+    complete: false,
+    result: {}
+  };
+}
+
 /**
  * A RequestContext with methods for manipulating the current state of the request.
  */
