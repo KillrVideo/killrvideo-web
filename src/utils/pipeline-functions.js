@@ -2,7 +2,7 @@ import Promise from 'bluebird';
 import R from 'ramda';
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import { logger } from './logging';
-import { isError } from './falcor-conversions';
+import { isError, isAtom } from './falcor-conversions';
 
 // Helper function for tapping debug logging into a pipeline
 const debugLog = R.tap(x => console.log(x));
@@ -10,27 +10,102 @@ const debugLog = R.tap(x => console.log(x));
 /**
  * Advance the request context to the specified depth.
  */
-export function advanceToDepth(depth) {
-  return requestContext => {
-    requestContext.advanceToDepth(depth);
-    return requestContext;
-  };
-};
+export const advanceToDepth = R.set(R.lensProp('depth'));
+// (depthVal, reqCtx) => reqCtx
+
+const isArrayOfStringsOrNumbers = R.pipe(R.head, R.either(R.is(String), R.is(Number)));
+// ([ obj ]) => bool
+
+const getIndexesFromRanges = R.chain(R.converge(R.range, [ R.prop('from'), R.compose(R.inc, R.prop('to')) ]));
+// ([ { from, to } ]) => [ number ]
+
+const getPathSetValuesAtDepth = R.pipe(R.nth, R.cond([
+  // If a single value, just wrap in an array
+  [R.complement(Array.isArray),   R.of],
+  // If is an array of strings or numbers, just returns array vals as-is
+  [isArrayOfStringsOrNumbers,     R.identity],
+  // Otherwise we have an array of ranges so transform them to indexes
+  [R.T,                           getIndexesFromRanges]
+]));
+// (depth, pathSet) => pathSet[depth] => [ pathSetVals ]
+
+const getPathSetValuesAtCurrentDepth = R.converge(
+  getPathSetValuesAtDepth, [ R.prop('depth'), R.prop('pathSet') ]
+);
+// (reqCtx) => [ pathSetVals ]
+
+// const getNonErrorOrAtomVals = R.filter(R.complement(R.either(isError, isAtom)));
+// ([ vals ]) => [ vals ]
+
+const mapLeaves = R.curryN(2, R.converge(mapPathSetVals, [
+  R.nthArg(0),
+  R.pipe(R.nthArg(1), R.prop('depth')),
+  R.nthArg(1)
+]));
+// (mapperFn, reqCtx) => reqCtx
+
+const valOrProp = R.ifElse(
+  R.pipe(R.nthArg(1), R.is(Object)),
+  R.prop,
+  R.nthArg(1)
+);
+// (prop, objOrVal) => obj[prop] || val 
+
+const convertPathSetVal = R.curryN(3, R.converge(R.call, [
+  R.nthArg(0),
+  R.converge(valOrProp, [ R.nthArg(2), R.nthArg(1) ]),
+  R.nthArg(2)
+]));
+// (mapperFn, parentVal, pathSetVal) => mapperFn(parentValOrProp, psVal) => newVal
+
+const reduceToObjectProps = R.useWith(R.reduce, [
+  (fn) => {
+    return (acc, val) => {
+      acc[val] = fn(val);
+      return acc;
+    };
+  },
+  R.identity,
+  R.identity
+]);
+// (converterFn, obj, pathSetVals) => obj
+
+const mapParentVal = R.ifElse(
+  // If parent val is an error or an atom
+  R.pipe(R.nthArg(2), R.either(isError, isAtom)),
+  // Just return the parent val as-is
+  R.nthArg(2),
+  // Reduce the path set vals to a new object by using mapper funciton provided and the parent's value
+  R.curryN(3, R.converge(reduceToObjectProps, [
+    R.converge(convertPathSetVal, [ R.nthArg(1), R.nthArg(2) ]),
+    () => ({}),
+    R.nthArg(0)
+  ]))
+)
+// (pathSetVals, mapperFn, parentVal) => newParentVal
+
+function mapPathSetVals(mapperFn, depth, reqCtx) {
+  while (depth >= 0) {
+    var psVals = getPathSetValuesAtDepth(depth, reqCtx.pathSet);
+    var m = mapParentVal(psVals, mapperFn);
+    
+    mapperFn = m;
+    depth = depth - 1;
+  }
+  
+  reqCtx.result = mapperFn(reqCtx.result);
+  return reqCtx;
+}
 
 /**
  * Create requests at the leaf nodes of the current depth using the specified mapper function. The mapper function
- * will be passed the path value of the leaf for each leaf and should return an object that can be used as a Grpc
+ * will be passed the pathSet value of the leaf for each leaf and should return an object that can be used as a Grpc
  * service request.
  */
 export function createRequests(mapperFn) {
-  return requestContext => {
-    let depth = requestContext.getDepth();
-    requestContext.getPathValues().forEach(pv => {
-      let leaf = pv.path[depth];
-      pv.value = mapperFn(leaf);
-    });
-    return requestContext;
-  };
+  return mapLeaves((val, psVal) => {
+    return mapperFn(psVal);
+  });
 };
 
 /**
@@ -41,36 +116,30 @@ export function createRequests(mapperFn) {
  */
 export function doRequests(serviceName, requestFn) {
   return requestContext => {
-    let client = requestContext.getRouter().getServiceClient(serviceName);
-    let pathValues = requestContext.getPathValues();
-    let requests = [];
-    for (let i = 0; i < pathValues.length; i++) {
-      let pv = pathValues[i];
-      if (!pv.value) {
-        continue;
-      }
+    let client = requestContext.router.getServiceClient(serviceName);
+    let promises = [];
+    let reqCtx = mapLeaves(val => {
+      if (typeof val !== 'object') return val;
       
-      let promise = requestFn(client, pv.value)
-        .then(response => {
-          // Replace the value with the response if successful
-          pv.value = response;
-        })
+      let promise = requestFn(client, val)
         .catch(err => {
           // Otherwise log error and replace path value with an error object
           logger('error', `Error while calling ${serviceName}`, err);
-          pv.value = $error();
+          return $error();
         });
-      
-      requests.push(promise);
-    }
+      promises.push(promise);
+      return promise;
+    }, requestContext);
     
-    if (requests.length > 0) {
-      return Promise.all(requests).return(requestContext);
-    }
-    
-    return requestContext;
+    return Promise.all(promises).then(() => {
+      return mapLeaves(val => {
+        return val instanceof Promise
+          ? val.value()
+          : val;
+      }, reqCtx);
+    });
   };
-}
+};
 
 /**
  * Picks properties from response objects at the leaf nodes. The current path value of the leaf is assumed to be
@@ -78,71 +147,17 @@ export function doRequests(serviceName, requestFn) {
  */
 export function pickPropsFromResponses(propPicker) {
   return requestContext => {
-    let pathValues = requestContext.getPathValues();
-    let depth = requestContext.getDepth();
-    for (let i = 0; i < pathValues.length; i++) {
-      let pv = pathValues[i];
-      if (isError(pv.value)) {
-        continue;
-      }
-      
-      let propName = pv.path[depth];
-      
-      // Replace the response object with the picked property value
-      pv.value = propPicker(propName, pv.value);
-    }
-    return requestContext;
-  };
-}
-
-/**
- * Clears the paging state cache for any keys created for paths to the current depth. The cache keys are derived
- * from any paths at the current depth.
- */
-export function clearPagingStateCache() {
-  return requestContext => {
-    let pathValues = requestContext.getPathValues();
-    let pagingStateCache = requestContext.getRouter().pagingStateCache;
+    // Assume props we want are at the next depth
+    const propsToPick = getPathSetValuesAtDepth(requestContext.depth + 1, requestContext.pathSet);
     
-    // Clear keys derived by concating path elements together
-    pathValues.forEach(pv => {
-      let cacheKey = pv.path.join('_');
-      pagingStateCache.clearKey(cacheKey);
-    });
-    
-    return requestContext;
+    // Leaves should be response objects, so pick props from those and return a new object
+    return mapLeaves((val, psVal) => {
+      return propsToPick.reduce((acc, prop) => {
+        acc[prop] = propPicker(prop, val);
+        return acc;
+      }, {});
+    }, requestContext);
   };
 };
 
-const EMPTY_LIST_VALUE = R.always('NONE');
-const getPathValues = R.invoker(0, 'getPathValues');
 
-export function createPagingToken(listPath, tokenProps, propPicker) {
-  // responseObj => pathValue => bool
-  const responseListIsEmpty = R.pipe(R.path(listPath), R.isEmpty);
-  
-  // responseObj => [ propVals ]
-  const pickProps = R.juxt(R.map(propPicker, tokenProps));
-  
-  // responseObj => responseList => responseList[0] => [ props ] => strToken
-  const getToken = R.pipe(R.path(listPath), R.head, pickProps, R.join('_'));
-  
-  // Take a RequestContext and return it when finished
-  return R.tap( 
-    // With that request context
-    R.pipe(
-      // Get the path values
-      getPathValues,
-      // Iterate over the path values
-      R.forEach(
-        R.over(R.lensProp('value'), 
-          R.ifElse(
-            responseListIsEmpty,
-            EMPTY_LIST_VALUE,
-            getToken
-          )
-        )
-      )
-    )
-  );
-};

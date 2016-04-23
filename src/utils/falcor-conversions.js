@@ -95,6 +95,6 @@ export function toArray(value) {
  */
 function isSentinel(t) {
   return val => {
-    return val['$type'] === t;
+    return val ? val['$type'] === t : false;
   };
 }

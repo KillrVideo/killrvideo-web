@@ -18,17 +18,7 @@ const pickVideoProp = responsePicker({
   'stats': pipe(prop('videoId'), uuidToString, toArray, prepend('videosById'), append('stats'), toRef)
 });
 
-const pickRecentVideosToken = responsePicker({
-  'recentVideos': (res) => { 
-    return res.videoPreviews.length === 0 
-      ? EMPTY_LIST_VALUE 
-      : `${pickVideoProp('videoId', res.videoPreviews[0])}_${pickVideoProp('addedDate', res.videoPreviews[0])}`; 
-  }
-});
-
 const mapToVideoById = getPathValuesFromResponse(pickVideoProp);
-
-
 
 // All routes supported by the video catalog service
 const routes = [
@@ -39,22 +29,13 @@ const routes = [
       advanceToDepth(1),
       createRequests(videoId => ({ videoId: stringToUuid(videoId) })),
       doRequests(VIDEO_CATALOG_SERVICE, (client, req) => { return client.getVideoAsync(req); }),
-      advanceToDepth(2),
       pickPropsFromResponses(pickVideoProp)
     )
   },
   {
     // Reference point for the recent videos list
     route: 'recentVideos',
-    get: createGetPipeline(
-      advanceToDepth(0),
-      clearPagingStateCache(),
-      createRequests(() => ({ pageSize: 1 })),
-      doRequests(VIDEO_CATALOG_SERVICE, (client, req) => { return client.getLatestVideoPreviewsAsync(req); }),
-      // pickPropsFromResponses(pickRecentVideosToken)
-      createPagingToken([ 'videoPreviews' ], [ 'videoId', 'addedDate' ], pickVideoProp)
-    )
-    /*(pathSet) {
+    get(pathSet) {
       // Reset any cached paging state
       this.pagingStateCache.clearKey('recentVideos');
       
@@ -78,7 +59,7 @@ const routes = [
             { path: [ 'recentVideos' ], value: $error() }
           ];
         });
-    }*/
+    }
   },
   {
     // The recent videos list
