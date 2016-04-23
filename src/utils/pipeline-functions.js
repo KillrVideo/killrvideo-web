@@ -34,16 +34,6 @@ const getPathSetValuesAtCurrentDepth = R.converge(
 );
 // (reqCtx) => [ pathSetVals ]
 
-// const getNonErrorOrAtomVals = R.filter(R.complement(R.either(isError, isAtom)));
-// ([ vals ]) => [ vals ]
-
-const mapLeaves = R.curryN(2, R.converge(mapPathSetVals, [
-  R.nthArg(0),
-  R.pipe(R.nthArg(1), R.prop('depth')),
-  R.nthArg(1)
-]));
-// (mapperFn, reqCtx) => reqCtx
-
 const valOrProp = R.ifElse(
   R.pipe(R.nthArg(1), R.is(Object)),
   R.prop,
@@ -81,32 +71,50 @@ const mapParentVal = R.ifElse(
     () => ({}),
     R.nthArg(0)
   ]))
-)
+);
 // (pathSetVals, mapperFn, parentVal) => newParentVal
 
+/**
+ * Map pathSet values at a specified depth.
+ */
 function mapPathSetVals(mapperFn, depth, reqCtx) {
+  // Work backwards down to the bottom and create a new mapper function for each depth
+  // based on the previous mapper function
   while (depth >= 0) {
     var psVals = getPathSetValuesAtDepth(depth, reqCtx.pathSet);
-    var m = mapParentVal(psVals, mapperFn);
-    
-    mapperFn = m;
+    mapperFn = mapParentVal(psVals, mapperFn);
     depth = depth - 1;
   }
   
+  // Once we've got all the mapper functions, apply them to the current result tree
+  // and set the result to the new tree
   reqCtx.result = mapperFn(reqCtx.result);
   return reqCtx;
 }
+
+/**
+ * Map the leaves at the current depth of the request context using the supplied mapper function. The mapper
+ * function is called with (val, psVal).
+ */
+const mapLeaves = R.curryN(2, R.converge(mapPathSetVals, [
+  R.nthArg(0),
+  R.pipe(R.nthArg(1), R.prop('depth')),
+  R.nthArg(1)
+]));
+// (mapperFn, reqCtx) => reqCtx
 
 /**
  * Create requests at the leaf nodes of the current depth using the specified mapper function. The mapper function
  * will be passed the pathSet value of the leaf for each leaf and should return an object that can be used as a Grpc
  * service request.
  */
-export function createRequests(mapperFn) {
-  return mapLeaves((val, psVal) => {
-    return mapperFn(psVal);
-  });
-};
+export const createRequests = R.useWith(mapLeaves, [
+  // Mapper function supplied expects one arg, the psVal, but mapLeaves will invoke it with (val, psVal), so convert to binary
+  // and flip args to have it invoked with psVal like it expects
+  R.pipe(R.binary, R.flip),
+  R.identity
+]);
+// (mapperFn, reqCtx) => reqCtx
 
 /**
  * Do any requests found at the leaf nodes of the current depth using the specified service name. The requestFn provided
