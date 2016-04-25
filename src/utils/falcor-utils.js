@@ -191,7 +191,9 @@ function* getPathSetValues(pathSet, depthIdx) {
   // See what type we're dealing with in the array by peeking at the first element
   let arrayValType = typeof pathSetVal[0];
   if (arrayValType === 'object' && pathSetVal[0].hasOwnProperty('from')) {
+    // Indicate a range and sort the ranges from low to high
     arrayValType = 'range';
+    pathSetVal = pathSetVal.sort((a, b) => { return a.from - b.from; });
   }
   
   for(let i = 0; i < pathSetVal.length; i++) {

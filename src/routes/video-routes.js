@@ -4,12 +4,12 @@ import { VIDEO_CATALOG_SERVICE, VideoLocationType } from '../services/video-cata
 import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestamp, enumToInteger } from '../utils/protobuf-conversions';
 import { flattenPathValues, explodePaths, toEmptyPathValue, getRequestPages, EMPTY_LIST_VALUE } from '../utils/falcor-utils';
 import { responsePicker, getPathValuesFromResponse, toAtom, toRef, toArray } from '../utils/falcor-conversions';
-import { pipe, prepend, append, prop, props, path, ifElse, isNil } from 'ramda';
+import { pipe, prepend, append, prop } from 'ramda';
 import { logger } from '../utils/logging';
 import { createGetPipeline } from '../utils/falcor-pipeline';
-import { advanceToDepth, createRequests, doRequests, pickPropsFromResponses, clearPagingStateCache, createPagingToken } from '../utils/pipeline-functions';
+import { createRequestsFromPaths, doRequests, mapResponses, zipPathsAndResultsToJsonGraph, clearPagingStateCache, mapResponsesToTokenRefs, createPagedRequestsFromPaths, doPagedRequests } from '../utils/pipeline-functions';
 
-const pickVideoProp = responsePicker({
+const pickVideoProps = responsePicker({
   'tags': pipe(prop('tags'), toAtom),
   'videoId': pipe(prop('videoId'), uuidToString),
   'addedDate': pipe(prop('addedDate'), timestampToDateString),
@@ -18,53 +18,46 @@ const pickVideoProp = responsePicker({
   'stats': pipe(prop('videoId'), uuidToString, toArray, prepend('videosById'), append('stats'), toRef)
 });
 
-const mapToVideoById = getPathValuesFromResponse(pickVideoProp);
-
 // All routes supported by the video catalog service
 const routes = [
   {
     // Basic video catalog data by video Id
     route: 'videosById[{keys:videoIds}]["videoId", "addedDate", "description", "location", "locationType", "name", "tags", "author"]',
     get: createGetPipeline(
-      advanceToDepth(1),
-      createRequests(videoId => ({ videoId: stringToUuid(videoId) })),
-      doRequests(VIDEO_CATALOG_SERVICE, (client, req) => { return client.getVideoAsync(req); }),
-      pickPropsFromResponses(pickVideoProp)
+      createRequestsFromPaths(1, path => ({ videoId: stringToUuid(path[1]) })),
+      doRequests(VIDEO_CATALOG_SERVICE, (req, client) => { return client.getVideoAsync(req); }),
+      mapResponses(2, pickVideoProps),
+      zipPathsAndResultsToJsonGraph(1)
     )
   },
   {
     // Reference point for the recent videos list
     route: 'recentVideos',
-    get(pathSet) {
-      // Reset any cached paging state
-      this.pagingStateCache.clearKey('recentVideos');
-      
-      const videosService = this.getServiceClient(VIDEO_CATALOG_SERVICE);
-      
-      // Figure out the latest video so we can return a reference to a list that's stable for paging
-      return videosService.getLatestVideoPreviewsAsync({ pageSize: 1 })
-        .then(response => {
-          let startingVideoToken = EMPTY_LIST_VALUE;
-          if (response.videoPreviews.length === 1) {
-            // Use video id and added date as token
-            startingVideoToken = `${uuidToString(response.videoPreviews[0].videoId)}_${timestampToDateString(response.videoPreviews[0].addedDate)}`;
-          }
-          return [
-            { path: [ 'recentVideos' ], value: $ref([ 'recentVideosList', startingVideoToken ]) }
-          ];
-        })
-        .catch(err => {
-          logger.log('error', 'Error while getting latest video preview', err);
-          return [
-            { path: [ 'recentVideos' ], value: $error() }
-          ];
-        });
-    }
+    get: createGetPipeline(
+      clearPagingStateCache(0),
+      createRequestsFromPaths(0, path => ({ pageSize: 1 })),
+      doRequests(VIDEO_CATALOG_SERVICE, (req, client) => { return client.getLatestVideoPreviewsAsync(req); }),
+      mapResponsesToTokenRefs(0, 'videoPreviews', [ 'videoId', 'addedDate' ], pickVideoProps),
+      zipPathsAndResultsToJsonGraph(0)
+    )
   },
   {
     // The recent videos list
     route: 'recentVideosList[{keys:startingVideoTokens}][{ranges:indexRanges}]["videoId", "name", "previewImageLocation", "addedDate", "author", "stats"]',
-    get(pathSet) {
+    get: createGetPipeline(
+      createPagedRequestsFromPaths(2, path => {
+        let tokenParts = path[1].split('_');
+        return {
+          startingVideoId: stringToUuid(tokenParts[0]),
+          startingAddedDate: dateStringToTimestamp(tokenParts[1])
+        };
+      }),
+      doPagedRequests(VIDEO_CATALOG_SERVICE, (req, client) => { return client.getLatestVideoPreviewsAsync(req); }, 'videoPreviews'),
+      mapResponses(3, pickVideoProps),
+      zipPathsAndResultsToJsonGraph(2)
+    )
+      
+      /*
       // This should only ever get called with a single starting video token, so do a sanity check
       if (pathSet.startingVideoTokens.length != 1) {
         throw new Error('Requests should only ever have a single starting video token');
@@ -114,7 +107,9 @@ const routes = [
       });
       
       return Promise.all(getPreviewsPromises).then(flattenPathValues);
+      
     }
+    */
   },
   {
     // Reference point for list of videos by author (user) Id
