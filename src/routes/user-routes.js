@@ -1,4 +1,5 @@
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
+import uuid from 'uuid';
 import { USER_MANAGEMENT_SERVICE } from '../services/user-management';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { responsePicker, isError } from '../utils/falcor-conversions';
@@ -40,30 +41,24 @@ const routes = [
     call: createCallPipeline(
       P.createRequestsFromArgs(args => ({ email: args[0], password: args[1] })),
       P.doRequests(USER_MANAGEMENT_SERVICE, (req, client) => client.verifyCredentialsAsync(req)),
-      P.pipeRequestContext(requestContext => {
+      reqCtx => {
         // Log the user in if found
-        let response = requestContext.results[0];
+        let response = reqCtx.results[0];
         if (response.userId) {
           // Set current user id is async to return a Promise that returns the original request context when finished
-          return requestContext.router.setCurrentUserId(uuidToString(response.userId))
-            .return(requestContext);
+          return reqCtx.router.setCurrentUserId(uuidToString(response.userId))
+            .return(reqCtx);
         }
-        return requestContext;
-      }),
-      P.transformResults(results => {
-        let response = results[0];
+        return reqCtx;
+      },
+      P.setResultsBy(reqCtx => {
+        let response = reqCtx.results[0];
         if (isError(response)) {
           return [
-            { path: [ 'currentUser' ], value: $error('Unexpected error. Try again later.') }
+            { path: [ 'currentUser', 'loginErrors' ], value: response }
           ];
         }
-        
-        if (!response.userId) {
-          return [
-            { path: [ 'currentUser', 'loginErrors' ], value: $error('Invalid email address or password') }
-          ];
-        }
-        
+                
         return [
           { path: [ 'currentUser' ], value: $ref([ 'usersById', uuidToString(response.userId) ]) }
         ];
@@ -83,9 +78,37 @@ const routes = [
   {
     // Register a new user
     route: 'currentUser.register',
-    call(callPath, args) {
-      throw new Error('Not implemented');
-    }
+    call: createCallPipeline(
+      P.addArg(uuid.v4()),
+      P.createRequestsFromArgs(args => ({
+        firstName: args[0],
+        lastName: args[1],
+        email: args[2], 
+        password: args[3],
+        userId: stringToUuid(args[4])
+      })),
+      P.doRequests(USER_MANAGEMENT_SERVICE, (req, client) => client.createUserAsync(req)),
+      reqCtx => {
+        let response = reqCtx.results[0];
+        if (!isError(response)) {
+          return reqCtx.router.setCurrentUserId(reqCtx.args[4])
+            .return(reqCtx);
+        }
+        return reqCtx;
+      },
+      P.setResultsBy(reqCtx => {
+        let response = reqCtx.results[0];
+        if (isError(response)) {
+          return [
+            { path: [ 'currentUser', 'registerErrors' ], value: response }
+          ];
+        }
+        
+        return [
+          { path: [ 'currentUser' ], value: $ref([ 'usersById', reqCtx.args[4] ])}
+        ];
+      })
+    )
   }
 ];
 
