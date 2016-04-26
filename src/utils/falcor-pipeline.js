@@ -1,12 +1,9 @@
 import Promise from 'bluebird';
 import { logger } from './logging';
+import { pipeRequestContext } from './pipeline-functions';
 
-function createRequestContext(pathSet, router) {
-  return {
-    pathSet,
-    router,
-    results: null
-  };
+function returnResults(requestContext) {
+  return requestContext.results;
 }
 
 /**
@@ -16,46 +13,28 @@ function createRequestContext(pathSet, router) {
  * the RequestContext will be returned when finished.
  */
 export function createGetPipeline(...steps) {
-  let pipeline = pipeRequestContext(...steps);
+  let pipeline = pipeRequestContext(...steps, returnResults);
   
   return function createRequestContextAndRunPipeline(pathSet) {
-    let requestContext = createRequestContext(pathSet, this);
+    let requestContext = { 
+      pathSet,
+      router: this,
+      results: null
+    };
     return pipeline(requestContext);
-  }
-};
-
-export function pipeRequestContext(...steps) {
-  return function runPipelineSteps(requestContext) {
-    // Start executing steps in order
-    let i = 0;
-    let isPromise = false;
-    while (i < steps.length) {
-      // Run current function
-      requestContext = steps[i](requestContext);
-      i++;
-            
-      // If we got a Promise back, we need to continue piping once it's resolved
-      if (requestContext instanceof Promise) {
-        isPromise = true;
-        break;
-      }
-    }
-    
-    // Did we break for a promise?
-    if (isPromise) {
-      // Once the promise resolves, execute any steps that are left
-      let stepsLeft = i < steps.length ? steps.slice(i) : [];
-      let remainingPipeline = pipeRequestContext(...stepsLeft);
-      
-      return requestContext
-        .then(remainingPipeline)
-        .catch(err => {
-          logger.log('error', 'Error executing pipeline step', err);
-          throw err;
-        });
-    }
-    
-    return requestContext.results;
   };
 };
 
+export function createCallPipeline(...steps) {
+  let pipeline = pipeRequestContext(...steps, returnResults);
+  
+  return function createRequestContextAndRunPipeline(callPath, args) {
+    let requestContext = {
+      pathSet: callPath,
+      args,
+      router: this,
+      results: null
+    };
+    return pipeline(requestContext);
+  };
+}

@@ -205,6 +205,45 @@ function groupPathsIntoPages(paths, pagingStateCache, mapperFn) {
 }
 
 /**
+ * Pipes a request context between step functions. The step functions can return either the requestContext to be
+ * used for the next step, or a Promise that resolves to the requestContext for the next step.
+ */
+export function pipeRequestContext(...steps) {
+  return function runPipelineSteps(requestContext) {
+    // Start executing steps in order
+    let i = 0;
+    let isPromise = false;
+    while (i < steps.length) {
+      // Run current function
+      requestContext = steps[i](requestContext);
+      i++;
+            
+      // If we got a Promise back, we need to continue piping once it's resolved
+      if (requestContext instanceof Promise) {
+        isPromise = true;
+        break;
+      }
+    }
+    
+    // Did we break for a promise?
+    if (isPromise) {
+      // Once the promise resolves, execute any steps that are left
+      let stepsLeft = i < steps.length ? steps.slice(i) : [];
+      let remainingPipeline = pipeRequestContext(...stepsLeft);
+      
+      return requestContext
+        .then(remainingPipeline)
+        .catch(err => {
+          logger.log('error', 'Error executing pipeline step', err);
+          throw err;
+        });
+    }
+    
+    return requestContext;
+  };
+};
+
+/**
  * Create request objects based on paths at a given depth in the pathSet. The mapperFn provided
  * will be called with the path values.
  */
@@ -445,4 +484,20 @@ export function matchResponseListToPaths(depth, responseProp, matchFn) {
     // The second element in responsesByPath will be the new array of responses found for each path
     return setResults(responsesByPath[1], requestContext);
   };
-}
+};
+
+/**
+ * Create request object from the args to a call. The mapperFn will be called with the args and
+ * should return a response object.
+ */
+export function createRequestsFromArgs(mapperFn) {
+  return setResultsBy(R.pipe(R.prop('args'), mapperFn, R.of));
+};
+
+/**
+ * Set the results based on a generic transform function. The resultsFn will be called with the current
+ * value of the results and should return a new value.
+ */
+export function transformResults(resultsFn) {
+  return setResultsBy(R.pipe(R.prop('results'), resultsFn));
+};
