@@ -1,49 +1,21 @@
-import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
-import Promise from 'bluebird';
 import { STATS_SERVICE } from '../services/stats';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
-import { logger } from '../utils/logging';
+import { defaultResponsePicker } from '../utils/falcor-conversions';
+import { createGetPipeline } from '../utils/falcor-pipeline';
+import * as P from '../utils/pipeline-functions';
 
 // Route definitions handled by the statistics service
 const routes = [
   {
     // Number of views for a video by id
-    route: 'videosById[{keys:videoIds}].stats.views',
-    get(pathSet) {
-      // Convert string keys to uuids for protobuf request
-      const videoIds = pathSet.videoIds.map(videoId => stringToUuid(videoId));
-      
-      const statsService = this.getServiceClient(STATS_SERVICE);
-      
-      // Make the request
-      return statsService.getNumberOfPlaysAsync({ videoIds })
-        .then(response => {
-          // Put stats into a map keyed by video id
-          const statsById = new Map();
-          response.stats.forEach(s => {
-            statsById.set(uuidToString(s.videoId), s);
-          });
-          
-          // Get a path value for each video Id
-          return pathSet.videoIds.map(videoId => {
-            // Did we get a stat for that video Id?
-            let stat = statsById.get(videoId);
-            if (!stat) {
-              // Nope, just return an empty atom
-              return { path: [ 'videosById', videoId, 'stats' ], value: $atom() };
-            }
-            
-            // Yup, return the number of views
-            return { path: [ 'videosById', videoId, 'stats', 'views' ], value: stat.views };
-          });
-        })
-        .catch(err => {
-          logger.log('error', 'Error while getting video stats', err);
-          return pathSet.videoIds.map(videoId => {
-            return { path: [ 'videosById', videoId, 'stats' ], value: $error() };
-          });
-        });
-    }
+    route: 'videosById[{keys:videoIds}].stats["views"]',
+    get: createGetPipeline(
+      P.createRequestFromAllPaths(2, allPaths => ({ videoIds: allPaths.map(path => stringToUuid(path[1])) })),
+      P.doRequests(STATS_SERVICE, (req, client) => { return client.getNumberOfPlaysAsync(req); }),
+      P.matchResponseListToPaths(2, 'stats', (path, stat) => path[1] === uuidToString(stat.videoId)),
+      P.mapResponses(3, defaultResponsePicker),
+      P.zipPathsAndResultsToJsonGraph(2)
+    )
   },
   {
     // Record playback on a video

@@ -28,6 +28,11 @@ export function responsePicker(theMap) {
 };
 
 /**
+ * A default response picker instance that just picks properties without mapping them at all.
+ */
+export const defaultResponsePicker = responsePicker({});
+
+/**
  * Wraps a value in an atom.
  */
 export const toAtom = $atom;

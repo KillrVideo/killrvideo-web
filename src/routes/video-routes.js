@@ -3,7 +3,7 @@ import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestam
 import { responsePicker, toAtom, toRef } from '../utils/falcor-conversions';
 import { pipe, prepend, append, prop, of as toArray } from 'ramda';
 import { createGetPipeline } from '../utils/falcor-pipeline';
-import { createRequestsFromPaths, doRequests, mapResponses, zipPathsAndResultsToJsonGraph, clearPagingStateCache, mapResponsesToTokenRefs, createPagedRequestsFromPaths, doPagedRequests } from '../utils/pipeline-functions';
+import * as P from '../utils/pipeline-functions';
 
 const pickVideoProps = responsePicker({
   'tags': pipe(prop('tags'), toAtom),
@@ -20,55 +20,55 @@ const routes = [
     // Basic video catalog data by video Id
     route: 'videosById[{keys:videoIds}]["videoId", "addedDate", "description", "location", "locationType", "name", "tags", "author"]',
     get: createGetPipeline(
-      createRequestsFromPaths(1, path => ({ videoId: stringToUuid(path[1]) })),
-      doRequests(VIDEO_CATALOG_SERVICE, (req, client) => { return client.getVideoAsync(req); }),
-      mapResponses(2, pickVideoProps),
-      zipPathsAndResultsToJsonGraph(1)
+      P.createRequestsFromPaths(1, path => ({ videoId: stringToUuid(path[1]) })),
+      P.doRequests(VIDEO_CATALOG_SERVICE, (req, client) => { return client.getVideoAsync(req); }),
+      P.mapResponses(2, pickVideoProps),
+      P.zipPathsAndResultsToJsonGraph(1)
     )
   },
   {
     // Reference point for the recent videos list
     route: 'recentVideos',
     get: createGetPipeline(
-      clearPagingStateCache(0),
-      createRequestsFromPaths(0, path => ({ pageSize: 1 })),
-      doRequests(VIDEO_CATALOG_SERVICE, (req, client) => { return client.getLatestVideoPreviewsAsync(req); }),
-      mapResponsesToTokenRefs(0, 'videoPreviews', [ 'videoId', 'addedDate' ], pickVideoProps),
-      zipPathsAndResultsToJsonGraph(0)
+      P.clearPagingStateCache(0),
+      P.createRequestsFromPaths(0, path => ({ pageSize: 1 })),
+      P.doRequests(VIDEO_CATALOG_SERVICE, (req, client) => { return client.getLatestVideoPreviewsAsync(req); }),
+      P.mapResponsesToTokenRefs(0, 'videoPreviews', [ 'videoId', 'addedDate' ], pickVideoProps),
+      P.zipPathsAndResultsToJsonGraph(0)
     )
   },
   {
     // The recent videos list
     route: 'recentVideosList[{keys:startingVideoTokens}][{ranges:indexRanges}]["videoId", "name", "previewImageLocation", "addedDate", "author", "stats"]',
     get: createGetPipeline(
-      createPagedRequestsFromPaths(2, path => {
+      P.createPagedRequestsFromPaths(2, path => {
         let tokenParts = path[1].split('_');
         return {
           startingVideoId: stringToUuid(tokenParts[0]),
           startingAddedDate: dateStringToTimestamp(tokenParts[1])
         };
       }),
-      doPagedRequests(VIDEO_CATALOG_SERVICE, (req, client) => { return client.getLatestVideoPreviewsAsync(req); }, 'videoPreviews'),
-      mapResponses(3, pickVideoProps),
-      zipPathsAndResultsToJsonGraph(2)
+      P.doPagedRequests(VIDEO_CATALOG_SERVICE, (req, client) => { return client.getLatestVideoPreviewsAsync(req); }, 'videoPreviews'),
+      P.mapResponses(3, pickVideoProps),
+      P.zipPathsAndResultsToJsonGraph(2)
     )
   },
   {
     // Reference point for list of videos by author (user) Id
     route: 'usersById[{keys:userIds}].videos',
     get: createGetPipeline(
-      clearPagingStateCache(2),
-      createRequestsFromPaths(2, path => ({ pageSize: 1, userId: stringToUuid(path[1]) })),
-      doRequests(VIDEO_CATALOG_SERVICE, (req, client) => { return client.getUserVideoPreviewsAsync(req); }),
-      mapResponsesToTokenRefs(2, 'videoPreviews', [ 'videoId', 'addedDate' ], pickVideoProps),
-      zipPathsAndResultsToJsonGraph(2)
+      P.clearPagingStateCache(2),
+      P.createRequestsFromPaths(2, path => ({ pageSize: 1, userId: stringToUuid(path[1]) })),
+      P.doRequests(VIDEO_CATALOG_SERVICE, (req, client) => { return client.getUserVideoPreviewsAsync(req); }),
+      P.mapResponsesToTokenRefs(2, 'videoPreviews', [ 'videoId', 'addedDate' ], pickVideoProps),
+      P.zipPathsAndResultsToJsonGraph(2)
     )
   },
   {
     // List of videos added by a particular user
     route: 'usersById[{keys:userIds}].videosList[{keys:startingVideoTokens}][{ranges:indexRanges}]["videoId", "name", "previewImageLocation", "addedDate", "author"]',
     get: createGetPipeline(
-      createPagedRequestsFromPaths(4, path => {
+      P.createPagedRequestsFromPaths(4, path => {
         let tokenParts = path[3].split('_');
         return {
           userId: stringToUuid(path[1]),
@@ -76,9 +76,9 @@ const routes = [
           startingAddedDate: dateStringToTimestamp(tokenParts[1])
         };
       }),
-      doPagedRequests(VIDEO_CATALOG_SERVICE, (req, client) => { return client.getUserVideoPreviewsAsync(req); }, 'videoPreviews'),
-      mapResponses(5, pickVideoProps),
-      zipPathsAndResultsToJsonGraph(4)
+      P.doPagedRequests(VIDEO_CATALOG_SERVICE, (req, client) => { return client.getUserVideoPreviewsAsync(req); }, 'videoPreviews'),
+      P.mapResponses(5, pickVideoProps),
+      P.zipPathsAndResultsToJsonGraph(4)
     )
   },
   {

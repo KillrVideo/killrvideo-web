@@ -388,3 +388,61 @@ export function doPagedRequests(serviceName, requestFn, responseProp) {
     });
   };
 };
+
+/**
+ * Create a single request object from all paths at a given depth. The mapperFn will be invoked with all the
+ * paths at the given depth and should return a request object.
+ */
+export function createRequestFromAllPaths(depth, mapperFn) {
+  let getPaths = getPathsAtDepth(depth);
+  return requestContext => {
+    let paths = getPaths(requestContext);
+    let request = mapperFn(paths);
+    return setResults([ request ], requestContext);
+  };
+};
+
+/**
+ * Matches individual items in a list on a response object to paths at the specified depth. The matchFn will
+ * be invoked with (path, listItem) and should return true if that listItem is for the path. The results will
+ * be set to each an array of listItems in the same order as the paths they matched.
+ */
+export function matchResponseListToPaths(depth, responseProp, matchFn) {
+  let getPaths = getPathsAtDepth(depth);
+  let getResponseList = R.prop(responseProp);
+  
+  return requestContext => {
+    let paths = getPaths(requestContext);
+    
+    // Sanity check, we should only have a single response in the results array
+    if (requestContext.results.length !== 1) {
+      throw new Error('Expected a single response');
+    }
+    
+    // See if the response was an error and if so, set the results to an array of errors for each path
+    let response = requestContext.results[0];
+    if (isError(response)) {
+      return setResults(R.repeat(response, paths.length), requestContext);
+    }
+    
+    let allResponses = getResponseList(response);
+    
+    // For each path ...
+    let responsesByPath = R.mapAccum((responses, path) => {
+      // Run the matchFn trying to find a matching response in the responses
+      let responseIdx = R.findIndex(r => matchFn(path, r), responses);
+      
+      // If we don't find one, just use an empty atom as the value for that path
+      if (responseIdx === -1) {
+        return [ responses, $atom() ];
+      }
+      
+      // Remove the response from the responses list (so it doesn't get matched again) and return the
+      // response that matched for this path
+      return [ R.remove(responseIdx, 1, responses), R.nth(responseIdx, responses) ]
+    }, allResponses, paths);
+    
+    // The second element in responsesByPath will be the new array of responses found for each path
+    return setResults(responsesByPath[1], requestContext);
+  };
+}
