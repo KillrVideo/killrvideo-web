@@ -101,7 +101,7 @@ function createToken(responseProp, tokenProps, propPicker) {
   let getResponse = R.prop(responseProp);
   let getToken = R.pipe(propPicker(tokenProps), R.props(tokenProps), R.join('_'));
   
-  return response => {
+  return R.unless(isError, response => {
     // Is response prop an empty list?
     let r = getResponse(response);
     if (R.isEmpty(r)) {
@@ -109,7 +109,7 @@ function createToken(responseProp, tokenProps, propPicker) {
     }
     
     return getToken(r[0]);
-  };
+  });
 }
 
 /**
@@ -289,6 +289,10 @@ export function mapResponsesToTokenRefs(depth, responseProp, tokenProps, propPic
     let paths = getPaths(requestContext);
     let tokens = mapResults(mapperFn, requestContext);
     let tokenRefs = R.zipWith((path, token) => {
+      if (isError(token)) {
+        return token;
+      }
+      
       let listName = `${path[path.length - 1]}List`;
       let listPath = R.append(token, R.append(listName, R.dropLast(1, path)));
       return $ref(listPath);
