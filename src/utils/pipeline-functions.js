@@ -8,7 +8,8 @@ import { explodePaths } from './falcor-utils';
 // Helper function for tapping debug logging into a pipeline
 const debugLog = R.tap(x => console.log(x));
 
-const EMPTY_LIST_VALUE = 'NONE';
+const EMPTY_LIST_VALUE = 'EMPTY';
+const NO_TOKEN_VALUE = 'NONE';
 
 // Common props on the ReqCtx object
 const pathSetProp = R.prop('pathSet');
@@ -154,8 +155,7 @@ function groupPathsIntoPages(paths, pagingStateCache, mapperFn) {
         { request: EMPTY_LIST_VALUE, paths }
       ];
     }
-    
-    
+        
     let pagingStates = pagingStateCache.getKey(pagingStateKey);
     let pagingStateIdx = 0;
     
@@ -205,6 +205,16 @@ function groupPathsIntoPages(paths, pagingStateCache, mapperFn) {
   }, pathsByPagingStateKey);
   
   return R.unnest(R.values(pages));
+}
+
+function createListReference(path, token) {
+  if (isError(token)) {
+    return token;
+  }
+  
+  let listName = `${path[path.length - 1]}List`;
+  let listPath = R.append(token, R.append(listName, R.dropLast(1, path)));
+  return $ref(listPath);
 }
 
 /**
@@ -291,18 +301,18 @@ export function mapResponsesToTokenRefs(depth, responseProp, tokenProps, propPic
   return requestContext => {
     let paths = getPaths(requestContext);
     let tokens = mapResults(mapperFn, requestContext);
-    let tokenRefs = R.zipWith((path, token) => {
-      if (isError(token)) {
-        return token;
-      }
-      
-      let listName = `${path[path.length - 1]}List`;
-      let listPath = R.append(token, R.append(listName, R.dropLast(1, path)));
-      return $ref(listPath);
-    }, paths, tokens);
+    let tokenRefs = R.zipWith(createListReference, paths, tokens);
     return setResults(tokenRefs, requestContext);
   };
 };
+
+/**
+ * Map paths at the given depth to list references with no starting token. Useful for lists that
+ * don't support stable paging and thus don't have a starting token.
+ */
+export function mapPathsToNoTokenRefs(depth) {
+  return setResultsBy(mapPathsAtDepth(depth, path => createListReference(path, NO_TOKEN_VALUE)));
+}
 
 /**
  * Like createRequestsFromPaths, creates request objects. The mapper function is invoked with all
