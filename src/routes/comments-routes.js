@@ -5,12 +5,14 @@ import { pipe, prop, of as toArray, prepend } from 'ramda';
 import { createGetPipeline } from '../utils/falcor-pipeline';
 import * as P from '../utils/pipeline-functions';
 
-const pickCommentProps = responsePicker({
+const commentsMap = {
   'commentId': pipe(prop('commentId'), uuidToString),
   'addedDate': pipe(prop('commentTimestamp'), timestampToDateString),
   'author': pipe(prop('userId'), uuidToString, toArray, prepend('usersById'), toRef),
   'video': pipe(prop('videoId'), uuidToString, toArray, prepend('videosById'), toRef)
-});
+};
+
+const pickCommentProps = responsePicker(commentsMap);
 
 const routes = [
   {
@@ -20,8 +22,7 @@ const routes = [
       P.clearPagingStateCache(2),
       P.createRequestsFromPaths(2, path => ({ pageSize: 1, videoId: stringToUuid(path[1]) })),
       P.doRequests(COMMENTS_SERVICE, (req, client) => { return client.getVideoCommentsAsync(req); }),
-      P.mapResponsesToTokenRefs(2, 'comments', [ 'commentId' ], pickCommentProps),
-      P.zipPathsAndResultsToJsonGraph(2)
+      P.mapResultsToTokenRefs('comments', [ 'commentId' ], pickCommentProps)
     )
   },
   {
@@ -34,9 +35,9 @@ const routes = [
           startingCommentId: stringToUuid(path[3])
         };
       }),
-      P.doPagedRequests(COMMENTS_SERVICE, (req, client) => { return client.getVideoCommentsAsync(req); }, 'comments'),
-      P.mapResponses(5, pickCommentProps),
-      P.zipPathsAndResultsToJsonGraph(4)
+      P.doRequests(COMMENTS_SERVICE, (req, client) => { return client.getVideoCommentsAsync(req); }),
+      // TODO: Pick props
+      P.emptyResults()
     )
   },
   {
@@ -46,8 +47,7 @@ const routes = [
       P.clearPagingStateCache(2),
       P.createRequestsFromPaths(2, path => ({ pageSize: 1, userId: stringToUuid(path[1]) })),
       P.doRequests(COMMENTS_SERVICE, (req, client) => { return client.getUserCommentsAsync(req); }),
-      P.mapResponsesToTokenRefs(2, 'comments', [ 'commentId' ], pickCommentProps),
-      P.zipPathsAndResultsToJsonGraph(2)
+      P.mapResultsToTokenRefs('comments', [ 'commentId' ], pickCommentProps)
     )
   },
   {
@@ -59,9 +59,9 @@ const routes = [
           startingCommentId: stringToUuid(path[3])
         };
       }),
-      P.doPagedRequests(COMMENTS_SERVICE, (req, client) => { return client.getUserCommentsAsync(req); }, 'comments'),
-      P.mapResponses(5, pickCommentProps),
-      P.zipPathsAndResultsToJsonGraph(4)
+      P.doRequests(COMMENTS_SERVICE, (req, client) => { return client.getUserCommentsAsync(req); }),
+      // TODO: Pick props
+      P.emptyResults()
     )
   },
   {

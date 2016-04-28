@@ -5,10 +5,12 @@ import { prop } from 'ramda';
 import { createGetPipeline } from '../utils/falcor-pipeline';
 import * as P from '../utils/pipeline-functions';
 
-const pickRatingsProps = responsePicker({
+const ratingsMap = {
   'count': prop('ratingsCount'),
   'total': prop('ratingsTotal')
-}); 
+};
+
+const pickRatingsProps = responsePicker(ratingsMap);
 
 // Routes handled by the ratings service
 const routes = [
@@ -18,8 +20,7 @@ const routes = [
     get: createGetPipeline(
       P.createRequestsFromPaths(2, path => ({ videoId: stringToUuid(path[1]) })),
       P.doRequests(RATINGS_SERVICE, (req, client) => { return client.getRatingAsync(req); }),
-      P.mapResponses(3, pickRatingsProps),
-      P.zipPathsAndResultsToJsonGraph(2)
+      P.mapProps(3, pickRatingsProps)
     )
   },
   {
@@ -29,8 +30,7 @@ const routes = [
       P.createRequestsFromPaths(3, path => ({ videoId: stringToUuid(path[3]), userId: stringToUuid(path[1]) })),
       // TODO: Only allowed to see your own ratings
       P.doRequests(RATINGS_SERVICE, (req, client) => { return client.getUserRatingAsync(req); }),
-      P.mapResponses(4, defaultResponsePicker),
-      P.zipPathsAndResultsToJsonGraph(3)
+      P.mapProps(4, defaultResponsePicker)
     )
   },
   {

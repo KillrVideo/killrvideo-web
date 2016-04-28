@@ -3,13 +3,15 @@ import uuid from 'uuid';
 import { USER_MANAGEMENT_SERVICE } from '../services/user-management';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { responsePicker, isError } from '../utils/falcor-conversions';
-import { pipe, prop, tap } from 'ramda';
+import { pipe, prop, tap, always } from 'ramda';
 import { createGetPipeline, createCallPipeline } from '../utils/falcor-pipeline';
 import * as P from '../utils/pipeline-functions';
 
-const pickUserProps = responsePicker({
+const userMap = {
   'userId': pipe(prop('userId'), uuidToString)
-});
+};
+
+const pickUserProps = responsePicker(userMap);
 
 // List of routes supported by the user management service
 const routes = [
@@ -28,11 +30,10 @@ const routes = [
     // Lookup users by their unique id
     route: 'usersById[{keys:userIds}]["userId", "firstName", "lastName", "email"]',
     get: createGetPipeline(
-      P.createRequestFromAllPaths(1, allPaths => ({ userIds: allPaths.map(path => stringToUuid(path[1])) })),
+      P.createBatchRequestsFromPaths(1, always('usersById'), paths => ({ userIds: paths.map(path => stringToUuid(path[1])) })),
       P.doRequests(USER_MANAGEMENT_SERVICE, (req, client) => { return client.getUserProfileAsync(req); }),
-      P.matchResponseListToPaths(1, 'profiles', (path, profile) => path[1] === uuidToString(profile.userId)),
-      P.mapResponses(2, pickUserProps),
-      P.zipPathsAndResultsToJsonGraph(1)
+      P.matchBatchResponsesToPaths('profiles', (path, profile) => path[1] === uuidToString(profile.userId)),
+      P.mapProps(2, pickUserProps)
     )
   },
   {

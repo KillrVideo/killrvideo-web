@@ -19,8 +19,7 @@ const routes = [
     route: 'videosById[{keys:videoIds}].relatedVideos',
     get: createGetPipeline(
       P.clearPagingStateCache(2),
-      P.mapPathsToNoTokenRefs(2),
-      P.zipPathsAndResultsToJsonGraph(2)
+      P.mapPathsToNoTokenRefs(2)
     )
   },
   {
@@ -28,9 +27,9 @@ const routes = [
     route: 'videosById[{keys:videoIds}].relatedVideosList[{keys:startingTokens}][{ranges:indexRanges}]["videoId", "addedDate", "name", "previewImageLocation", "author", "stats"]',
     get: createGetPipeline(
       P.createPagedRequestsFromPaths(4, path => ({ videoId: stringToUuid(path[1]) })),
-      P.doPagedRequests(SUGGESTED_VIDEO_SERVICE, (req, client) => { return client.getRelatedVideosAsync(req); }, 'videos'),
-      P.mapResponses(5, pickVideoProps),
-      P.zipPathsAndResultsToJsonGraph(4)
+      P.doRequests(SUGGESTED_VIDEO_SERVICE, (req, client) => { return client.getRelatedVideosAsync(req); }),
+      // TODO: Map props
+      P.emptyResults()
     )
   },
   {
@@ -38,8 +37,7 @@ const routes = [
     route: 'usersById[{keys:userIds}].recommendedVideos',
     get: createGetPipeline(
       P.clearPagingStateCache(2),
-      P.mapPathsToNoTokenRefs(2),
-      P.zipPathsAndResultsToJsonGraph(2)
+      P.mapPathsToNoTokenRefs(2)
     )
   },
   {
@@ -47,9 +45,9 @@ const routes = [
     route: 'usersById[{keys:userIds}].recommendedVideosList[{keys:startingTokens}][{ranges:indexRanges}]["videoId", "addedDate", "name", "previewImageLocation", "author", "stats"]',
     get: createGetPipeline(
       P.createPagedRequestsFromPaths(4, path => ({ userId: stringToUuid(path[1]) })),
-      P.doPagedRequests(SUGGESTED_VIDEO_SERVICE, (req, client) => { return client.getSuggestedForUserAsync(req); }, 'videos'),
-      P.mapResponses(5, pickVideoProps),
-      P.zipPathsAndResultsToJsonGraph(4)
+      P.doRequests(SUGGESTED_VIDEO_SERVICE, (req, client) => { return client.getSuggestedForUserAsync(req); }),
+      // TODO: Map props
+      P.emptyResults()
     )
   }
 ];

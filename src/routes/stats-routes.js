@@ -1,6 +1,7 @@
 import { STATS_SERVICE } from '../services/stats';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { defaultResponsePicker } from '../utils/falcor-conversions';
+import { always } from 'ramda';
 import { createGetPipeline } from '../utils/falcor-pipeline';
 import * as P from '../utils/pipeline-functions';
 
@@ -10,11 +11,10 @@ const routes = [
     // Number of views for a video by id
     route: 'videosById[{keys:videoIds}].stats["views"]',
     get: createGetPipeline(
-      P.createRequestFromAllPaths(2, allPaths => ({ videoIds: allPaths.map(path => stringToUuid(path[1])) })),
+      P.createBatchRequestsFromPaths(2, always('videosById'), paths => ({ videoIds: paths.map(p => stringToUuid(p[1])) })),
       P.doRequests(STATS_SERVICE, (req, client) => { return client.getNumberOfPlaysAsync(req); }),
-      P.matchResponseListToPaths(2, 'stats', (path, stat) => path[1] === uuidToString(stat.videoId)),
-      P.mapResponses(3, defaultResponsePicker),
-      P.zipPathsAndResultsToJsonGraph(2)
+      P.matchBatchResponsesToPaths('stats', (path, stat) => path[1] === uuidToString(stat.videoId)),
+      P.mapProps(3, defaultResponsePicker)
     )
   },
   {

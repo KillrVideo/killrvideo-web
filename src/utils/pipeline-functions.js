@@ -2,11 +2,17 @@ import Promise from 'bluebird';
 import R from 'ramda';
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import { logger } from './logging';
-import { isError, isAtom } from './falcor-conversions';
-import { explodePaths } from './falcor-utils';
+import { isError, isAtom, toRef } from './falcor-conversions';
 
 // Helper function for tapping debug logging into a pipeline
-const debugLog = R.tap(x => console.log(x));
+const debugLog = R.tap(x => {
+  console.log(x);
+});
+
+export const debugLogRequestContext = R.tap(reqCtx => {
+  let { pathSet, results, errors } = reqCtx;
+  console.log('%j', { pathSet, results, errors });
+});
 
 const EMPTY_LIST_VALUE = 'EMPTY';
 const NO_TOKEN_VALUE = 'NONE';
@@ -14,9 +20,14 @@ const NO_TOKEN_VALUE = 'NONE';
 // Common props on the ReqCtx object
 const pathSetProp = R.prop('pathSet');
 const resultsProp = R.prop('results');
+const errorsProp = R.prop('errors');
 
 // Set the results on a ReqCtx to a value
 const setResults = R.set(R.lensProp('results'));
+// a -> ReqCtx r -> ReqCtx r2
+
+// Set the erros on a ReqCtx to a value
+const setErrors = R.set(R.lensProp('errors'));
 // a -> ReqCtx r -> ReqCtx r2
 
 /**
@@ -29,13 +40,18 @@ export const setResultsBy = R.curryN(2, R.converge(setResults, [
 ]));
 // (ReqCtx r -> resultValue) -> ReqCtx r -> ReqCtx r2
 
+export const setErrorsBy = R.curryN(2, R.converge(setErrors, [
+  R.call,
+  R.nthArg(1)
+]));
+
 const isArrayOfStringsOrNumbers = R.pipe(R.head, R.either(R.is(String), R.is(Number)));
 // ([ obj ]) => bool
 
 const getIndexesFromRanges = R.chain(R.converge(R.range, [ R.prop('from'), R.compose(R.inc, R.prop('to')) ]));
 // ([ { from, to } ]) => [ number ]
 
-const getPathSetValuesAtDepth = R.pipe(R.nth, R.cond([
+export const getPathSetValuesAtDepth = R.pipe(R.nth, R.cond([
   // If a single value, just wrap in an array
   [R.complement(Array.isArray),   R.of],
   // If is an array of strings or numbers, just returns array vals as-is
@@ -44,27 +60,6 @@ const getPathSetValuesAtDepth = R.pipe(R.nth, R.cond([
   [R.T,                           getIndexesFromRanges]
 ]));
 // (depth, pathSet) => pathSet[depth] => [ pathSetVals ]
-
-const getPathsAtDepth = R.useWith(R.flip(explodePaths), [
-  R.identity,
-  pathSetProp
-]);
-// int depth -> ReqCtx r -> [ paths ]
-
-function mapPathsAtDepth(depth, mapperFn) {
-  let map = R.map(mapperFn);
-  let getPaths = getPathsAtDepth(depth);
-  return requestContext => {
-    return map(getPaths(requestContext));
-  };
-}
-// (int depth, (Path p -> a)) -> (ReqCtx r -> [ a ])
-
-const mapResults = R.useWith(R.map, [
-  R.identity,
-  resultsProp
-]);
-// (a -> b) -> ReqCtx r -> [ b ]
 
 const getServiceClient = R.curry(function getServiceClient(serviceName, reqCtx) {
   return reqCtx.router.getServiceClient(serviceName);
@@ -87,143 +82,247 @@ function handleRequestErrors(requestPromise) {
   });
 }
 
-function toJsonGraph(paths, results) {
-  return paths.reduce((acc, path, idx) => {
-    return R.set(R.lensPath(path), results[idx], acc);
-  }, {});
-}
-
-function getPagingStateCache(reqCtx) {
-  return reqCtx.router.pagingStateCache;
-}
-
 function getPagingStateCacheKey(path) {
   return path.join('_');
 }
 
-function createToken(responseProp, tokenProps, propPicker) {
-  let getResponse = R.prop(responseProp);
-  let getToken = R.pipe(propPicker(tokenProps), R.props(tokenProps), R.join('_'));
-  
-  return R.unless(isError, response => {
-    // Is response prop an empty list?
-    let r = getResponse(response);
-    if (R.isEmpty(r)) {
-      return EMPTY_LIST_VALUE;
-    }
-    
-    return getToken(r[0]);
+const appendToPath = R.curry(function appendToPath(valueFn, pathSetVals, pathAndValue) {
+  return pathSetVals.map(psv => {
+    let path = R.append(psv, pathAndValue.path);
+    let value = valueFn(pathAndValue.value, path);
+    return { path, value };
   });
+});
+
+const expandPath = R.curry(function expandPath(depth, valueFn, pathSet, pathAndValue) {
+  let curDepth = pathAndValue.path.length - 1;
+  if (curDepth > depth) {
+    throw new Error(`Path is already expanded beyond depth ${depth}`);
+  }
+  
+  let pathAndValues = R.of(pathAndValue);
+  while (curDepth < depth) {
+    let appendPathSetVals = appendToPath(valueFn, getPathSetValuesAtDepth(curDepth + 1, pathSet));
+    pathAndValues = R.chain(appendPathSetVals, pathAndValues);
+    curDepth++;
+  }
+  
+  return pathAndValues;
+});
+
+const expandPaths = R.curry(function expandPaths(depth, valueFn, pathSet, pathAndValues) {
+  return R.chain(expandPath(depth, valueFn, pathSet), pathAndValues);
+});
+
+const valueIsError = R.pipe(R.prop('value'), isError);
+
+/**
+ * Expand the results to the specified depth by copying any values from parents to their children.
+ */
+function expandResults(depth) {
+  let expand = expandPaths(depth, R.identity);
+  return setResultsBy(
+    R.converge(expand, [ pathSetProp, resultsProp ])
+  );
 }
 
 /**
- * Returns a list of pages from the given paths with indexes. A page looks like:
- *  {
- *    request: Obj,
-      startingIndex: Int,
-      pagingState: Str,
-      paths: [],
-      savePagingStateToKey: Str
- *  }
+ * Map over the results and set a new value property on each PathAndValue by invoking the mapper function with
+ * the current PathAndValue.
  */
-function groupPathsIntoPages(paths, pagingStateCache, mapperFn) {
-  // A path should be [ ...pagingStatePath, startingToken, index ]
-  let fullLength = paths[0].length;
-    
-  // Group paths by the paging state cache key for the path
-  let pathsByPagingStateKey = R.groupBy(path => {
-    // The path to generate the paging state key should be everything before the starting token and index
-    let pagingStatePath = R.take(fullLength - 2, path);
-    return getPagingStateCacheKey(pagingStatePath);
-  }, paths);
-  
-  let startingTokenIdx = fullLength - 2;
-  let indexIdx = fullLength - 1;
-  
-  // Map each paging state key's paths to pages
-  let pages = R.mapObjIndexed((paths, pagingStateKey) => {
-    // Make sure there is only one starting token for each list
-    let startingTokens = R.uniqBy(R.nth(startingTokenIdx), paths);
-    if (startingTokens.length !== 1) {
-      throw new Error('Each list should only ever have one unique starting token');
-    }
-    
-    // Get the starting token and if an empty list value, bail early
-    let startingToken = startingTokens[0];
-    if (startingToken === EMPTY_LIST_VALUE) {
-      return [
-        { request: EMPTY_LIST_VALUE, paths }
-      ];
-    }
-        
-    let pagingStates = pagingStateCache.getKey(pagingStateKey);
-    let pagingStateIdx = 0;
-    
-    let pages = [];
-    let newPage = true;
-    
-    // Loop through the paths and group them into page objects
-    for (let i = 0; i < paths.length; i++) {
-      // Get path and the index that should be the last element of the path
-      let path = paths[i];
-      let index = path[indexIdx];
-      
-      // Find the appropriate paging state for that index
-      while (pagingStateIdx < pagingStates.length - 1 && index >= pagingStates[pagingStateIdx + 1].startingIndex) {
-        pagingStateIdx++;
-        newPage = true;
-      }
-      
-      // Create the page object if necessary
-      if (newPage) {
-        // Create a request object and add some paging info to it
-        let request = mapperFn(R.take(fullLength - 1, path));
-        
-        let { startingIndex, pagingState } = pagingStates[pagingStateIdx];
-        let page = {
-          request,
-          startingIndex,
-          pagingState,
-          paths: []
-        };
-        
-        // We want to save the paging state from the response if this is the last paging state
-        // we know about
-        if (pagingStateIdx === pagingStates.length - 1) {
-          page.savePagingStateToKey = pagingStateKey;
-        }
-        
-        pages.push(page);
-      }
-      
-      // Add the path to the current page
-      pages[pages.length - 1].paths.push(path);
-      newPage = false;
-    }
-    
-    return pages;
-  }, pathsByPagingStateKey);
-  
-  return R.unnest(R.values(pages));
+function mapResults(mapperFn) {
+  mapperFn = R.converge(R.set(R.lensProp('value')), [ mapperFn, R.identity ]);
+  let map = R.map(mapperFn);
+  return setResultsBy(R.pipe(resultsProp, map));
 }
 
-function createListReference(path, token) {
-  if (isError(token)) {
-    return token;
+/**
+ * Groups results according to the groupFn, then maps over the resulting groups invoking the mapperFn to generate
+ * a value for a new PathAndValue where the path is set to the array of all paths in the group. The groupFn is
+ * invoked with a PathAndValue. The mapperFn is invoked with all the paths for a group and the groupName.
+ */
+function groupResults(groupFn, mapperFn) {
+  let group = R.groupBy(groupFn);
+  let map = R.mapObjIndexed((pathAndValues, groupName) => {
+    let paths = R.pluck('path', pathAndValues);
+    return {
+      path: paths,
+      value: mapperFn(paths, groupName)
+    };
+  });
+  return setResultsBy(R.pipe(resultsProp, group, map, R.values));
+}
+
+const getPagingCacheKeyForIndexPath = R.pipe(R.dropLast(2), getPagingStateCacheKey);
+
+function getGroupByPageGroupFn() {
+  return requestContext => {
+    let pagingStateCache = requestContext.router.pagingStateCache;
+    return function groupByPage(pathAndValue) {
+      let cacheKey = getPagingCacheKeyForIndexPath(pathAndValue.path);
+      let index = R.last(pathAndValue.path);
+      
+      let pagingStates = pagingStateCache.getKey(cacheKey);
+      let pagingStateIdx = R.findLastIndex(ps => ps.startingIndex <= index, pagingStates);
+      return `${cacheKey}_${pagingStateIdx}`;
+    };
+  };
+}
+
+function getGroupByPageMapFn(mapperFn) {
+  return requestContext => {
+    let pagingStateCache = requestContext.router.pagingStateCache;
+    return function mapByPage(paths, groupName) {
+      let [ cacheKey, pagingStateIdx ] = groupName.split('_');
+      let pagingState = pagingStateCache.getKey(cacheKey)[pagingStateIdx];
+      let lastIndex = R.last(R.map(R.last, paths));
+      
+      let path = R.dropLast(1, R.head(paths));
+      let request = mapperFn(path, groupName);
+      request.pagingState = pagingState.pagingState;
+      request.pageSize = lastIndex - pagingState.startingIndex + 1;
+      return request;
+    };
   }
+}
+
+function ungroupResults(responseProp, matchFn) {
+  let getResponseList = R.prop(responseProp);
   
-  let listName = `${path[path.length - 1]}List`;
-  let listPath = R.append(token, R.append(listName, R.dropLast(1, path)));
-  return $ref(listPath);
+  let mapResponseListToPaths = R.pipe(R.mapAccum((responses, path) => {
+    // Find the response in the list of responses that matches
+    let responseIdx = R.findIndex(r => matchFn(path, r), responses);
+    
+    // Didn't find one? Just return an empty atom as the value
+    if (responseIdx === -1) {
+      return [ responses, { path, value: $atom() } ];
+    }
+    
+    // Remove the response from the responses array since we matched it and return the appropriate 
+    // pathAndValue for the path
+    return [
+      R.remove(responseIdx, 1, responses),
+      { path, value: R.nth(responseIdx, responses) }
+    ];
+  }), R.nth(1));
+  
+  let map = R.map(pathAndValue => {
+    // The value of pathAndValue will be a single response object with a list/array at the response prop
+    let responseList = getResponseList(pathAndValue.value);
+    
+    // Just propogate errors
+    if (isError(responseList)) {
+      return pathAndValue.paths.map(path => ({ path, value: responseList }));
+    }
+    
+    // Map all the paths in pathAndvalue.path to responses in the response list
+    return mapResponseListToPaths(responseList, pathAndValue.path);
+  });
+  return setResultsBy(R.pipe(resultsProp, map, R.unnest));
+}
+
+function waitForAllRequests() {
+  return requestContext => {
+    let promises = R.pluck('value', requestContext.results);
+    let paths = R.pluck('path', requestContext.results);
+    
+    return Promise.all(promises).then(responses => {
+      let results = R.zipWith((path, value) => ({ path, value }), paths, responses);
+      return setResults(results, requestContext);
+    });
+  };
+}
+
+const getPropsWithPropPicker = R.curry(function getPropsWithPropPicker(propPicker, props, obj) {
+  let mapperFn = propPicker(R.__, obj);
+  return R.map(mapperFn, props);
+});
+
+// Return a function that takes a pathAndValue and creates a token from it
+function createToken(responseProp, tokenProps, propPicker) {
+  let getResponse = R.path([ 'value', responseProp ]);
+  return R.ifElse(
+    R.pipe(getResponse, R.isEmpty),
+    R.always(EMPTY_LIST_VALUE),
+    R.pipe(getResponse, R.head, getPropsWithPropPicker(propPicker, tokenProps), R.join('_'))
+  );
+}
+
+// Return a function that can create a token ref from a pathAndValue
+function createTokenRef(tokenFn) {
+  let getRefPath = R.converge(R.append, [
+    R.pipe(R.prop('path'), R.last, pv => pv += 'List'),
+    R.pipe(R.prop('path'), R.dropLast(1))
+  ]);
+  
+  return R.pipe(
+    R.converge(R.append, [ tokenFn, getRefPath ]),
+    toRef
+  );
+}
+
+// Return a function that takes a request context and moves error values in the results collection to the errors collection
+function moveErrors() {
+  // (reqCtx) -> [ [ errors ], [ results ] ]
+  let partitionResultsByError = R.pipe(resultsProp, R.partition(valueIsError));
+  
+  // (reqCtx) -> [ errors ]
+  let concatErrors = R.converge(R.concat, [ errorsProp, R.compose(R.nth(0), resultsProp) ]);
+  
+  // (reqCtx) -> [ results ]
+  let pickResults = R.pipe(resultsProp, R.nth(1));
+  
+  return pipeRequestContext(
+    setResultsBy(partitionResultsByError),
+    setErrorsBy(concatErrors),
+    setResultsBy(pickResults)
+  );
+}
+
+function createRequests(depth, requestsFn) {
+  return pipeRequestContext(
+    expandResults(depth),
+    requestsFn
+  );
+}
+
+function mapPathValuesToRequestPromises(serviceName, requestFn) {
+    // reqFn = ((req, client) -> Promise)
+  requestFn = R.pipe(R.useWith(requestFn, [ R.prop('value'), R.identity ]), handleRequestErrors);
+  return R.converge(R.call, [
+    R.pipe(addServiceClientToMapperFn(serviceName, requestFn), mapResults), 
+    R.identity
+  ]);
 }
 
 /**
  * Create request objects based on paths at a given depth in the pathSet. The mapperFn provided
- * will be called with the path values.
+ * will be called with each individual path value.
  */
 export function createRequestsFromPaths(depth, mapperFn) {
-  return setResultsBy(mapPathsAtDepth(depth, mapperFn));
+  mapperFn = R.pipe(R.prop('path'), mapperFn);
+  return createRequests(depth, mapResults(mapperFn));
 };
+
+/**
+ * Create request objects by grouping the paths first using the groupByFn, then using the mapperFn
+ * to create requests for the group of paths. The mapper fn will be called with an array of path
+ * values.
+ */
+export function createBatchRequestsFromPaths(depth, groupByFn, mapperFn) {
+  return createRequests(depth, groupResults(groupByFn, mapperFn));
+};
+
+export function createPagedRequestsFromPaths(indexDepth, mapperFn) {
+  return createRequests(indexDepth, R.converge(R.call, [
+    R.converge(groupResults, [ getGroupByPageGroupFn(), getGroupByPageMapFn(mapperFn) ]),
+    R.identity
+  ]));
+};
+
+export function emptyResults() {
+  return setResults([]);
+}
 
 /**
  * Take all request objects in the current results and do them by invoking the requestFn. The
@@ -231,44 +330,29 @@ export function createRequestsFromPaths(depth, mapperFn) {
  * specified service.
  */
 export function doRequests(serviceName, requestFn) {
-  let getMapperFn = addServiceClientToMapperFn(serviceName, requestFn);
-  
-  return requestContext => {
-    // Mapper fn will be invoked with (req, client)
-    let mapperFn = R.pipe(getMapperFn(requestContext), handleRequestErrors);
-    
-    // Run mapper function with request objects from the results property
-    let promises = mapResults(mapperFn, requestContext);
-    
-    // Set results to response values once all promises have completed
-    return Promise.all(promises).then(responses => {
-      return setResults(responses, requestContext);
-    });
-  };
+  return pipeRequestContext(
+    mapPathValuesToRequestPromises(serviceName, requestFn),
+    waitForAllRequests()
+  );
 };
 
 /**
- * Maps responses found in the results by picking the props at the propDepth specified in the pathSet. Creates 
+ * Maps responses in the results by picking the props at the propDepth specified in the pathSet. Creates 
  * new result objects by picking the props using the propPicker.
  */
-export function mapResponses(propDepth, propPicker) {
-  return requestContext => {
-    let props = getPathSetValuesAtDepth(propDepth, requestContext.pathSet);
-    let mapperFn = R.unless(isAtom, propPicker(props));
-    return setResultsBy(mapResults(mapperFn), requestContext);
+export function mapProps(propDepth, propPicker) {
+  let valueFn = (value, path) => {
+    let prop = path[path.length - 1];
+    return propPicker(prop, value);
   };
-};
-
-/**
- * Zips all the paths at the depth specified with the results and returns a new JSON graph result.
- */
-export function zipPathsAndResultsToJsonGraph(depth) {
-  let getPaths = getPathsAtDepth(depth);
-  return requestContext => {
-    let paths = getPaths(requestContext);
-    let results = requestContext.results;
-    return setResults({ jsonGraph: toJsonGraph(paths, results) }, requestContext);
-  };
+  let expandResults = expandPaths(propDepth, valueFn);
+  let expandErrors = expandPaths(propDepth, R.identity);
+  
+  return pipeRequestContext(
+    moveErrors(),
+    setResultsBy(R.converge(expandResults, [ pathSetProp, resultsProp ])),
+    setErrorsBy(R.converge(expandErrors, [ pathSetProp, errorsProp ]))
+  );
 };
 
 /**
@@ -276,17 +360,15 @@ export function zipPathsAndResultsToJsonGraph(depth) {
  * performs a side-effect).
  */
 export function clearPagingStateCache(depth) {
-  let getPaths = getPathsAtDepth(depth);
-  return requestContext => {
-    let cache = getPagingStateCache(requestContext);
-    let paths = getPaths(requestContext);
-    paths.forEach(path => {
-      // Append list to the key generated from the path since the path for the refs generated to lists will add the 'List' suffix 
-      let key = `${getPagingStateCacheKey(path)}List`;
-      cache.clearKey(key);
-    });
-    return requestContext;
-  };
+  return pipeRequestContext(
+    expandResults(depth),
+    R.tap(
+      R.converge(R.forEach, [
+        reqCtx => reqCtx.router.pagingStateCache.clearKey.bind(reqCtx.router.pagingStateCache),
+        R.pipe(resultsProp, R.map(R.pipe(R.prop('path'), getPagingStateCacheKey, key => key += 'List')))
+      ])
+    )
+  )
 };
 
 /**
@@ -295,15 +377,9 @@ export function clearPagingStateCache(depth) {
  * on the results for a response list with a single value, and then picking the token props specified 
  * from that response using the propPicker.
  */
-export function mapResponsesToTokenRefs(depth, responseProp, tokenProps, propPicker) {
-  let getPaths = getPathsAtDepth(depth);
-  let mapperFn = createToken(responseProp, tokenProps, propPicker);
-  return requestContext => {
-    let paths = getPaths(requestContext);
-    let tokens = mapResults(mapperFn, requestContext);
-    let tokenRefs = R.zipWith(createListReference, paths, tokens);
-    return setResults(tokenRefs, requestContext);
-  };
+export function mapResultsToTokenRefs(responseProp, tokenProps, propPicker) {
+  let mapperFn = createTokenRef(createToken(responseProp, tokenProps, propPicker));
+  return mapResults(mapperFn);
 };
 
 /**
@@ -311,25 +387,26 @@ export function mapResponsesToTokenRefs(depth, responseProp, tokenProps, propPic
  * don't support stable paging and thus don't have a starting token.
  */
 export function mapPathsToNoTokenRefs(depth) {
-  return setResultsBy(mapPathsAtDepth(depth, path => createListReference(path, NO_TOKEN_VALUE)));
-}
+  let mapperFn = createTokenRef(R.always(NO_TOKEN_VALUE));
+  return pipeRequestContext(
+    expandResults(depth),
+    mapResults(mapperFn)
+  );
+};
 
 /**
- * Like createRequestsFromPaths, creates request objects. The mapper function is invoked with all
- * paths at indexDepth - 1 and should create request objects which paging information can then
- * be added to. The requests are then placed in the results.
+ * Matches individual list items in a batch response object to paths. The matchFn will
+ * be invoked with (path, listItem) and should return true if that listItem is for the path. 
  */
-export function createPagedRequestsFromPaths(indexDepth, mapperFn) {
-  let getPaths = getPathsAtDepth(indexDepth);
-    
-  return requestContext => {
-    let paths = getPaths(requestContext);
-    let pagingStateCache = getPagingStateCache(requestContext);
-    
-    let pages = groupPathsIntoPages(paths, pagingStateCache, mapperFn);
-    return setResults(pages, requestContext);
-  };
+export function matchBatchResponsesToPaths(responseProp, matchFn) {
+  return ungroupResults(responseProp, matchFn);
 };
+
+
+/**
+ * *****************************************************************************************************************************
+ * OLD BELOW
+ */
 
 /**
  * Like doRequests, executes service requests that are paged and were created using the createPagedRequestsFromPaths
@@ -403,77 +480,63 @@ export function doPagedRequests(serviceName, requestFn, responseProp) {
 };
 
 /**
- * Create a single request object from all paths at a given depth. The mapperFn will be invoked with all the
- * paths at the given depth and should return a request object.
- */
-export function createRequestFromAllPaths(depth, mapperFn) {
-  let getPaths = getPathsAtDepth(depth);
-  return requestContext => {
-    let paths = getPaths(requestContext);
-    let request = mapperFn(paths);
-    return setResults([ request ], requestContext);
-  };
-};
-
-/**
- * Matches individual items in a list on a response object to paths at the specified depth. The matchFn will
- * be invoked with (path, listItem) and should return true if that listItem is for the path. The results will
- * be set to each an array of listItems in the same order as the paths they matched.
- */
-export function matchResponseListToPaths(depth, responseProp, matchFn) {
-  let getPaths = getPathsAtDepth(depth);
-  let getResponseList = R.prop(responseProp);
-  
-  return requestContext => {
-    let paths = getPaths(requestContext);
-    
-    // Sanity check, we should only have a single response in the results array
-    if (requestContext.results.length !== 1) {
-      throw new Error('Expected a single response');
-    }
-    
-    // See if the response was an error and if so, set the results to an array of errors for each path
-    let response = requestContext.results[0];
-    if (isError(response)) {
-      return setResults(R.repeat(response, paths.length), requestContext);
-    }
-    
-    let allResponses = getResponseList(response);
-    
-    // For each path ...
-    let responsesByPath = R.mapAccum((responses, path) => {
-      // Run the matchFn trying to find a matching response in the responses
-      let responseIdx = R.findIndex(r => matchFn(path, r), responses);
-      
-      // If we don't find one, just use an empty atom as the value for that path
-      if (responseIdx === -1) {
-        return [ responses, $atom() ];
-      }
-      
-      // Remove the response from the responses list (so it doesn't get matched again) and return the
-      // response that matched for this path
-      return [ R.remove(responseIdx, 1, responses), R.nth(responseIdx, responses) ]
-    }, allResponses, paths);
-    
-    // The second element in responsesByPath will be the new array of responses found for each path
-    return setResults(responsesByPath[1], requestContext);
-  };
-};
-
-/**
- * Create request object from the args to a call. The mapperFn will be called with the args and
- * should return a response object.
+ * Create request object for a call function. The mapperFn will be called with the args and and callPath and
+ * should return a request object.
  */
 export function createRequestsFromArgs(mapperFn) {
-  return setResultsBy(R.pipe(R.prop('args'), mapperFn, R.of));
+  return setResultsBy(
+    R.converge(R.compose(R.of, mapperFn), [ 
+      R.prop('args'),
+      R.prop('callPath') 
+    ])
+  );
 };
 
 /**
  * Adds an argument to the requestContext's args collection for a call request.
  */
-export function addArg(arg) {
+export function addArg(argFn) {
   return requestContext => {
-    requestContext.args = R.append(arg, requestContext.args);
+    requestContext.args = R.append(argFn(requestContext), requestContext.args);
+    return requestContext;
+  };
+};
+
+/**
+ * Pipes a request context between step functions. The step functions can return either the requestContext to be
+ * used for the next step, or a Promise that resolves to the requestContext for the next step.
+ */
+export function pipeRequestContext(...steps) {
+  return function runPipelineSteps(requestContext) {
+    // Start executing steps in order
+    let i = 0;
+    let isPromise = false;
+    while (i < steps.length) {
+      // Run current function
+      requestContext = steps[i](requestContext);
+      i++;
+            
+      // If we got a Promise back, we need to continue piping once it's resolved
+      if (requestContext instanceof Promise) {
+        isPromise = true;
+        break;
+      }
+    }
+    
+    // Did we break for a promise?
+    if (isPromise) {
+      // Once the promise resolves, execute any steps that are left
+      let stepsLeft = i < steps.length ? steps.slice(i) : [];
+      let remainingPipeline = pipeRequestContext(...stepsLeft);
+      
+      return requestContext
+        .then(remainingPipeline)
+        .catch(err => {
+          logger.log('error', 'Error executing pipeline step', err);
+          throw err;
+        });
+    }
+    
     return requestContext;
   };
 };
