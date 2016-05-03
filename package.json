@@ -10,6 +10,7 @@
     "build:client": "cpx node_modules/killrvideo-web/dist/** out/resources/static --verbose",
     "build:killrvideoprotos": "cpx lib/killrvideo-service-protos/src/** out/resources/protos --verbose",
     "build:googleprotos": "cpx lib/google/** out/resources/protos/google --verbose",
+    "client": "npm-run-all --parallel start serve",
     "nodemon": "nodemon --debug",
     "wait": "wait-on file:out/index.js",
     "serve": "npm-run-all wait nodemon",
