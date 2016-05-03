@@ -4,6 +4,7 @@ import { toRef } from './common/sentinels';
 import { createPropPicker } from './common/props';
 import { pipe, prop, of as toArray, prepend } from 'ramda';
 import * as Common from './common';
+import { logger } from '../utils/logging';
 
 const commentsMap = {
   'commentId': pipe(prop('commentId'), uuidToString),
@@ -70,8 +71,55 @@ const routes = [
     // Leave a comment on a video
     route: 'videosById[{keys:videoIds}].comments.add',
     call(callPath, args) {
-      // TODO: Is this the right path since comments is a reference above?
-      throw new Error('Not implemented');
+      const [ comment ] = args;
+      let pathValues = [];
+      
+      if (callPath.videoIds.length !== 1) {
+        callPath.videoIds.forEach(videoId => {
+          pathValues.push({
+            path: [ 'videosById', videoId, 'comments', 'addErrors' ],
+            value: $error('Cannot add a comment to multiple videos.')
+          });
+        });
+        return pathValues;
+      }
+      
+      const videoId = callPath.videoIds[0];
+      
+      // Get current user
+      const userId = this.getCurrentUserId();
+      if (userId === null) {
+        pathValues.push({
+          path: [ 'videosById', videoId, 'comments', 'addErrors' ],
+          value: $error('Not currently logged in')
+        });
+        return pathValues;
+      }
+      
+      // Create the request for the service
+      let commentId = uuid.v1();
+      let request = {
+        videoId: stringToUuid(videoId), 
+        userId: stringToUuid(userId), 
+        commentId: stringToUuid(commentId), 
+        comment
+      };
+      
+      // Make the request
+      let client = this.getServiceClient(COMMENTS_SERVICE);
+      return client.commentOnVideoAsync(request)
+        .then(response => {
+          return [
+            { path: [ 'videosById', videoId, 'comments' ], invalidated: true },
+            { path: [ 'usersById', userId, 'comments' ], invalidated: true }
+          ];
+        })
+        .catch(err => {
+          logger.log('error', 'Error while commenting on video', err);
+          return [
+            { path: [ 'videosById', videoId, 'comments', 'addErrors' ], value: $error(err.message) }
+          ];
+        });
     }
   }
 ];
