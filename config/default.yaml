@@ -1,8 +1,10 @@
 # Loaded using https://github.com/lorenwest/node-config
 # Can be overridden by creating a local.yaml file
 
-# The API key for talking to YouTube
-youtube_api_key: REPLACE_WITH_YOUR_KEY
+# Configuration available to the client via falcor routes
+client:
+  # The API key for talking to YouTube
+  youTubeApiKey: REPLACE_WITH_YOUR_KEY
 
 # Web Server settings
 web:
@@ -15,7 +17,7 @@ web:
     name: killrvideo.sid
     secret: THE_INTERNET_IS_FULL_OF_CAT_VIDEOS
     cassandra:
-      contact_points:
+      contactPoints:
         - 127.0.0.1
       keyspace: killrvideo_web
       table: express_session
@@ -23,4 +25,4 @@ web:
 # Logging config
 logging:
   # Whether or not to do additional logging of falcor requests
-  log_falcor_requests: true
+  logFalcorRequests: true

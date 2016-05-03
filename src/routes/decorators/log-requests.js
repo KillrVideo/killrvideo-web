@@ -26,7 +26,7 @@ function logFalcor(fn) {
 
 // If configured to log falcor requests, export the function otherwise just export no-op function
 let logFn = noOp;
-if (config.get('logging.log_falcor_requests') === true) {
+if (config.get('logging.logFalcorRequests') === true) {
   logFn = logFalcor;
 }
 

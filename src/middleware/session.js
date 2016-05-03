@@ -15,7 +15,7 @@ export function session() {
   const store = new CassandraSessionStore({
     table: cassandra.table,
     clientOptions: {
-      contactPoints: cassandra.contact_points,
+      contactPoints: cassandra.contactPoints,
       keyspace: cassandra.keyspace,
       queryOptions: {
         prepare: true
