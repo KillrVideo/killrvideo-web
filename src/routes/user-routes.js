@@ -2,16 +2,16 @@ import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import uuid from 'uuid';
 import { USER_MANAGEMENT_SERVICE } from '../services/user-management';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
-import { responsePicker, isError } from '../utils/falcor-conversions';
-import { pipe, prop, tap, always } from 'ramda';
-import { createGetPipeline, createCallPipeline } from '../utils/falcor-pipeline';
-import * as P from '../utils/pipeline-functions';
+import { pipe, prop } from 'ramda';
+import { createPropPicker } from './common/props';
+import * as Common from './common';
+import { logger } from '../utils/logging';
 
 const userMap = {
   'userId': pipe(prop('userId'), uuidToString)
 };
 
-const pickUserProps = responsePicker(userMap);
+const pickUserProps = createPropPicker(userMap);
 
 // List of routes supported by the user management service
 const routes = [
@@ -29,42 +29,40 @@ const routes = [
   {
     // Lookup users by their unique id
     route: 'usersById[{keys:userIds}]["userId", "firstName", "lastName", "email"]',
-    get: createGetPipeline(
-      P.createBatchRequestsFromPaths(1, always('usersById'), paths => ({ userIds: paths.map(path => stringToUuid(path[1])) })),
-      P.doRequests(USER_MANAGEMENT_SERVICE, (req, client) => { return client.getUserProfileAsync(req); }),
-      P.matchBatchResponsesToPaths('profiles', (path, profile) => path[1] === uuidToString(profile.userId)),
-      P.mapProps(2, pickUserProps)
+    get: Common.batchedServiceRequest(
+      paths => ({ userIds: paths.map(path => stringToUuid(path[1])) }),
+      USER_MANAGEMENT_SERVICE,
+      (req, client) => { return client.getUserProfileAsync(req); },
+      (path, profile) => path[1] === uuidToString(profile.userId),
+      pickUserProps
     )
   },
   {
     // Log a user into the system
     route: 'currentUser.login',
-    call: createCallPipeline(
-      P.createRequestsFromArgs(args => ({ email: args[0], password: args[1] })),
-      P.doRequests(USER_MANAGEMENT_SERVICE, (req, client) => client.verifyCredentialsAsync(req)),
-      reqCtx => {
-        // Log the user in if found
-        let response = reqCtx.results[0];
-        if (response.userId) {
-          // Set current user id is async to return a Promise that returns the original request context when finished
-          return reqCtx.router.setCurrentUserId(uuidToString(response.userId))
-            .return(reqCtx);
-        }
-        return reqCtx;
-      },
-      P.setResultsBy(reqCtx => {
-        let response = reqCtx.results[0];
-        if (isError(response)) {
+    call(callPath, args) {
+      let [ email, password ] = args;
+      let client = this.getServiceClient(USER_MANAGEMENT_SERVICE);
+      return client.verifyCredentialsAsync({ email, password })
+        .tap(response => {
+          // Log the user in if successfully verified
+          if (!response.userId) {
+            return;
+          }
+          return this.setCurrentUserId(uuidToString(response.userId));
+        })
+        .then(response => {
           return [
-            { path: [ 'currentUser', 'loginErrors' ], value: response }
+            { path: [ 'currentUser' ], value: $ref([ 'usersById', uuidToString(response.userId) ]) }
           ];
-        }
-                
-        return [
-          { path: [ 'currentUser' ], value: $ref([ 'usersById', uuidToString(response.userId) ]) }
-        ];
-      })
-    )
+        })
+        .catch(err => {
+          logger.log('error', 'Error logging a user in', err);
+          return [
+            { path: [ 'currentUser', 'loginErrors' ], value: $error(err.message) }
+          ];
+        });
+    }
   },
   {
     // Log a user out of the system
@@ -79,37 +77,30 @@ const routes = [
   {
     // Register a new user
     route: 'currentUser.register',
-    call: createCallPipeline(
-      P.addArg(uuid.v4()),
-      P.createRequestsFromArgs(args => ({
-        firstName: args[0],
-        lastName: args[1],
-        email: args[2], 
-        password: args[3],
-        userId: stringToUuid(args[4])
-      })),
-      P.doRequests(USER_MANAGEMENT_SERVICE, (req, client) => client.createUserAsync(req)),
-      reqCtx => {
-        let response = reqCtx.results[0];
-        if (!isError(response)) {
-          return reqCtx.router.setCurrentUserId(reqCtx.args[4])
-            .return(reqCtx);
-        }
-        return reqCtx;
-      },
-      P.setResultsBy(reqCtx => {
-        let response = reqCtx.results[0];
-        if (isError(response)) {
+    call(callPath, args) {
+      let [ firstName, lastName, email, password ] = args;
+      let userId = uuid.v4();
+      let client = this.getServiceClient(USER_MANAGEMENT_SERVICE);
+      
+      return client.createUserAsync({
+          firstName, lastName, email, password, userId: stringToUuid(userId)
+        })
+        .tap(response => {
+          // This will only get called on non-errors, so log the user in if successful
+          return this.setCurrentUserId(userId);
+        })
+        .then(response => {
           return [
-            { path: [ 'currentUser', 'registerErrors' ], value: response }
+            { path: [ 'currentUser' ], value: $ref([ 'usersById', userId ]) }
           ];
-        }
-        
-        return [
-          { path: [ 'currentUser' ], value: $ref([ 'usersById', reqCtx.args[4] ])}
-        ];
-      })
-    )
+        })
+        .catch(err => {
+          logger.log('error', 'Error registering user', err);
+          return [
+            { path: [ 'currentUser', 'registerErrors' ], value: $error(err.message) }
+          ];
+        });
+    }
   }
 ];
 
