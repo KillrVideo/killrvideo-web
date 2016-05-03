@@ -1,6 +1,7 @@
 {
   "verbose": false,
   "delay": 1000,
-  "ext": "js html",
-  "watch": "out"
+  "ext": "js",
+  "watch": "out",
+  "ignore": "out/resources/static/"
 }
