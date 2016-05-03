@@ -1,9 +1,11 @@
 import { pipe, prepend, append, prop, of as toArray } from 'ramda';
+import uuid from 'uuid';
 import { VIDEO_CATALOG_SERVICE, VideoLocationType } from '../services/video-catalog';
 import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestamp, enumToInteger } from '../utils/protobuf-conversions';
-import { toAtom, toRef } from './common/sentinels';
+import { toAtom, toRef, toError } from './common/sentinels';
 import { createPropPicker } from './common/props';
 import * as Common from './common';
+import { logger } from '../utils/logging';
 
 const videoPropsMap = {
   'tags': pipe(prop('tags'), toAtom),
@@ -85,18 +87,94 @@ const routes = [
   },
   {
     // Submit a YouTube video to the catalog
-    route: 'usersById[{keys:userIds}].videos.addYouTube',
+    route: 'videosById.addYouTube',
     call(callPath, args) {
-      // TODO: Add YouTube video
-      throw new Error('Not implemented');
+      const [ youTubeVideoId, name, description, tags ] = args;
+      
+      const errPath = [ 'videosById', 'addYouTubeErrors' ];
+      
+      // Make sure the user is logged in
+      const userId = this.getCurrentUserId();
+      if (userId === null) {
+        return [
+          { path: errPath, value: toError('Not currently logged in') }
+        ];
+      }
+      
+      // Create request
+      let videoId = uuid.v4();
+      let request = {
+        videoId: stringToUuid(videoId),
+        userId: stringToUuid(userId),
+        name,
+        description,
+        tags,
+        youTubeVideoId
+      };
+      
+      // Do request
+      let client = this.getServiceClient(VIDEO_CATALOG_SERVICE);
+      return client.submitYouTubeVideoAsync(request)
+        .then(response => {
+          // Since YouTube videos are available immediately, invalidate the recentVideos collection
+          return [
+            { path: [ 'usersById', userId, 'videos' ], invalidated: true },
+            { path: [ 'recentVideos' ], invalidated: true },
+            { path: [ 'videosById', videoId, 'videoId' ], value: videoId }
+          ];
+        })
+        .catch(err => {
+          logger.log('error', 'Error adding YouTube video', err);
+          return [
+            { path: errPath, value: toError(err.message) }
+          ];
+        });
     }
   },
   {
     // Submit an uploaded video to the catalog
-    route: 'usersById[{keys:userIds}].videos.addUploaded',
+    route: 'videosById.addUploaded',
     call(callPath, args) {
-      // TODO: Add Uploaded video
-      throw new Error('Not implemented');
+      const [ uploadUrl, name, description, tags ] = args;
+      
+      const errPath = [ 'videosById', 'addUploadedErrors' ];
+      
+      // Make sure the user is logged in
+      const userId = this.getCurrentUserId();
+      if (userId === null) {
+        return [
+          { path: errPath, value: toError('Not currently logged in') }
+        ];
+      }
+      
+      // Create request
+      let videoId = uuid.v4();
+      let request = {
+        videoId: stringToUuid(videoId),
+        userId: stringToUuid(userId),
+        name,
+        description,
+        tags,
+        uploadUrl
+      };
+      
+      // Do the request
+      let client = this.getServiceClient(VIDEO_CATALOG_SERVICE);
+      return client.submitUploadedVideoAsync(request)
+        .then(response => {
+          // Since uploaded videos won't be available immediately, we don't need to invalidate the
+          // recentVideos collection yet
+          return [
+            { path: [ 'usersById', userId, 'videos' ], invalidated: true },
+            { path: [ 'videosById', videoId, 'videoId' ], value: videoId }
+          ];
+        })
+        .catch(err => {
+          logger.log('error', 'Error adding Uploaded video', err);
+          return [
+            { path: errPath, value: toError(err.message) }
+          ];
+        });
     }
   }
 ];
