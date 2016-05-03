@@ -1,34 +1,49 @@
-import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
-import Promise from 'bluebird';
+import { pipe, prop, prepend, append, of as toArray } from 'ramda';
 import { SEARCH_SERVICE } from '../services/search';
-import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
-import { flattenPathValues, getIndexesFromRanges, groupIndexesByPagingState } from '../utils/falcor-utils';
-import { logger } from '../utils/logging';
+import { uuidToString, timestampToDateString } from '../utils/protobuf-conversions';
+import { toRef, toAtom } from './common/sentinels';
+import { createPropPicker } from './common/props';
+import * as Common from './common';
+
+const videosMap = {
+  'videoId': pipe(prop('videoId'), uuidToString),
+  'addedDate': pipe(prop('addedDate'), timestampToDateString),
+  'author': pipe(prop('userId'), uuidToString, toArray, prepend('usersById'), toRef),
+  'stats': pipe(prop('videoId'), uuidToString, toArray, prepend('videosById'), append('stats'), toRef)
+};
+const pickVideoProps = createPropPicker(videosMap);
+
+const suggestionsMap = {
+  'suggestions': pipe(prop('suggestions'), toAtom)
+};
+const pickSuggestions = createPropPicker(suggestionsMap);
 
 // Routes served by the search service
 const routes = [
   {
-    // Search for videos
-    route: 'search[{keys:terms}][{ranges:indexRanges}]["videoId", "addedDate", "name", "previewImageLocation", "author", "stats"]',
-    get(pathSet) {
-      const searchPromises = pathSet.queries.map(term => {
-        // Term will be something like 'query=What to search for'
-        const [ , query ] = term.split('=');
-        
-        // TODO: Search
-        throw new Error('Not implemented');
-      });
-      
-      return Promise.all(searchPromises).then(flattenPathValues);
-    }
+    // Reference point for search results list
+    route: 'search[{keys:terms}].results',
+    get: Common.listReferenceWithDummyToken()
   },
   {
-    // Get search term suggestions
-    route: 'searchSuggestions[{keys:terms}].suggestions',
-    get(pathSet) {
-      // TODO: Suggestions as atom array
-      throw new Error('Not implemented');
-    }
+    // Video search results
+    route: 'search[{keys:terms}].resultsList[{keys:startingVideoTokens}][{ranges:indexRanges}]["videoId", "addedDate", "name", "previewImageLocation", "author", "stats"]',
+    get: Common.pagedServiceRequest(
+      path => ({ query: path[1] }),
+      SEARCH_SERVICE,
+      (req, client) => { return client.searchVideosAsync(req); },
+      pickVideoProps
+    )
+  },
+  {
+    // Search term suggestions as an atom
+    route: 'search[{keys:terms}].suggestions',
+    get: Common.serviceRequest(
+      path => ({ query: path[1], pageSize: 5 }),
+      SEARCH_SERVICE,
+      (req, client) => { return client.getQuerySuggestionsAsync(req); },
+      pickSuggestions
+    )
   }
 ];
 
