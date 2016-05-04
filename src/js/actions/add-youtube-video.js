@@ -9,6 +9,7 @@ import { createActionTypeConstants } from './promises';
 import getYouTubeClient from 'lib/youtube-client';
 import parseYouTubeVideoId from 'lib/parse-youtube-video-id';
 import { ExtendableError } from 'lib/extendable-error';
+import { deepFind } from 'lib/deep-find';
 
 // Custom error classes that have a youTubeUrl property with a failure message
 class YouTubeNotAvailable extends ExtendableError {
@@ -180,8 +181,12 @@ export function addYouTubeVideo(vals) {
   return (dispatch, getState) => {
     const { addVideo: { youTube: { youTubeVideoId } } } = getState();
     
-    const promise = model.call([ 'currentUser', 'videos', 'addYouTube' ], [ youTubeVideoId, vals.name, vals.description, vals.tags ], [ 'videoId' ])
-      .then(response => ({ addedVideoId: response.json.currentUser.videos[0].videoId }));
+    const promise = model.call([ 'videosById', 'addYouTube' ], [ youTubeVideoId, vals.name, vals.description, vals.tags ])
+      .then(response => {
+        // Find the video Id that was added in the response
+        let addedVideoId = deepFind('videoId', response.json.videosById);
+        return { addedVideoId };
+      });
       
     dispatch({
       type: ADD_YOUTUBE_VIDEO,

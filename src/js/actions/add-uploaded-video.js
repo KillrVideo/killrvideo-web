@@ -5,6 +5,7 @@ import Uri from 'jsuri';
 import xhr from 'xhr';
 import model from 'stores/falcor-model';
 import { createActionTypeConstants } from './promises';
+import { deepFind } from 'lib/deep-find';
 
 // Promisify the put method on the xhr lib
 const xhrPut = Promise.promisify(xhr.put);
@@ -216,9 +217,13 @@ export function addUploadedVideo(vals) {
     
     const promise = uploadPromise
       .then(result => {
-        return model.call([ 'currentUser', 'videos', 'addUploaded' ], [ result.uploadUrl, vals.name, vals.description, vals.tags ], [ 'videoId' ]);
+        return model.call([ 'videosById', 'addUploaded' ], [ result.uploadUrl, vals.name, vals.description, vals.tags ]);
       })
-      .then(response => ({ addedVideoId: response.json.currentUser.videos[0].videoId }));
+      .then(response => {
+        // Find the videoId of the video that was added in the response
+        let addedVideoId = deepFind('videoId', response.json.videosById);
+        return { addedVideoId };
+      });
       
     dispatch({
       type: ADD_UPLOADED_VIDEO,

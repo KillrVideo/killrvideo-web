@@ -59,8 +59,8 @@ Call Routes List
 - `currentUser.login(email, password)`
 - `currentUser.logout()`
 - `currentUser.register(firstName, lastName, email, password)`
-- `currentUser.videos.addYouTube(youTubeVideoId, name, description, tags)`
-- `currentUser.videos.addUploaded(uploadUrl, name, description, tags)`
+- `videosById.addYouTube(youTubeVideoId, name, description, tags)`
+- `videosById.addUploaded(uploadUrl, name, description, tags)`
 - `videosById[{ key:uuid }].comments.add(comment)`
 - `videosById[{ key:uuid }].rate(newRating)`
 - `videosById[{ key:uuid }].recordPlayback()`
@@ -103,9 +103,6 @@ All Routes Tree
     - `.previewImageLocation`
 - `.ratings[{ key:uuid }]`
   - `.rating`
-- `.videos`
-  - `.addYouTube(youTubeVideoId, name, description, tags)`
-  - `.addUploaded(uploadUrl, name description, tags)`
 - `.videos[{ range }]`
   - `.videoId`
   - `.name`
@@ -139,6 +136,8 @@ All Routes Tree
 - `.locationType`
 - `.status`
 - `.statusDate`
+- `.addYouTube(youTubeVideoId, name, description, tags)`
+- `.addUploaded(uploadUrl, name description, tags)`
 - `.recordPlayback()`
 - `.stats`
   - `.views`
