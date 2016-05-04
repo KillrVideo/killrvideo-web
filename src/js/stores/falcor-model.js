@@ -1,15 +1,25 @@
-import { Promise } from 'lib/promise';
 import falcor from 'falcor';
 import HttpDataSource from 'falcor-http-datasource';
+import { Promise } from 'lib/promise';
 
-// Have falcor use same promise library as rest of the app
-falcor.Promise = Promise;
+// Wrap the given function with Promise.resolve 
+function wrapWithPromise(fn) {
+  return function withPromise(...args) {
+    return Promise.resolve(fn.apply(this, args));
+  };
+}
 
 // Do queries via HTTP to model.json
 const source = new HttpDataSource('/model.json');
 
+// Wrap model methods with our Promise implementation
+const model = falcor({ source }).batch();
+model.call = wrapWithPromise(model.call);
+model.get = wrapWithPromise(model.get);
+model.set = wrapWithPromise(model.set);
+
 // Export singleton instance of the Falcor Model
-export const model = falcor({ source }).batch();
+export { model };
 export default model;
 
 /**

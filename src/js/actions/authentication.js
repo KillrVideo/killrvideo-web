@@ -1,8 +1,9 @@
 import { createAction } from 'redux-actions';
 import { createActionTypeConstants } from './promises';
 import model from 'stores/falcor-model';
-import { pluck, isUndefined } from 'lodash';
+import { map, isUndefined } from 'lodash';
 import { Promise } from 'lib/promise';
+import { throwAsReduxFormError } from 'lib/redux-form-error';
 
 /**
  * Public action constants
@@ -15,22 +16,14 @@ const REGISTER = 'authentication/REGISTER';
 
 export const ActionTypes = {
   LOGIN: createActionTypeConstants(LOGIN),
-  LOGIN_RESET: 'authentication/LOGIN_RESET',
-  
   LOGOUT: createActionTypeConstants(LOGOUT),
-  
   GET_CURRENT_USER: createActionTypeConstants(GET_CURRENT_USER),
-  
   REGISTER: createActionTypeConstants(REGISTER),
-  REGISTER_RESET: 'authentication/REGISTER_RESET'
 };
 
 /**
  * Public action creators
  */
-
-// Reset the login UI
-export const loginReset = createAction(ActionTypes.LOGIN_RESET);
 
 // The array of default attributes to get from the current user when logging in or registering
 const defaultUserAttributes = [ 'userId', 'firstName', 'lastName', 'email' ];
@@ -40,10 +33,8 @@ export function login(email, password) {
   return dispatch => {
     // Make the request
     const promise = model.call('currentUser.login', [ email, password ], defaultUserAttributes)
-      .then(
-        response => response.json.currentUser, 
-        errors => Promise.reject(pluck(errors, 'value'))
-      );
+      .catch(throwAsReduxFormError)
+      .then(response => response.json.currentUser);
       
     dispatch({
       type: LOGIN,
@@ -62,7 +53,7 @@ export function logout() {
   return dispatch => {
     // Make the falcor request
     const promise = model.call('currentUser.logout')
-      .then(null, errors => Promise.reject(pluck(errors, 'value')));
+      .catch(throwAsReduxFormError);
     
     dispatch({
       type: LOGOUT,
@@ -96,18 +87,13 @@ export function getCurrentUser(queries) {
   };
 };
 
-// Reset the user registration UI
-export const registerReset = createAction(ActionTypes.REGISTER_RESET);
-
 // Register a new user
 export function register(firstName, lastName, email, password) {
   return dispatch => {
     // Make falcor request and handle results
     const promise = model.call('currentUser.register', [ firstName, lastName, email, password ], defaultUserAttributes)
-      .then(
-        response => response.json.currentUser,
-        errors => Promise.reject(pluck(errors, 'value'))
-      );
+      .catch(throwAsReduxFormError)
+      .then(response => response.json.currentUser);
       
     dispatch({
       type: REGISTER,

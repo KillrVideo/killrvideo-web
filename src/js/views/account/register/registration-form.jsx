@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button, Alert } from 'react-bootstrap';
 import { reduxForm } from 'redux-form';
 import { validateForm } from 'lib/validation';
 
@@ -8,10 +8,15 @@ import Input from 'components/shared/input';
 
 class RegistrationForm extends Component {
   render() {
-    const { fields: { firstName, lastName, email, password, retypePassword }, handleSubmit, submitting, hideForm } = this.props;
+    const { fields: { firstName, lastName, email, password, retypePassword }, handleSubmit, submitting, error } = this.props;
     
     return (
-      <form role="form" onSubmit={handleSubmit} className={this.props.hideForm ? 'hidden' : undefined}>
+      <form role="form" onSubmit={handleSubmit}>
+        <Alert bsStyle="info" className={error ? 'hidden' : undefined}>
+          Register for an account to upload and comment on videos.
+        </Alert>
+        <Alert bsStyle="danger" className={error ? undefined : 'hidden'}>{error}</Alert>
+        
         <Row>
           <Col md={5}>
             <Input {...firstName} type="text" placeholder="First name" label="First name" focusOnMount />
@@ -38,9 +43,7 @@ RegistrationForm.propTypes = {
   fields: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   submitting: PropTypes.bool.isRequired,
-  resetForm: PropTypes.func.isRequired,
-  // Provided by screen
-  hideForm: PropTypes.bool.isRequired
+  error: PropTypes.string
 };
 
 // Validation constraints

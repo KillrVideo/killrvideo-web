@@ -2,17 +2,11 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { routeActions } from 'react-router-redux';
 
-import { Row, Col, Panel, Alert, Button } from 'react-bootstrap';
+import { Row, Col, Panel, Button } from 'react-bootstrap';
 import SignInForm from './sign-in-form';
-import ErrorAlert from 'components/shared/error-alert';
-import { login, loginReset } from 'actions/authentication';
+import { login } from 'actions/authentication';
 
 class SignIn extends Component {
-  componentWillMount() {
-    // Reset page when loading
-    this.props.loginReset();
-  }
-  
   componentWillReceiveProps(nextProps) {
     // Redirect once logged in
     if (this.props.isLoggedIn === false && nextProps.isLoggedIn === true) {
@@ -40,12 +34,6 @@ class SignIn extends Component {
         <Row>
           <Col md={4} mdOffset={4}>
             <Panel header="Sign In" id="signin-account">
-              <Alert bsStyle="info">
-                If you've already got an account, sign in with your username and password below.
-              </Alert>
-              
-              <ErrorAlert errors={this.props.loginState.errors} />
-              
               <SignInForm onSubmit={vals => this.props.login(vals.email, vals.password)} />
               
               <div className="section-divider text-center muted">
@@ -66,7 +54,6 @@ class SignIn extends Component {
 // Prop validation
 SignIn.propTypes = {
   // State from redux
-  loginState: PropTypes.object.isRequired,
   isLoggedIn: PropTypes.bool.isRequired,
   
   // From react-router
@@ -74,19 +61,17 @@ SignIn.propTypes = {
   
   // Actions
   login: PropTypes.func.isRequired,
-  loginReset: PropTypes.func.isRequired,
   push: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state) {
   let { 
     authentication: { 
-      login: loginState, 
       currentUser: { isLoggedIn } 
     } 
   } = state;
   
-  return { loginState, isLoggedIn };
+  return { isLoggedIn };
 }
 
-export default connect(mapStateToProps, { login, loginReset, push: routeActions.push })(SignIn);
+export default connect(mapStateToProps, { login, push: routeActions.push })(SignIn);

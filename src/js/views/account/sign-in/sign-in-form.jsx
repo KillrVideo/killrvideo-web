@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Alert } from 'react-bootstrap';
 import { reduxForm } from 'redux-form';
 import { validateForm } from 'lib/validation';
 
@@ -8,10 +8,15 @@ import Icon from 'components/shared/icon';
 
 class SignInForm extends Component {
   render() {
-    const { fields: { email, password }, handleSubmit, submitting } = this.props;
+    const { fields: { email, password }, handleSubmit, submitting, error } = this.props;
     
     return (
       <form role="form" onSubmit={handleSubmit}>
+        <Alert bsStyle="info" className={error ? 'hidden' : undefined}>
+          If you've already got an account, sign in with your email address and password below.
+        </Alert>
+        <Alert bsStyle="danger" className={error ? undefined : 'hidden'}>{error}</Alert>
+        
         <Input {...email} id="signin-email" type="email" placeholder="Enter email address" label="Email address" focusOnMount />
         <Input {...password} id="signin-password" type="password" placeholder="Password" label="Password" />
         <Button type="submit" bsStyle="primary" block disabled={submitting}>
@@ -26,7 +31,8 @@ class SignInForm extends Component {
 SignInForm.propTypes = {
   // Provided by redux-form
   fields: PropTypes.object.isRequired,
-  handleSubmit: PropTypes.func.isRequired
+  handleSubmit: PropTypes.func.isRequired,
+  error: PropTypes.string
 };
 
 // Validation constraints
