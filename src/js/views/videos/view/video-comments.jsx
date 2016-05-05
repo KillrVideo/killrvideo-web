@@ -8,17 +8,17 @@ import UserProfileLink from 'components/users/user-profile-link';
 import UserProfileImage from 'components/users/user-profile-image';
 
 // Helper function that renders a single comment
-function renderComment(c) {
+function renderComment(comment, author) {
   return (
-    <li className="clearfix" key={c.commentId}>
-      <UserProfileLink userId={c.author.userId} className="pull-left">
-        <UserProfileImage email={c.author.email} className="small img-circle" />
+    <li className="clearfix" key={comment.commentId}>
+      <UserProfileLink userId={author.userId} className="pull-left">
+        <UserProfileImage email={author.email} className="small img-circle" />
       </UserProfileLink>
-      <UserProfileLink userId={c.author.userId}>
-        {c.author.firstName + ' ' + c.author.lastName}
-      </UserProfileLink> <span className="text-muted">{moment(c.addedDate).fromNow()}</span><br/>
+      <UserProfileLink userId={author.userId}>
+        {author.firstName + ' ' + author.lastName}
+      </UserProfileLink> <span className="text-muted">{moment(comment.addedDate).fromNow()}</span><br/>
       
-      {c.comment}
+      {comment.comment}
     </li>
   );
 }
@@ -29,7 +29,8 @@ class VideoComments extends Component {
     const {
       comments: { data, isLoading, moreDataOnServer, currentPageIndex, pagingConfig, nextPageDisabled },
       addedComments: { comments: addedData },
-      showMoreComments
+      showMoreComments,
+      currentUser: { info: currentUserInfo }
     } = this.props;
     
     // See if we need to show the "Show more comments" button
@@ -56,10 +57,10 @@ class VideoComments extends Component {
       <div id="view-video-comments">
         <h5>Latest Comments</h5>
         <ul className="video-comments list-unstyled">
-          {addedData.map(c => renderComment(c))}
+          {addedData.map(c => renderComment(c, currentUserInfo))}
           {range(0, commentsToShow).map(idx => {
             if (idx >= data.length) return;
-            return renderComment(data[idx]);
+            return renderComment(data[idx], data[idx].author);
           })}
           {moreCommentsButton}
         </ul>
@@ -75,6 +76,12 @@ VideoComments.queries = {
       [ [ 'commentId', 'comment', 'addedDate' ] ],
       [ 'author', [ 'firstName', 'lastName', 'email', 'userId' ] ]
     ];
+  },
+  
+  currentUser() {
+    return [ 
+      [ 'firstName', 'lastName', 'email', 'userId' ]
+    ];
   }
 };
 
@@ -82,6 +89,7 @@ VideoComments.queries = {
 VideoComments.propTypes = {
   comments: PropTypes.object.isRequired,
   addedComments: PropTypes.object.isRequired,
+  currentUser: PropTypes.object.isRequired,
   
   // Actions
   showMoreComments: PropTypes.func.isRequired

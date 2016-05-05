@@ -17,11 +17,8 @@ require('view-video.css');
 
 class ViewVideo extends Component {
   componentDidMount() {
-    if (this.props.isLoggedIn === null) {
-      this.props.getIsLoggedIn();
-    }
-    
-    // Get the video once mounted
+    // Get the current user and video
+    this.props.getCurrentUser(ViewVideo.queries.currentUser());
     this.props.load(ViewVideo.queries.video(), ViewVideo.queries.comments());
   }
   
@@ -44,7 +41,7 @@ class ViewVideo extends Component {
       videoId,
       location,
       viewVideo: { details, comments, addedComments, moreLikeThis, rating }, 
-      isLoggedIn,
+      currentUser,
       recordPlayback,
       showMoreComments,
       rateVideo,
@@ -61,12 +58,12 @@ class ViewVideo extends Component {
             <VideoPlayer videoDetails={details} onPlaybackStarted={() => recordPlayback([ [ 'stats', 'views' ] ])} />
           </Col>
           <Col md={5} xs={12} id="view-video-details">
-            <VideoDetails details={details} comments={comments} addedComments={addedComments} isLoggedIn={isLoggedIn}
+            <VideoDetails details={details} comments={comments} addedComments={addedComments} currentUser={currentUser}
                           ratingEnabled={rating.ratingEnabled} currentUserRating={rating.currentUserRating} rateVideo={rateVideo}
                           showMoreComments={() => showMoreComments(ViewVideo.queries.comments())} push={push} />
                           
-            <VideoAddComment addedComments={addedComments} isLoggedIn={isLoggedIn} addAnotherComment={addAnotherComment}
-                             location={location} onSubmit={vals => addComment(vals.comment, ViewVideo.queries.comments())} />
+            <VideoAddComment addedComments={addedComments} isLoggedIn={currentUser.isLoggedIn} addAnotherComment={addAnotherComment}
+                             location={location} onSubmit={vals => addComment(vals.comment)} />
           </Col>
         </Row>
         <VideoPreviewList title="More Videos Like This" {...moreLikeThis} {...moreLikeThisActions}  />
@@ -88,6 +85,10 @@ ViewVideo.queries = {
   
   comments() {
     return VideoDetails.queries.comments();
+  },
+  
+  currentUser() {
+    return VideoDetails.queries.currentUser();
   }
 };
 
@@ -99,7 +100,7 @@ ViewVideo.propTypes = {
   
   // From redux
   viewVideo: PropTypes.object.isRequired,
-  isLoggedIn: PropTypes.bool,
+  currentUser: PropTypes.object.isRequired,
   
   // Actions
   load: PropTypes.func.isRequired,
@@ -110,12 +111,12 @@ ViewVideo.propTypes = {
   addAnotherComment: PropTypes.func.isRequired,
   moreLikeThisActions: PropTypes.object.isRequired,
   push: PropTypes.func.isRequired,
-  getIsLoggedIn: PropTypes.func.isRequired
+  getCurrentUser: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state, ownProps) {
   return {
-    isLoggedIn: state.authentication.currentUser.isLoggedIn,
+    currentUser: state.authentication.currentUser,
     videoId: ownProps.params.videoId,
     location: ownProps.location,
     viewVideo: state.viewVideo
@@ -133,7 +134,7 @@ function mapDispatchToProps(dispatch) {
     addAnotherComment: bindActionCreators(Actions.addAnotherComment, dispatch),
     moreLikeThisActions: bindActionCreators(Actions.moreLikeThis, dispatch),
     push: bindActionCreators(routeActions.push, dispatch),
-    getIsLoggedIn: bindActionCreators(AuthActions.getIsLoggedIn, dispatch)
+    getCurrentUser: bindActionCreators(AuthActions.getCurrentUser, dispatch)
   };
 }
 

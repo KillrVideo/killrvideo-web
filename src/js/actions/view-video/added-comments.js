@@ -1,6 +1,7 @@
 import { createActionTypeConstants } from 'actions/promises';
 import { createAction } from 'redux-actions';
 import { model } from 'stores/falcor-model';
+import { throwAsReduxFormErrorForField } from 'lib/redux-form-error';
 
 const ADD_COMMENT = 'viewVideo/ADD_COMMENT';
 export const ActionTypes = {
@@ -9,11 +10,11 @@ export const ActionTypes = {
   ADD_ANOTHER_COMMENT: 'viewVideo/ADD_ANOTHER_COMMENT'
 };
 
-export function addComment(videoId, comment, commentQueries) {
+export function addComment(videoId, comment) {
   return (dispatch, getState) => {
-    commentQueries = commentQueries.map(q => [ 'addedComments', 0, ...q ]);
-    const promise = model.call([ 'videosById', videoId, 'comments', 'add' ], [ comment ], [], commentQueries)
-      .then(response => response.json.videosById[videoId].comments.addedComments[0]);
+    const promise = model.call([ 'videosById', videoId, 'comments', 'add' ], [ comment ], [], [])
+      .catch(throwAsReduxFormErrorForField('comment'))
+      .return(comment);
     
     dispatch({
       type: ADD_COMMENT,
@@ -24,6 +25,8 @@ export function addComment(videoId, comment, commentQueries) {
         }
       }
     });
+    
+    return promise;
   };
 };
 

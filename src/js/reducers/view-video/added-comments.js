@@ -1,4 +1,5 @@
 import { ActionTypes } from 'actions/view-video/added-comments';
+import moment from 'moment';
 
 const defaultAddedComments = {
   isLoading: false,
@@ -18,10 +19,15 @@ function addedComments(state = defaultAddedComments, action) {
       };
       
     case ActionTypes.ADD_COMMENT.SUCCESS:
+      let newComment = {
+        commentId: state.comments.length.toString(),
+        comment: action.payload,
+        addedDate: moment()
+      };
       return {
         isLoading: false,
         commentAdded: true,
-        comments: [ action.payload, ...state.comments ]
+        comments: [ newComment, ...state.comments ]
       };
       
     case ActionTypes.ADD_COMMENT.FAILURE:

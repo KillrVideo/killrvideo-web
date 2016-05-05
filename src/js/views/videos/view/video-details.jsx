@@ -15,7 +15,7 @@ class VideoDetails extends Component {
   render() {
     const {
       details: { isLoading, video },
-      isLoggedIn,
+      currentUser,
       ratingEnabled,
       currentUserRating,
       rateVideo,
@@ -42,7 +42,7 @@ class VideoDetails extends Component {
         </Row>
         
         { /* Star ratings and sharing */ }
-        <VideoRatingSharing video={video} isLoggedIn={isLoggedIn} ratingEnabled={ratingEnabled} 
+        <VideoRatingSharing video={video} isLoggedIn={currentUser.isLoggedIn} ratingEnabled={ratingEnabled} 
                             currentUserRating={currentUserRating} rateVideo={rateVideo} />
         
         { /* Author and Tags */ }
@@ -68,7 +68,8 @@ class VideoDetails extends Component {
         
         <VideoDescription video={video} />        
         
-        <VideoComments comments={comments} addedComments={addedComments} showMoreComments={showMoreComments} />
+        <VideoComments comments={comments} addedComments={addedComments} showMoreComments={showMoreComments}
+                       currentUser={currentUser} />
       </GeminiScrollbar>
     );
   }
@@ -88,6 +89,10 @@ VideoDetails.queries = {
   
   comments() {
     return VideoComments.queries.comments();
+  },
+  
+  currentUser() {
+    return VideoComments.queries.currentUser();
   }
 };
 
@@ -96,9 +101,9 @@ VideoDetails.propTypes = {
   details: PropTypes.object.isRequired,
   comments: PropTypes.object.isRequired,
   addedComments: PropTypes.object.isRequired,
-  isLoggedIn: PropTypes.bool,
   ratingEnabled: PropTypes.bool.isRequired,
   currentUserRating: PropTypes.number.isRequired,
+  currentUser: PropTypes.object.isRequired,
   
   // Actions
   showMoreComments: PropTypes.func.isRequired,
