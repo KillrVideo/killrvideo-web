@@ -6,6 +6,12 @@ import { validateForm } from 'lib/validation';
 import Icon from 'components/shared/icon';
 
 class SearchBox extends Component {
+  handleChange(e) {
+    // Let form track the changes to the input then get suggestions
+    this.props.fields.query.onChange(e);
+    this.props.getSuggestions(e.target.value);
+  }
+  
   render() {
     const { fields: { query }, suggestions, handleSubmit } = this.props;
     
@@ -18,7 +24,7 @@ class SearchBox extends Component {
               <Icon name="search" title="Search" />
             </button>
           </span>
-          <input type="text" {...query} className="form-control" name="query" 
+          <input type="text" {...query} onChange={e => this.handleChange(e)} className="form-control" name="query" 
                  placeholder="Search" list="navbar-search-suggestions" />
           <datalist id="navbar-search-suggestions">
             {suggestions.map((s, idx) => <option value={s} key={s}></option>)}
@@ -33,8 +39,12 @@ SearchBox.propTypes = {
   // Provided by redux-form
   fields: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
+  
   // Other
-  suggestions: PropTypes.arrayOf(PropTypes.string).isRequired
+  suggestions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  
+  // Actions
+  getSuggestions: PropTypes.func.isRequired
 };
 
 const searchConstraints = {

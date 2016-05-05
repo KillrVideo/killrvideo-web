@@ -1,16 +1,40 @@
 import { combineReducers } from 'redux';
 import { isUndefined } from 'lodash';
-import * as Actions from 'actions/search';
+import { ActionTypes } from 'actions/search';
 
 import { createPagedReducer } from './paged';
 
 // Default state for the search box
 const defaultSearchBoxState = {
+  _suggestionsPromise: null,
   suggestions: []
 };
 
 // Reducer for the search box state
 function searchBox(state = defaultSearchBoxState, action) {
+  let p = state._suggestionsPromise;
+  
+  switch(action.type) {
+    case ActionTypes.CLEAR_SUGGESTIONS:
+    case ActionTypes.GET_SUGGESTIONS.FAILURE:
+      if (p !== null) p.cancel();
+      return defaultSearchBoxState;
+      
+    case ActionTypes.GET_SUGGESTIONS.LOADING:
+      if (p !== null) p.cancel();
+      return {
+        ...state,
+        _suggestionsPromise: action.payload.promise,
+        suggestions: []
+      };
+      
+    case ActionTypes.GET_SUGGESTIONS.SUCCESS:
+      return {
+        ...state,
+        _suggestionsPromise: null,
+        suggestions: action.payload
+      };
+  }
   return state;
 }
 

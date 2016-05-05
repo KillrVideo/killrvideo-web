@@ -6,6 +6,7 @@ import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 
 import { toggleWhatIsThis } from 'actions';
 import { getCurrentUser } from 'actions/authentication';
+import { getSuggestions } from 'actions/search';
 import Icon from 'components/shared/icon';
 import UserProfileImage from 'components/users/user-profile-image';
 import WhatIsThis from './what-is-this';
@@ -85,7 +86,7 @@ class Header extends Component {
             <Navbar.Toggle />
           </Navbar.Header>
           <Navbar.Collapse>
-            <SearchBox onSubmit={vals => this.submitSearch(vals.query)} />
+            <SearchBox onSubmit={vals => this.submitSearch(vals.query)} getSuggestions={this.props.getSuggestions} />
             <Nav navbar pullRight>
               <NavItem eventKey={1} href="#" onSelect={e => this.props.toggleWhatIsThis()} className={this.props.showWhatIsThis ? 'dropup' : ''}>
                 What is this? <span className="caret"></span>
@@ -112,7 +113,8 @@ Header.propTypes = {
   // Actions
   toggleWhatIsThis: PropTypes.func.isRequired,
   getCurrentUser: PropTypes.func.isRequired,
-  push: PropTypes.func.isRequired
+  push: PropTypes.func.isRequired,
+  getSuggestions: PropTypes.func.isRequired
 };
 
 // Falcor queries
@@ -133,4 +135,4 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps, { toggleWhatIsThis, getCurrentUser, push: routeActions.push })(Header);
+export default connect(mapStateToProps, { toggleWhatIsThis, getCurrentUser, push: routeActions.push, getSuggestions })(Header);
