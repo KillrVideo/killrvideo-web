@@ -5,6 +5,7 @@ import { createPropPicker } from './common/props';
 import { pipe, prop, of as toArray, prepend } from 'ramda';
 import * as Common from './common';
 import { logger } from '../utils/logging';
+import uuid from 'uuid';
 
 const commentsMap = {
   'commentId': pipe(prop('commentId'), uuidToString),
