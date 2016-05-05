@@ -3,18 +3,25 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import * as HomeActions from 'actions/home';
+import * as AuthActions from 'actions/authentication';
 
 import VideoPreviewList from 'components/videos/video-preview-list';
 
 class Home extends Component {
+  componentDidMount() {
+    if (this.props.isLoggedIn === null) {
+      this.props.getIsLoggedIn();
+    }
+  }
+  
   render() {
     const { 
-      currentUser, recentVideos, recommendedVideos, myVideos,
+      isLoggedIn, recentVideos, recommendedVideos, myVideos,
       recentVideosActions, recommendedVideosActions, myVideosActions 
     } = this.props;
     
     let recommendedVideosList, userVideosList;
-    if (currentUser.isLoggedIn) {
+    if (isLoggedIn === true) {
       recommendedVideosList = <VideoPreviewList title="Recommended for You" {...recommendedVideos} {...recommendedVideosActions} />;
       userVideosList = <VideoPreviewList title="My Videos" {...myVideos} {...myVideosActions} />;
     }
@@ -32,7 +39,7 @@ class Home extends Component {
 // Prop validation
 Home.propTypes = {
   // State from redux store
-  currentUser: PropTypes.object.isRequired,
+  isLoggedIn: PropTypes.bool,
   recentVideos: PropTypes.object.isRequired,
   recommendedVideos: PropTypes.object.isRequired,
   myVideos: PropTypes.object.isRequired,
@@ -40,13 +47,14 @@ Home.propTypes = {
   // Actions
   recentVideosActions: PropTypes.object.isRequired,
   recommendedVideosActions: PropTypes.object.isRequired,
-  myVideosActions: PropTypes.object.isRequired
+  myVideosActions: PropTypes.object.isRequired,
+  getIsLoggedIn: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state) {
-  const { authentication: { currentUser }, home: { recentVideos, recommendedVideos, myVideos } } = state;
+  const { authentication: { currentUser: { isLoggedIn } }, home: { recentVideos, recommendedVideos, myVideos } } = state;
   return {
-    currentUser,
+    isLoggedIn,
     recentVideos,
     recommendedVideos,
     myVideos
@@ -57,7 +65,8 @@ function mapDispatchToProps(dispatch) {
   return {
     recentVideosActions: bindActionCreators(HomeActions.recentVideos, dispatch),
     recommendedVideosActions: bindActionCreators(HomeActions.recommendedVideos, dispatch),
-    myVideosActions: bindActionCreators(HomeActions.myVideos, dispatch)
+    myVideosActions: bindActionCreators(HomeActions.myVideos, dispatch),
+    getIsLoggedIn: bindActionCreators(AuthActions.getIsLoggedIn, dispatch)
   };
 }
 

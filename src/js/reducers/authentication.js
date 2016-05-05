@@ -4,9 +4,8 @@ import { merge } from 'lodash';
 
 // Default state of the currently authenticated user
 const defaultCurrentUserState = {
-  isFromServer: false,
-  isLoggedIn: false,
-  info: null
+  isLoggedIn: null,
+  info: {}
 };
 
 // Reducer for the currently authenticated user
@@ -15,23 +14,21 @@ function currentUserReducer(state = defaultCurrentUserState, action) {
     case ActionTypes.LOGIN.SUCCESS:
     case ActionTypes.REGISTER.SUCCESS:
       return {
-        isFromServer: true,
         isLoggedIn: true,
         info: action.payload
       };
       
     case ActionTypes.LOGOUT.SUCCESS:
       return {
-        isFromServer: true,
         isLoggedIn: false,
-        info: null
+        info: {}
       };
       
     case ActionTypes.GET_CURRENT_USER.SUCCESS:
+      let isLoggedIn = !!action.payload;
       return {
-        isFromServer: true,
-        isLoggedIn: !!action.payload,
-        info: !!action.payload ? merge({}, state.info, action.payload) : null
+        isLoggedIn,
+        info: isLoggedIn ? merge({}, state.info, action.payload) : {}
       };
   }
   return state;

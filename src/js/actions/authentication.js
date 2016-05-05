@@ -87,6 +87,10 @@ export function getCurrentUser(queries) {
   };
 };
 
+export function getIsLoggedIn() {
+  return getCurrentUser([ [ 'userId' ] ]);
+};
+
 // Register a new user
 export function register(firstName, lastName, email, password) {
   return dispatch => {

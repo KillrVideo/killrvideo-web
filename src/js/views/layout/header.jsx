@@ -14,15 +14,12 @@ import SearchBox from './search-box';
 var logoUrl = require('killrvideo.png');
 
 class Header extends Component {
-  componentWillMount() {
-    // Refresh current user information from server if necessary
-    if (this.props.currentUser.isFromServer === false) {
-      this.props.getCurrentUser(Header.queries.currentUser());
-    }
+  componentDidMount() {
+    this.props.getCurrentUser(Header.queries.currentUser());
   }
     
   submitSearch(q) {
-    this.props.push({ 
+    this.props.push({
       pathname: '/search/results', 
       query: { q }
     });
@@ -32,46 +29,50 @@ class Header extends Component {
     // Leave these undefined if we haven't gotten the current user information from the server yet
     let loggedInMenu, signIn, register;
     
-    if (this.props.currentUser.isFromServer) {
-      if (this.props.currentUser.isLoggedIn) {
-        // Menu for logged in users
-        const menuTitle = (
+    if (this.props.currentUser.isLoggedIn === true) {
+      // Menu for logged in users
+      let { firstName, lastName, email } = this.props.currentUser.info;
+      let menuTitle = 'My Account';
+      if (!!firstName && !!lastName && !!email) {
+        menuTitle = (
           <span>
-            {this.props.currentUser.info.firstName + ' ' + this.props.currentUser.info.lastName + ' '}
-            <UserProfileImage email={this.props.currentUser.info.email} className="small img-circle" />
+            {firstName + ' ' + lastName + ' '}
+            <UserProfileImage email={email} className="small img-circle" />
           </span>
         );
-        
-        loggedInMenu = (
-          <NavDropdown eventKey={4} title={menuTitle} id="loggedin-user">
-            <MenuItem eventKey={4.1} onSelect={e => this.props.push('/account/info')}>
-              <Icon name="cog" fixedWidth /> My Account
-            </MenuItem>
-            <MenuItem eventKey={4.2} onSelect={e => this.props.push('/videos/add')}>
-              <Icon name="video-camera" fixedWidth /> Add a Video
-            </MenuItem>
-            <MenuItem divider />
-            <MenuItem eventKey={4.3} onSelect={e => this.props.push('/account/signout')}>
-              <Icon name="sign-out" fixedWidth /> Sign Out
-            </MenuItem>
-          </NavDropdown>
-          
-        );
-      } else {
-        // Buttons for logging in or registering the site
-        signIn = (
-          <NavItem eventKey={2} href="#" onSelect={e => this.props.push('/account/signin')} className="text-uppercase">
-            Sign in
-          </NavItem>
-        );
-        register = (
-          <NavItem eventKey={3} href="#" onSelect={e => this.props.push('/account/register')} className="bg-success text-uppercase">
-            Register
-          </NavItem>
-        );
       }
+      
+      loggedInMenu = (
+        <NavDropdown eventKey={4} title={menuTitle} id="loggedin-user">
+          <MenuItem eventKey={4.1} onSelect={e => this.props.push('/account/info')}>
+            <Icon name="cog" fixedWidth /> My Account
+          </MenuItem>
+          <MenuItem eventKey={4.2} onSelect={e => this.props.push('/videos/add')}>
+            <Icon name="video-camera" fixedWidth /> Add a Video
+          </MenuItem>
+          <MenuItem divider />
+          <MenuItem eventKey={4.3} onSelect={e => this.props.push('/account/signout')}>
+            <Icon name="sign-out" fixedWidth /> Sign Out
+          </MenuItem>
+        </NavDropdown>
+        
+      );
+    } 
+    
+    if (this.props.currentUser.isLoggedIn === false) {
+      // Buttons for logging in or registering the site
+      signIn = (
+        <NavItem eventKey={2} href="#" onSelect={e => this.props.push('/account/signin')} className="text-uppercase">
+          Sign in
+        </NavItem>
+      );
+      register = (
+        <NavItem eventKey={3} href="#" onSelect={e => this.props.push('/account/register')} className="bg-success text-uppercase">
+          Register
+        </NavItem>
+      );
     }
-  
+      
     return (
       <div id="header">
         <Navbar fixedTop id="navbar-main">

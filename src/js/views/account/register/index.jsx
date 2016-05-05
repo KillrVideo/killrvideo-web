@@ -9,7 +9,7 @@ import { register } from 'actions/authentication';
 class Register extends Component {
   componentWillReceiveProps(nextProps) {
     // Redirect the user after registering and being logged in
-    if (this.props.isLoggedIn === false && nextProps.isLoggedIn === true) {
+    if (this.props.isLoggedIn !== nextProps.isLoggedIn && nextProps.isLoggedIn === true) {
       const { location: { state } } = this.props;
       if (state && state.redirectAfterLogin) {
         this.props.push(state.redirectAfterLogin);

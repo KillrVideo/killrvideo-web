@@ -6,6 +6,7 @@ import { isUndefined } from 'lodash';
 import { routeActions } from 'react-router-redux';
 
 import * as Actions from 'actions/view-video';
+import * as AuthActions from 'actions/authentication';
 import VideoPlayer from './video-player';
 import VideoDetails from './video-details';
 import VideoAddComment from './video-add-comment';
@@ -16,6 +17,10 @@ require('view-video.css');
 
 class ViewVideo extends Component {
   componentDidMount() {
+    if (this.props.isLoggedIn === null) {
+      this.props.getIsLoggedIn();
+    }
+    
     // Get the video once mounted
     this.props.load(ViewVideo.queries.video(), ViewVideo.queries.comments());
   }
@@ -39,7 +44,7 @@ class ViewVideo extends Component {
       videoId,
       location,
       viewVideo: { details, comments, addedComments, moreLikeThis, rating }, 
-      currentUser: { isLoggedIn },
+      isLoggedIn,
       recordPlayback,
       showMoreComments,
       rateVideo,
@@ -94,7 +99,7 @@ ViewVideo.propTypes = {
   
   // From redux
   viewVideo: PropTypes.object.isRequired,
-  currentUser: PropTypes.object.isRequired,
+  isLoggedIn: PropTypes.bool,
   
   // Actions
   load: PropTypes.func.isRequired,
@@ -104,12 +109,13 @@ ViewVideo.propTypes = {
   addComment: PropTypes.func.isRequired,
   addAnotherComment: PropTypes.func.isRequired,
   moreLikeThisActions: PropTypes.object.isRequired,
-  push: PropTypes.func.isRequired
+  push: PropTypes.func.isRequired,
+  getIsLoggedIn: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state, ownProps) {
   return {
-    currentUser: state.authentication.currentUser,
+    isLoggedIn: state.authentication.currentUser.isLoggedIn,
     videoId: ownProps.params.videoId,
     location: ownProps.location,
     viewVideo: state.viewVideo
@@ -126,7 +132,8 @@ function mapDispatchToProps(dispatch) {
     addComment: bindActionCreators(Actions.addComment, dispatch),
     addAnotherComment: bindActionCreators(Actions.addAnotherComment, dispatch),
     moreLikeThisActions: bindActionCreators(Actions.moreLikeThis, dispatch),
-    push: bindActionCreators(routeActions.push, dispatch)
+    push: bindActionCreators(routeActions.push, dispatch),
+    getIsLoggedIn: bindActionCreators(AuthActions.getIsLoggedIn, dispatch)
   };
 }
 

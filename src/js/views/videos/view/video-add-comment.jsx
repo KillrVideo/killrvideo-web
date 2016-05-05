@@ -41,7 +41,7 @@ class VideoAddComment extends Component {
     
     const formClasses = classNames({
       inProgress: comment.active || comment.dirty,
-      hidden: !isLoggedIn || commentAdded
+      hidden: isLoggedIn === false || isLoggedIn === null || commentAdded
     });
     
     // Data for where to send a user if they aren't signed in or registered yet
@@ -61,7 +61,7 @@ class VideoAddComment extends Component {
           Comment added successfully. <a className="alert-link" href="#" onClick={() => this.addAnotherComment()}>Click here</a> to add another.
         </Alert>
         
-        <Alert bsStyle="warning" className={isLoggedIn ? 'small hidden' : 'small'}>
+        <Alert bsStyle="warning" className={isLoggedIn === true || isLoggedIn === null ? 'small hidden' : 'small'}>
           You must <Link to={registerLinkTo} className="alert-link">register</Link> or <Link to={signInLinkTo} className="alert-link">sign in</Link> first
           to post comments.
         </Alert>
@@ -89,7 +89,7 @@ VideoAddComment.propTypes = {
   resetForm: PropTypes.func.isRequired,
   
   // Passed in
-  isLoggedIn: PropTypes.bool.isRequired,
+  isLoggedIn: PropTypes.bool,
   addedComments: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
   

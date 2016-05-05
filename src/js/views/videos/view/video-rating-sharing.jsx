@@ -39,7 +39,7 @@ class VideoRatingSharing extends Component {
   }
   
   ratingEnabled() {
-    return this.props.isLoggedIn && this.props.ratingEnabled;
+    return this.props.isLoggedIn === true && this.props.ratingEnabled;
   }
   
   proposeRating(rating) {
@@ -114,7 +114,7 @@ VideoRatingSharing.queries = {
 // Prop validation
 VideoRatingSharing.propTypes = {
   video: PropTypes.object.isRequired,
-  isLoggedIn: PropTypes.bool.isRequired,
+  isLoggedIn: PropTypes.bool,
   ratingEnabled: PropTypes.bool.isRequired,
   currentUserRating: PropTypes.number.isRequired,
   

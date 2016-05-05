@@ -96,7 +96,7 @@ VideoDetails.propTypes = {
   details: PropTypes.object.isRequired,
   comments: PropTypes.object.isRequired,
   addedComments: PropTypes.object.isRequired,
-  isLoggedIn: PropTypes.bool.isRequired,
+  isLoggedIn: PropTypes.bool,
   ratingEnabled: PropTypes.bool.isRequired,
   currentUserRating: PropTypes.number.isRequired,
   

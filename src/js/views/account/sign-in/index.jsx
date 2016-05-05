@@ -9,7 +9,7 @@ import { login } from 'actions/authentication';
 class SignIn extends Component {
   componentWillReceiveProps(nextProps) {
     // Redirect once logged in
-    if (this.props.isLoggedIn === false && nextProps.isLoggedIn === true) {
+    if (this.props.isLoggedIn !== nextProps.isLoggedIn && nextProps.isLoggedIn === true) {
       const { location: { state } } = this.props;
       if (state && state.redirectAfterLogin) {
         this.props.push(state.redirectAfterLogin);

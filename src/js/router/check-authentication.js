@@ -1,5 +1,5 @@
 import { store } from 'stores/redux-store';
-import { getCurrentUser } from 'actions/authentication';
+import { getIsLoggedIn } from 'actions/authentication';
 import { Promise } from 'lib/promise';
 
 /**
@@ -8,11 +8,11 @@ import { Promise } from 'lib/promise';
  */
 export function checkAuthentication(nextState, replace, cb) {
   // See if user is authenticated
-  let { authentication: { currentUser: { isLoggedIn, isFromServer } } } = store.getState();
+  let { authentication: { currentUser: { isLoggedIn } } } = store.getState();
   
-  const isLoggedInPromise = isFromServer
+  const isLoggedInPromise = isLoggedIn !== null
     ? Promise.resolve(isLoggedIn)
-    : store.dispatch(getCurrentUser([ 'userId' ]))
+    : store.dispatch(getIsLoggedIn())
         .then(() => {
           // See if they are logged in after asking the server for their userId
           const { authentication: { currentUser: { isLoggedIn: isLoggedInFromServer } } } = store.getState();
