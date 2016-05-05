@@ -16,7 +16,7 @@ const results = createPagedActions(state => state.search.results);
 
 // Get initial seach results for a term
 export function searchFor(term, previewsQueries) {
-  const queryRoot = [ 'search', `query=${term}` ];
+  const queryRoot = [ 'search', term, 'results' ];
   return results.getInitialPage(queryRoot, previewsQueries);
 };
 
