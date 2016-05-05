@@ -40,12 +40,16 @@ class AddVideo extends Component {
       videoLocationType,
       fields,
       resetForm,
+      asyncValidate,
+      untouchAll,
       handleSubmit,
-      submitting
+      submitting,
+      error
     } = this.props;
     
     // Center columns until we're showing the common video details column
     const columnPush = showCommonDetails === false || addedVideoId !== null ? 3 : undefined;
+    const headerCols = showCommonDetails === false || addedVideoId !== null ? 6 : 12;
     
     let successAlert;
     if (addedVideoId !== null) {
@@ -69,10 +73,10 @@ class AddVideo extends Component {
     return (
       <div id="video-add" className="body-content container">
         <Row>
-          <Col sm={6} smPush={columnPush}>
+          <Col sm={headerCols} smPush={columnPush}>
             <h3><em>Add</em> Video</h3>
             
-            {/*TODO: UiMessages? */}
+            <Alert bsStyle="danger" className={error ? undefined : 'hidden'}>{error}</Alert>
             
             {successAlert}
           </Col>
@@ -84,7 +88,8 @@ class AddVideo extends Component {
               <SourceSelector />
             </Input>
             
-            <SourceSpecificComponent fields={fields} resetForm={resetForm} />
+            <SourceSpecificComponent fields={fields} resetForm={resetForm} asyncValidate={asyncValidate}
+                                     untouchAll={untouchAll} />
           </Col>
           {/* Common video details */}
           <Col sm={6} className={showCommonDetails === false ? 'hidden' : ''}>
@@ -113,8 +118,11 @@ AddVideo.propTypes = {
   // From redux form
   fields: PropTypes.object.isRequired,
   resetForm: PropTypes.func.isRequired,
+  asyncValidate: PropTypes.func.isRequired,
+  untouchAll: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
-  submitting: PropTypes.bool.isRequired
+  submitting: PropTypes.bool.isRequired,
+  error: PropTypes.string
 };
 
 // Map redux store state to component props

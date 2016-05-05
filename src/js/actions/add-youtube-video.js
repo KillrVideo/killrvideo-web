@@ -10,6 +10,7 @@ import getYouTubeClient from 'lib/youtube-client';
 import parseYouTubeVideoId from 'lib/parse-youtube-video-id';
 import { ExtendableError } from 'lib/extendable-error';
 import { deepFind } from 'lib/deep-find';
+import { throwAsReduxFormError } from 'lib/redux-form-error';
 
 // Custom error classes that have a youTubeUrl property with a failure message
 class YouTubeNotAvailable extends ExtendableError {
@@ -182,6 +183,7 @@ export function addYouTubeVideo(vals) {
     const { addVideo: { youTube: { youTubeVideoId } } } = getState();
     
     const promise = model.call([ 'videosById', 'addYouTube' ], [ youTubeVideoId, vals.name, vals.description, vals.tags ])
+      .catch(throwAsReduxFormError)
       .then(response => {
         // Find the video Id that was added in the response
         let addedVideoId = deepFind('videoId', response.json.videosById);

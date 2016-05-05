@@ -6,6 +6,8 @@ import xhr from 'xhr';
 import model from 'stores/falcor-model';
 import { createActionTypeConstants } from './promises';
 import { deepFind } from 'lib/deep-find';
+import { ExtendableError } from 'lib/extendable-error';
+import { throwAsReduxFormError, throwAsReduxFormErrorForField } from 'lib/redux-form-error';
 
 // Promisify the put method on the xhr lib
 const xhrPut = Promise.promisify(xhr.put);
@@ -175,11 +177,13 @@ export function uploadVideo(uploadFile) {
     let startUpload;
     const startPromise = new Promise(resolve => { startUpload = resolve; });
     
-    // Create a promise to represent the entire upload process
+    // Create a promise to represent the entire upload process and propogate any errors to redux-form
+    // as errors on the uploadFile field
     const promise = Promise.bind(startPromise)
       .then(generateUploadDestination)
       .then(uploadTheFile)
-      .then(putBlockList);
+      .then(putBlockList)
+      .catch(throwAsReduxFormErrorForField('uploadFile'));
     
     // Tell redux we're uploading a video
     dispatch({
@@ -217,7 +221,8 @@ export function addUploadedVideo(vals) {
     
     const promise = uploadPromise
       .then(result => {
-        return model.call([ 'videosById', 'addUploaded' ], [ result.uploadUrl, vals.name, vals.description, vals.tags ]);
+        return model.call([ 'videosById', 'addUploaded' ], [ result.uploadUrl, vals.name, vals.description, vals.tags ])
+          .catch(throwAsReduxFormError);
       })
       .then(response => {
         // Find the videoId of the video that was added in the response

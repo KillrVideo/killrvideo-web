@@ -28,12 +28,23 @@ const uploadDefaultState = {
   showCommonDetails: false,
   form: {
     fields: [ 'uploadFile', ...commonFields ],
+    asyncBlurFields: [ 'uploadFile' ],
     initialValues: {
       uploadFile: null,
       ...commonInitialValues
     },
     validate(vals) {
       return validateForm(vals, constraints);
+    },
+    asyncValidate(vals, dispatch) {
+      return dispatch(uploadVideo(vals.uploadFile))
+        .catch(err => {
+          // Remove name property from Error object so it doesn't get propogated to the name form field
+          if (err.name) {
+            err.name = null;
+          }
+          throw err;
+        });
     },
     onSubmit(vals, dispatch) {
       return dispatch(addUploadedVideo(vals));
@@ -43,15 +54,20 @@ const uploadDefaultState = {
 
 // Reducer for upload-specific state
 function upload(state = uploadDefaultState, action) {
+  let p;
   switch (action.type) {
     case CommonActions.SET_SOURCE:
     case CommonActions.UNLOAD:  
     case UploadActions.CLEAR_UPLOAD_VIDEO_SELECTION:
-      const p = state._uploadPromise;
+      p = state._uploadPromise;
       if (p !== null) p.cancel();
       return uploadDefaultState;
       
     case UploadActions.UPLOAD_VIDEO.LOADING:
+      // Cancel any existing uploads
+      p = state._uploadPromise;
+      if (p !== null) p.cancel();
+      
       return {
         ...state,
         _uploadPromise: action.payload.promise,
@@ -79,7 +95,8 @@ function upload(state = uploadDefaultState, action) {
     case UploadActions.UPLOAD_VIDEO.FAILURE:
       return {
         ...state,
-        statusMessage: 'An unexpected error occurred. Please try again later.',
+        // Use message from Error object as status message
+        statusMessage: action.payload.message,
         statusMessageStyle: 'danger'
       };
       

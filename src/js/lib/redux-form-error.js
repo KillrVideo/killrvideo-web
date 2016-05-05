@@ -6,7 +6,7 @@ import { map } from 'lodash';
  * appropriate error message. That message is stored on the _error property so redux-form can pick it up.
  */
 export class ReduxFormError extends ExtendableError {
-  constructor(error) {
+  constructor(error, fieldName) {
     // Did we get an array of falcor paths and values from the server or something else?
     let errorMessage = Array.isArray(error)
       ? map(error, 'value').join(' ') // Get the values from the array of paths and values and join into a string
@@ -14,8 +14,12 @@ export class ReduxFormError extends ExtendableError {
     
     super(errorMessage);
     
-    // Store on the _error property so that redux-form can pick it up
-    this._error = errorMessage;
+    // Store as property so that redux-form can pick it up
+    if (!fieldName) {
+      this._error = errorMessage;
+    } else {
+      this[fieldName] = errorMessage;
+    }
   }
 };
 
@@ -26,3 +30,12 @@ export class ReduxFormError extends ExtendableError {
 export function throwAsReduxFormError(err) {
   throw new ReduxFormError(err);
 };
+
+/**
+ * Returns a function that can be used to throw a ReduxFormError for a particular field name.
+ */
+export function throwAsReduxFormErrorForField(fieldName) {
+  return function errorHandler(err) {
+    throw new ReduxFormError(err, fieldName);
+  };
+}
