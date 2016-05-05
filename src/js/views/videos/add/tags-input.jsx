@@ -72,7 +72,7 @@ class TagsInput extends Component {
   }
   
   addTag() {
-    const value = [ ...this.state.value, this.state.tagValue ];
+    const value = [ ...this.state.value, this.state.tagValue.toLowerCase() ];
     this.setState({
       value,
       tagValue: ''
