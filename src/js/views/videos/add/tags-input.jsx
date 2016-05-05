@@ -61,6 +61,11 @@ class TagsInput extends Component {
   }
   
   handleBlur(e) {
+    // If there is some input in the tagValue box when blurred, add that as a tag
+    if (this.state.tagValue !== '') {
+      this.addTag();
+    }
+    
     if (this.props.onBlur) {
       this.props.onBlur();
     }
