@@ -6,7 +6,7 @@ import model from 'stores/falcor-model';
 import { change } from 'redux-form';
 
 import { createActionTypeConstants } from './promises';
-import getYouTubeClient from 'lib/youtube-client';
+import { getYouTubeClient } from 'lib/youtube-client';
 import parseYouTubeVideoId from 'lib/parse-youtube-video-id';
 import { ExtendableError } from 'lib/extendable-error';
 import { deepFind } from 'lib/deep-find';
@@ -94,7 +94,8 @@ export function validateYouTubeUrl(youTubeUrl) {
     }
     
     // See what the current async validation state is
-    const { 
+    const {
+      config: { youTubeApiKey },
       addVideo: {
         youTube: { 
           _youTubeUrl: validatedYouTubeUrl, 
@@ -119,7 +120,7 @@ export function validateYouTubeUrl(youTubeUrl) {
     const allowValidationPromise = new Promise(resolve => { allowValidationToComplete = resolve; });
     
     // Create a promise representing looking up the video Id with the YouTube client API
-    const promise = getYouTubeClient()
+    const promise = getYouTubeClient(youTubeApiKey)
       .catchThrow(new YouTubeNotAvailable())
       .bind({ videoId })
       .then(lookupYouTubeVideo)
