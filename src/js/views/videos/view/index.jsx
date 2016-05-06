@@ -42,6 +42,7 @@ class ViewVideo extends Component {
       location,
       viewVideo: { details, comments, addedComments, moreLikeThis, rating }, 
       currentUser,
+      chatEnabled,
       recordPlayback,
       showMoreComments,
       rateVideo,
@@ -59,8 +60,8 @@ class ViewVideo extends Component {
           </Col>
           <Col md={5} xs={12} id="view-video-details">
             <VideoDetails details={details} comments={comments} addedComments={addedComments} currentUser={currentUser}
-                          ratingEnabled={rating.ratingEnabled} currentUserRating={rating.currentUserRating} rateVideo={rateVideo}
-                          showMoreComments={() => showMoreComments(ViewVideo.queries.comments())} push={push} />
+                          ratingEnabled={rating.ratingEnabled} currentUserRating={rating.currentUserRating} chatEnabled={chatEnabled} 
+                          rateVideo={rateVideo} showMoreComments={() => showMoreComments(ViewVideo.queries.comments())} push={push} />
                           
             <VideoAddComment addedComments={addedComments} isLoggedIn={currentUser.isLoggedIn} addAnotherComment={addAnotherComment}
                              location={location} onSubmit={vals => addComment(vals.comment)} />
@@ -101,6 +102,7 @@ ViewVideo.propTypes = {
   // From redux
   viewVideo: PropTypes.object.isRequired,
   currentUser: PropTypes.object.isRequired,
+  chatEnabled: PropTypes.bool.isRequired,
   
   // Actions
   load: PropTypes.func.isRequired,
@@ -117,6 +119,7 @@ ViewVideo.propTypes = {
 function mapStateToProps(state, ownProps) {
   return {
     currentUser: state.authentication.currentUser,
+    chatEnabled: state.config.chatEnabled,
     videoId: ownProps.params.videoId,
     location: ownProps.location,
     viewVideo: state.viewVideo

@@ -18,14 +18,14 @@ class VideoTagLink extends Component {
   }
   
   render() {
-    const { tag } = this.props;
+    const { tag, chatEnabled } = this.props;
     
     const popover = (
-      <Popover>
+      <Popover id="view-video-tags-popover">
         <Button onClick={() => this.gotoSearch()} title={`Search for '${tag}' videos`}>
           <Icon name="search" fixedWidth />
-        </Button>&nbsp;
-        <Button onClick={() => this.gotoChat()} title={`Chat about '${tag}' videos`}>
+        </Button>
+        <Button onClick={() => this.gotoChat()} title={`Chat about '${tag}' videos`} className={chatEnabled ? undefined : 'hidden'}>
           <Icon name="comment" fixedWidth />
         </Button>
       </Popover>
@@ -42,7 +42,8 @@ class VideoTagLink extends Component {
 // Prop validation
 VideoTagLink.propTypes = {
   tag: PropTypes.string.isRequired,
-  push: PropTypes.func.isRequired
+  push: PropTypes.func.isRequired,
+  chatEnabled: PropTypes.bool.isRequired
 };
 
 export default VideoTagLink;

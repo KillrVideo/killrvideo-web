@@ -18,6 +18,7 @@ class VideoDetails extends Component {
       currentUser,
       ratingEnabled,
       currentUserRating,
+      chatEnabled,
       rateVideo,
       comments,
       addedComments,
@@ -57,7 +58,7 @@ class VideoDetails extends Component {
             </UserProfileLink>
           </Col>
           <Col xs={7} id="view-video-tags" className="text-right">
-            {video.tags.map(tag => <VideoTagLink tag={tag} key={tag} push={push} /> )}
+            {video.tags.map(tag => <VideoTagLink tag={tag} key={tag} push={push} chatEnabled={chatEnabled} /> )}
           </Col>
         </Row>
         
@@ -104,6 +105,7 @@ VideoDetails.propTypes = {
   ratingEnabled: PropTypes.bool.isRequired,
   currentUserRating: PropTypes.number.isRequired,
   currentUser: PropTypes.object.isRequired,
+  chatEnabled: PropTypes.bool.isRequired,
   
   // Actions
   showMoreComments: PropTypes.func.isRequired,

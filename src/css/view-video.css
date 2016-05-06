@@ -135,6 +135,10 @@
   margin-left: 0.2em;
 }
 
+#view-video-tags-popover button + button {
+  margin-left: 5px;
+}
+
 /* Video date description */
 #view-video-date {
   font-size: 86%;
