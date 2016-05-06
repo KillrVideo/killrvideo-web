@@ -2,7 +2,6 @@ import { logRequests } from './decorators/log-requests';
 import { logErrors } from './decorators/log-errors';
 
 import commentsRoutes from './comments-routes';
-import configRoutes from './configuration-routes';
 import ratingsRoutes from './ratings-routes';
 import sampleDataRoutes from './sample-data-routes';
 import searchRoutes from './search-routes';
@@ -16,7 +15,6 @@ import videoRoutes from './video-routes';
 // Combine all routes into a single array
 const routes = [
   ...commentsRoutes,
-  ...configRoutes,
   ...ratingsRoutes,
   ...sampleDataRoutes,
   ...searchRoutes,
