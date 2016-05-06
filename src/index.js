@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import { logErrors } from './middleware/log-errors';
 import { handleErrors } from './middleware/handle-errors';
 import { falcorRouter } from './middleware/falcor-router';
+import { appHtml } from './middleware/app-html';
 import { handleConnection } from './chat-handler';
 import config from 'config';
 import { logger } from './utils/logging';
@@ -25,9 +26,7 @@ if (app.get('env') === 'development') {
 app.use('/model.json', falcorRouter());
 
 // All other requests serve up the server.html page 
-app.get('/*', (req, res) => {
-  res.sendFile(`${__dirname}/resources/static/server.html`);
-});
+app.get('/*', appHtml());
 
 // Error handlers
 app.use(logErrors());
