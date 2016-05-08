@@ -41,9 +41,12 @@ Get Routes List
 - `recentVideos[{ range }][ 'videoId', 'name', 'previewImageLocation', 'addedDate' ]`
 - `recentVideos[{ range }].stats.views`
 - `recentVideos[{ range }].author[ 'firstName', 'lastName' ]`
-- `search[{ key:query=term }][ 'videoId', 'name', 'previewImageLocation', 'addedDate' ]`
-- `search[{ key:query=term }].stats.views`
-- `search[{ key:query=term }].author[ 'firstName', 'lastName' ]`
+- `search[{ key:query=term }][{ range }][ 'videoId', 'name', 'previewImageLocation', 'addedDate' ]`
+- `search[{ key:query=term }][{ range }].stats.views`
+- `search[{ key:query=term }][{ range }].author[ 'firstName', 'lastName' ]`
+
+### Uploads as Root
+- `uploads.destinationUrl`
 
 ### Chat Room as Root
 - `chatRooms[{ key:string }].users.length`
@@ -64,6 +67,7 @@ Call Routes List
 - `videosById[{ key:uuid }].comments.add(comment)`
 - `videosById[{ key:uuid }].rate(newRating)`
 - `videosById[{ key:uuid }].recordPlayback()`
+- `uploads.generateDestination(fileName)`
 - `chatRooms[{ key:string }].join()`
 - `chatRooms[{ key:string }].leave()`
 - `chatRooms[{ key:string }].sendMessage(messageBody)`
@@ -191,7 +195,7 @@ All Routes Tree
   - `.firstName`
   - `.lastName`
   
-### `search[{ key:query=term }]`
+### `search[{ key:query=term }][{ range }]`
 - `.videoId`
 - `.name`
 - `.previewImageLocation`
@@ -201,6 +205,10 @@ All Routes Tree
 - `.author`
   - `.firstName`
   - `.lastName`
+
+### `uploads`
+- `.generateDestination(fileName)`
+- `.destinationUrl`
 
 ### `chatRooms[{ key:string }]`
 - `.messages[{ range }]`
