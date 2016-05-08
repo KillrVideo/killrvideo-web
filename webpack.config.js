@@ -4,7 +4,6 @@ var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var LiveReloadPlugin = require('webpack-livereload-plugin');
 
-var packageJson = require('./package.json');
 
 // Plugin to help resolve bootswatch relative paths
 var BootswatchPlugin = {
@@ -32,18 +31,13 @@ var BootswatchPlugin = {
   }
 }
 
-// Dependencies in package.json that are only for CSS purposes
-var cssDependencies = new Set([
-  'bootstrap', 'bootswatch', 'font-awesome' 
-]);
-
 // Path constants
 var Paths = {
-  SRC: path.resolve(__dirname, 'src'),
-  JS: path.resolve(__dirname, 'src/js'),
-  CSS: path.resolve(__dirname, 'src/css'),
-  IMAGES: path.resolve(__dirname, 'src/images'),
-  BUILD_OUTPUT: path.resolve(__dirname, 'dist')
+  SRC: path.resolve(__dirname, 'src/client'),
+  JS: path.resolve(__dirname, 'src/client/js'),
+  CSS: path.resolve(__dirname, 'src/client/css'),
+  IMAGES: path.resolve(__dirname, 'src/client/images'),
+  BUILD_OUTPUT: path.resolve(__dirname, 'dist/client')
 };
 
 // Plugins for the build
@@ -55,7 +49,7 @@ var plugins = [
   }),
   
   // Put CSS that's extracted into killrvideo.css
-  new ExtractTextPlugin("css/killrvideo.css", { allChunks: true }),
+  new ExtractTextPlugin('css/killrvideo.css', { allChunks: true }),
   
   // Bootswatch references relative paths to fonts that are actually in Bootstrap, so use a special resolver
   // to help find those files (see resolver implementation above)
@@ -88,7 +82,12 @@ module.exports = {
   context: Paths.SRC,
   entry: {
     killrvideo: './webpack.js',
-    vendor: Object.keys(packageJson.dependencies).filter(function(dep) { return cssDependencies.has(dep) === false; })
+    vendor: [ 
+      'bluebird', 'classnames', 'falcor', 'falcor-http-datasource', 'gemini-scrollbar', 'jsuri', 'load-script',
+      'lodash', 'md5', 'moment', 'react', 'react-bootstrap', 'react-dom', 'react-dropzone', 'react-gemini-scrollbar',
+      'react-redux', 'react-router', 'react-router-redux', 'redux', 'redux-actions', 'redux-form', 'redux-logger',
+      'redux-promise-middleware', 'redux-thunk', 'reselect', 'socket.io-client', 'validate.js', 'xhr'
+    ]
   },
   resolve: {
     extensions: [ '', '.js', '.jsx' ],

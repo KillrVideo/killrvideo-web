@@ -4,8 +4,10 @@
   "description": "Web UI for the KillrVideo application demo.",
   "main": "src/webpack.js",
   "scripts": {
-    "clean": "rimraf dist",
-    "build": "webpack --progress",
+    "clean": "npm-run-all --parallel \"clean:*\"",
+    "clean:client": "rimraf dist/client",
+    "clean:server": "rimraf dist/server",
+    "build:client": "webpack --progress",
     "watch": "npm run build -- --watch",
     "start": "npm-run-all clean watch",
     "postversion": "npm-run-all push:*",
