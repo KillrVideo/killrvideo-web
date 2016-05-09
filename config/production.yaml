@@ -1,0 +1,6 @@
+logging:
+  logFalcorRequests: false
+  console:
+    enabled: false
+  file:
+    enabled: true
