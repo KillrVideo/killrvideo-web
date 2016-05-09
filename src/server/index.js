@@ -14,8 +14,8 @@ import { logger } from './utils/logging';
 // Create the server
 const app = express();
 
-// Serve up static build assets
-app.use('/static', express.static(`${__dirname}/resources/static`));
+// Serve up static build assets for the client
+app.use('/static', express.static(`${__dirname}/../client`));
 
 // Request logging when in development
 if (app.get('env') === 'development') {
