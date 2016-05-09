@@ -31,13 +31,15 @@ var BootswatchPlugin = {
   }
 }
 
+var PROJECT_DIR = path.resolve(__dirname, '..');
+
 // Path constants
 var Paths = {
-  SRC: path.resolve(__dirname, 'src/client'),
-  JS: path.resolve(__dirname, 'src/client/js'),
-  CSS: path.resolve(__dirname, 'src/client/css'),
-  IMAGES: path.resolve(__dirname, 'src/client/images'),
-  BUILD_OUTPUT: path.resolve(__dirname, 'dist/client')
+  SRC: path.resolve(PROJECT_DIR, 'src/client'),
+  JS: path.resolve(PROJECT_DIR, 'src/client/js'),
+  CSS: path.resolve(PROJECT_DIR, 'src/client/css'),
+  IMAGES: path.resolve(PROJECT_DIR, 'src/client/images'),
+  BUILD_OUTPUT: path.resolve(PROJECT_DIR, 'dist/client')
 };
 
 // Plugins for the build
