@@ -31,7 +31,7 @@ var BootswatchPlugin = {
   }
 }
 
-var PROJECT_DIR = path.resolve(__dirname, '..');
+var PROJECT_DIR = path.resolve(__dirname);
 
 // Path constants
 var Paths = {

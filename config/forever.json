@@ -1,6 +1,0 @@
-{
-  "uid": "killrvideo",
-  "script": "index.js",
-  "sourceDir": "./dist/server",
-  "append": true
-}

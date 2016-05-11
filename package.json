@@ -8,16 +8,15 @@
     "clean:client": "rimraf dist/client",
     "clean:server": "rimraf dist/server",
     "build": "npm-run-all --parallel build:client \"build:server:*\"",
-    "build:client": "webpack --config build/webpack.config.js --progress",
+    "build:client": "webpack --progress",
     "build:server:js": "babel src/server --out-dir dist/server --source-maps",
     "build:server:resources": "cpx src/server/resources/** dist/server/resources --verbose",
     "build:server:protos": "cpx lib/killrvideo-service-protos/src/** dist/server/resources/protos --verbose",
     "build:server:googleprotos": "cpx lib/google/** dist/server/resources/protos/google --verbose",
     "watch": "npm-run-all clean --parallel \"build:client -- --watch\" \"build:server:* -- --watch\"",
-    "start": "forever start config/forever.json",
-    "stop": "forever stop killrvideo",
     "release": "cross-env NODE_ENV=production npm-run-all clean build",
-    "analyze": "webpack --config build/webpack.config.js --json | webpack-bundle-size-analyzer > webpack-bundle-size-analyzer.log"
+    "start": "node dist/server/index.js",
+    "analyze": "webpack --json | webpack-bundle-size-analyzer > webpack-bundle-size-analyzer.log"
   },
   "author": "Luke Tillman <luke@luketillman.com> (http://www.luketillman.com)",
   "repository": {
@@ -73,7 +72,6 @@
     "falcor-json-graph": "^1.1.7",
     "falcor-router": "^0.4.0",
     "font-awesome": "^4.6.1",
-    "forever": "^0.15.1",
     "gemini-scrollbar": "^1.2.9",
     "grpc": "^0.13.2-pre1",
     "js-yaml": "^3.6.0",

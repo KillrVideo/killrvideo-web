@@ -1,0 +1,5 @@
+*
+!config/*
+config/local.yaml
+!dist/*
+!package.json
