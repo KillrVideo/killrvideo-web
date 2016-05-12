@@ -24,8 +24,8 @@ function startServer(app) {
   io.on('connection', handleConnection);
 
   // Start the server
-  const { host, port } = config.get('web.server');
-  server.listen(port, host);
+  const { port } = config.get('web');
+  server.listen(port);
   return server;
 }
 

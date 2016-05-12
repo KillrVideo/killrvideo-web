@@ -9,9 +9,7 @@ client:
 # Web Server settings
 web:
   # Where to start the web server
-  server:
-    host: localhost
-    port: 3000
+  port: 3000
   # Express session settings
   session:
     name: killrvideo.sid
