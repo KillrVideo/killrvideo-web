@@ -34,7 +34,11 @@ logger.log('info', 'Trying to start KillrVideo Web Server');
 const expressApp = express();
 
 // Run KillrVideo web server
-let startPromise = initMiddlewareAsync(expressApp).then(startServer);
+let startPromise = initMiddlewareAsync(expressApp).then(startServer)
+  .catch(err => {
+    logger.log('error', 'Unable to start KillrVideo Web Server', err);
+    process.exit(1);
+  });
 
 // If we get SIGINT, try and cancel/exit
 process.on('SIGINT', function handleSigint() {
