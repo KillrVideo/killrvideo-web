@@ -1,52 +1,50 @@
 import express from 'express';
 import { createServer } from 'http';
 import SocketIO from 'socket.io';
-import morgan from 'morgan';
 
-import { logErrors } from './middleware/log-errors';
-import { handleErrors } from './middleware/handle-errors';
-import { falcorRouter } from './middleware/falcor-router';
-import { appHtml } from './middleware/app-html';
+import { initMiddlewareAsync } from './middleware';
 import { handleConnection } from './chat-handler';
-import config from 'config';
 import { logger } from './utils/logging';
 
-// Create the server
-const app = express();
+function startServer(app) {
+  // Create the server
+  const server = createServer(app);
 
-// Serve up static build assets for the client
-app.use('/static', express.static(`${__dirname}/../client`));
+  // Attach some logging to start/stop
+  server.on('listening', () => {
+    logger.log('info', 'KillrVideo Web Server listening on %j', server.address());
+  });
+  server.on('close', () => {
+    logger.log('info', 'KillrVideo Web Server is closed');
+  });
+  
+  // Listen for websocket connections
+  const io = SocketIO(server);
+  io.on('connection', handleConnection);
 
-// Request logging when in development
-if (app.get('env') === 'development') {
-  app.use(morgan('dev'));
+  // Start the server
+  const { host, port } = config.get('web.server');
+  server.listen(port, host);
+  return server;
 }
 
-// Falcor requests to model.json
-app.use('/model.json', falcorRouter());
+logger.log('info', 'Trying to start KillrVideo Web Server');
 
-// All other requests serve up the server.html page 
-app.get('/*', appHtml());
+// Create the express app
+const expressApp = express();
 
-// Error handlers
-app.use(logErrors());
-app.use(handleErrors());
+// Run KillrVideo web server
+let startPromise = initMiddlewareAsync(expressApp).then(startServer);
 
-// Create the server
-const server = createServer(app);
-
-// Attach some logging to start/stop
-server.on('listening', () => {
-  logger.log('info', 'KillrVideo Web Server listening on %j', server.address());
+// If we get SIGINT, try and cancel/exit
+process.on('SIGINT', function handleSigint() {
+  logger.log('info', 'Got SIGINT, attempting to shutdown');
+  
+  if (startPromise.isFulfilled()) {
+    let server = startPromise.value;
+    server.close(() => process.exit(0));
+  } else {
+    startPromise.cancel();
+    process.exit(0);
+  }
 });
-server.on('close', () => {
-  logger.log('info', 'KillrVideo Web Server is closed');
-});
-
-// Listen for websocket connections
-const io = SocketIO(server);
-io.on('connection', handleConnection);
-
-// Start the server
-const { host, port } = config.get('web.server');
-server.listen(port, host);

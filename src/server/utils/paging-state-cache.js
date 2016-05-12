@@ -1,7 +1,7 @@
 /**
  * A wrapper around express session that provides an API for dealing with paging state.
  */
-export default class PagingStateCache {
+export class PagingStateCache {
   constructor(req) {
     this._req = req;
   }
@@ -47,3 +47,5 @@ export default class PagingStateCache {
     psObject[startingIndex] = pagingState;
   }
 };
+
+export default PagingStateCache;
