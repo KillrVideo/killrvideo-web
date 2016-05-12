@@ -15,7 +15,12 @@
     "build:server:protos": "cpx lib/killrvideo-service-protos/src/** dist/server/resources/protos --verbose",
     "build:server:googleprotos": "cpx lib/google/** dist/server/resources/protos/google --verbose",
     "watch": "npm-run-all clean --parallel \"build:client -- --watch\" \"build:server:* -- --watch\"",
-    "release": "cross-env NODE_ENV=production npm-run-all clean build",
+    "postversion": "npm-run-all push:commits push:tags",
+    "push:commits": "git push",
+    "push:tags": "git push --tags",
+    "release:build": "cross-env NODE_ENV=production npm run build",
+    "release:docker": "docker build -t luketillman/killrvideo-web:latest .",
+    "release": "npm-run-all clean release:build release:docker",
     "start": "node dist/server/index.js",
     "analyze": "webpack --json | webpack-bundle-size-analyzer > webpack-bundle-size-analyzer.log"
   },

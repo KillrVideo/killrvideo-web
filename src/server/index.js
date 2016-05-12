@@ -1,6 +1,7 @@
 import express from 'express';
 import { createServer } from 'http';
 import SocketIO from 'socket.io';
+import config from 'config';
 
 import { initMiddlewareAsync } from './middleware';
 import { handleConnection } from './chat-handler';
