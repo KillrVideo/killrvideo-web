@@ -19,8 +19,7 @@
     "push:commits": "git push",
     "push:tags": "git push --tags",
     "release:build": "cross-env NODE_ENV=production npm run build",
-    "release:docker": "docker build -t luketillman/killrvideo-web:latest .",
-    "release": "npm-run-all clean release:build release:docker",
+    "release": "npm-run-all clean release:build",
     "start": "node dist/server/index.js",
     "analyze": "webpack --json | webpack-bundle-size-analyzer > webpack-bundle-size-analyzer.log"
   },
