@@ -26,14 +26,3 @@ web:
 logging:
   # Whether or not to do additional logging of falcor requests
   logFalcorRequests: true
-  console:
-    # Whether or not to log to the console
-    enabled: true
-  file:
-    # Whether or not to log to a file
-    enabled: false
-    # Path relative to the cwd of the running process
-    path: logs
-    # File name
-    name: killrvideo.log
-    
