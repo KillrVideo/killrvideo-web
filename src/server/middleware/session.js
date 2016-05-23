@@ -37,7 +37,11 @@ export const sessionAsync = Promise.method(() => {
   const { name, secret, cassandra } = config.get('web.session');
   
   // Create a client and promisify the connect method
-  let client = new Client({ contactPoints: cassandra.contactPoints });
+  let client = new Client({ 
+    contactPoints: cassandra.contactPoints, 
+    keyspace: cassandra.keyspace,
+    queryOptions: { prepare: true } 
+  });
   let connect = Promise.promisify(client.connect, { context: client });
   
   // Keep trying to connect until we succeed then return the middleware
@@ -45,13 +49,7 @@ export const sessionAsync = Promise.method(() => {
     // Create Cassandra storage
     const store = new CassandraSessionStore({
       table: cassandra.table,
-      client,
-      clientOptions: {
-        keyspace: cassandra.keyspace,
-        queryOptions: {
-          prepare: true
-        }
-      }
+      client
     });
     
     // Return the express session middleware
