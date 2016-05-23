@@ -17,7 +17,7 @@ web:
     cassandra:
       contactPoints:
         - 127.0.0.1
-      keyspace: killrvideo_web
+      keyspace: killrvideo
       table: express_session
 
 # Logging config

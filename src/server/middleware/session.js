@@ -19,7 +19,7 @@ function doInitialConnectWithRetry(connectFn) {
         throw err;
       }
       
-      logger.log('error', `Error connecting to Cassandra, retrying again in ${delayMs}ms`, err);
+      logger.log('verbose', `Error connecting to Cassandra, retrying again in ${delayMs}ms`, err);
       retryCount++;
       return Promise.delay(delayMs).then(doIt);
     });
