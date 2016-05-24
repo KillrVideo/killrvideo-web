@@ -2,10 +2,15 @@ import express from 'express';
 import { createServer } from 'http';
 import SocketIO from 'socket.io';
 import config from 'config';
+import Promise from 'bluebird';
 
 import { initMiddlewareAsync } from './middleware';
 import { handleConnection } from './chat-handler';
 import { logger } from './utils/logging';
+
+// Enable cancellation on Promises
+Promise.config({ cancellation: true });
+
 
 function startServer(app) {
   // Create the server

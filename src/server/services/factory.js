@@ -77,20 +77,34 @@ export function registerService(ClientConstructor) {
     }
   }
   
+  // Static properties on the ServiceClient class for this Grpc service
   ServiceClient.__serviceName = serviceName;
-  
-  // Static memoized function for getting a Grpc client for this service (all instances of this service will 
-  // share a single underlying Grpc client)
-  ServiceClient.__getClientAsync = memoize(function() {
-    return findServiceAsync(serviceName).then(host => new ClientConstructor(host, credentials.createInsecure()));
-  });
+  ServiceClient.__client = null;
+  ServiceClient.__clientPromise = null;
   
   // Static method for dispatching to a function on the underlying client
   ServiceClient.__withClient = function(methodName, ...args) {
-    return ServiceClient.__getClientAsync()
-      .then(client => {
-        return client[methodName](...args);
-      });
+    // If we have the client just dispatch to the method
+    if (ServiceClient.__client !== null) {
+      return ServiceClient.__client[methodName](...args);
+    }
+    
+    // If we haven't done the async creation or it's failed previously, find the service and create the client
+    // and store the promise so we know it's in progress
+    if (ServiceClient.__clientPromise === null) {
+      ServiceClient.__clientPromise = findServiceAsync(serviceName)
+        .then(host => {
+          ServiceClient.__client = new ClientConstructor(host, credentials.createInsecure());
+        })
+        .finally(() => {
+          ServiceClient.__clientPromise = null;
+        });
+    }
+    
+    // Wait until the promise completes, then dispatch to the method
+    return ServiceClient.__clientPromise.then(() => {
+      return ServiceClient.__client[methodName](...args);
+    });
   };
   
   // Define properties on the ServiceClient class that get the client and then call the same method on the client

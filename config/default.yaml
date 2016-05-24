@@ -15,12 +15,12 @@ web:
     name: killrvideo.sid
     secret: THE_INTERNET_IS_FULL_OF_CAT_VIDEOS
     cassandra:
-      contactPoints:
-        - 127.0.0.1
       keyspace: killrvideo
       table: express_session
 
 # Logging config
 logging:
-  # Whether or not to do additional logging of falcor requests
-  logFalcorRequests: true
+  level: verbose
+
+# Override host resolution by adding hostname keys and the corresponsing IP:Port strings as values to this section
+hosts:
