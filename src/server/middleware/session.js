@@ -5,6 +5,7 @@ import config from 'config';
 import { Client } from 'cassandra-driver';
 import { lookupServiceAsync } from '../utils/lookup-service';
 import { withRetries } from '../utils/with-retries';
+import { logger } from '../utils/logging';
 
 // Wrap CassandraStore around the express session
 const CassandraSessionStore = CassandraStore(expressSession);
@@ -20,8 +21,8 @@ function createSessionMiddlewareAsync() {
   // Get settings from config
   const { name, secret, cassandra } = config.get('web.session');
   
-  let cass = withRetries(lookupCassandra, 10, 2, 'Error looking up cassandra service', true);
-  let dse = withRetries(lookupDse, 10, 2, 'Error looking up datastax-enterprise service', true);
+  let cass = withRetries(lookupCassandra, 10, 10, 'Error looking up cassandra service', false);
+  let dse = withRetries(lookupDse, 10, 10, 'Error looking up datastax-enterprise service', false);
   
   // Find cassandra or DSE
   return Promise.any([ cass, dse ])
@@ -36,9 +37,18 @@ function createSessionMiddlewareAsync() {
         keyspace: cassandra.keyspace,
         queryOptions: { prepare: true } 
       });
-      
       let connectFn = Promise.promisify(client.connect, { context: client });
-      return withRetries(connectFn, 10, 2, 'Error connecting Cassandra client for session storage', true).return(client);
+      
+      // The function for connecting to Cassandra with the client and logging errors
+      function connectToCassandra() {
+        return connectFn().catch(err => {
+          logger.log('error', 'Error while connecting to Cassandra for session storage', err);
+          throw err;
+        });
+      }
+      
+      // Connect to Cassandra with retries and when successful, return the client
+      return withRetries(connectToCassandra, 10, 10, 'Could not connect Cassandra client for session storage', false).return(client);
     })
     .then(client => {
       // Create Cassandra storage
