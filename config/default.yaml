@@ -23,4 +23,5 @@ logging:
   level: verbose
 
 # Override host resolution by adding hostname keys and the corresponsing IP:Port strings as values to this section
-hosts:
+serviceLookup:
+  some-service-name: "127.0.0.1:1234"
