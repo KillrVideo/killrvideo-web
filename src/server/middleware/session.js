@@ -2,60 +2,39 @@ import Promise from 'bluebird';
 import expressSession from 'express-session';
 import CassandraStore from 'cassandra-store';
 import config from 'config';
-import { Client } from 'cassandra-driver';
-import { lookupServiceAsync } from '../utils/lookup-service';
 import { withRetries } from '../utils/with-retries';
 import { logger } from '../utils/logging';
+import { getCassandraClientAsync } from '../utils/cassandra-client';
 
 // Wrap CassandraStore around the express session
 const CassandraSessionStore = CassandraStore(expressSession);
 
-// Functions for looking up Cassandra and DSE services 
-const lookupCassandra = lookupServiceAsync.bind(undefined, 'cassandra', '9042');
-const lookupDse = lookupServiceAsync.bind(undefined, 'datastax-enterprise', '9042');
+// Creates the session storage table if it doesn't already exist
+const createSessionTableIfNotExistsAsync = Promise.method(client => {
+  const table = config.get('web.session.cassandra.table');
+  const cql = `
+    CREATE TABLE IF NOT EXISTS ${table} (
+      sid text,
+      session text,
+      expires timestamp,
+      PRIMARY KEY (sid)
+    )`;
+  
+  return client.executeAsync(cql);
+});
 
-/**
- * Returns a promise that will return the Express session middleware function.
- */
-function createSessionMiddlewareAsync() {
-  // Get settings from config
-  const { name, secret, cassandra } = config.get('web.session');
+// Internal function for creating the Cassandra session middleware
+const createSessionMiddleware = Promise.method(() => {
+  const { keyspace } = config.get('cassandra');
   
-  let cass = withRetries(lookupCassandra, 10, 10, 'Error looking up cassandra service', false);
-  let dse = withRetries(lookupDse, 10, 10, 'Error looking up datastax-enterprise service', false);
-  
-  // Find cassandra or DSE
-  return Promise.any([ cass, dse ])
-    .then(contactPoints => {
-      // Cancel both lookup promises since at least one is resolved now
-      cass.cancel();
-      dse.cancel();
-      
-      // Create a client and promisify the connect method
-      let client = new Client({
-        contactPoints, 
-        keyspace: cassandra.keyspace,
-        queryOptions: { prepare: true } 
-      });
-      let connectFn = Promise.promisify(client.connect, { context: client });
-      
-      // The function for connecting to Cassandra with the client and logging errors
-      function connectToCassandra() {
-        return connectFn().catch(err => {
-          logger.log('error', 'Error while connecting to Cassandra for session storage', err);
-          throw err;
-        });
-      }
-      
-      // Connect to Cassandra with retries and when successful, return the client
-      return withRetries(connectToCassandra, 10, 10, 'Could not connect Cassandra client for session storage', false).return(client);
-    })
+  // Get a client for the keyspace, create the table if necessary, then create the middleware
+  return getCassandraClientAsync(keyspace)
+    .then(client => createSessionTableIfNotExistsAsync(client).return(client))
     .then(client => {
-      // Create Cassandra storage
-      const store = new CassandraSessionStore({
-        table: cassandra.table,
-        client
-      });
+      const { name, secret, cassandra: { table } } = config.get('web.session');
+      
+      // Create Cassandra session storage
+      const store = new CassandraSessionStore({ table, client });
       
       // Return the express session middleware
       return expressSession({
@@ -65,11 +44,17 @@ function createSessionMiddlewareAsync() {
         saveUninitialized: false,
         store
       });
+    })
+    .catch(err => {
+      logger.log('error', 'Error while creating session middleware', err);
+      throw err;
     });
-}
+});
 
 /**
  * Creates Express session middleware. Returns a promise that will return a middleware function
  * once resolved.
  */
-export const sessionAsync = Promise.method(createSessionMiddlewareAsync);
+export function sessionAsync() {
+  return withRetries(createSessionMiddleware, 10, 10, 'Could not create session middleware', false);
+};

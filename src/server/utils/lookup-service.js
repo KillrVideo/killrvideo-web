@@ -97,18 +97,6 @@ export function lookupServiceAsync(serviceName, defaultPort) {
     
     throw new UnableToResolveServiceError(serviceName, errors);
   })
-  .catch(UnableToResolveServiceError, err => {
-    // These are expected if we couldn't find any records, so only log if there were other innerErrors
-    if (err.innerErrors && err.innerErrors.length > 0) {
-      logger.log('error', `Errors while resolving ${hostname}`, err.innerErrors);
-    }
-    throw err;
-  })
-  .catch(err => err instanceof UnableToResolveServiceError === false, err => {
-    // Unexpected errors in the join handler above
-    logger.log('error', `Error while resolving ${hostname}`, err);
-    throw err;
-  })
   .tap(hosts => {
     logger.log('verbose', `Found service ${serviceName} at ${JSON.stringify(hosts)} in DNS`);
   });

@@ -1,7 +1,7 @@
 # Loaded using https://github.com/lorenwest/node-config
 # Can be overridden by creating a local.yaml file
 
-# Configuration available to the client via falcor routes
+# Configuration injected into the client code when it's loaded
 client:
   # The API key for talking to YouTube
   youTubeApiKey: REPLACE_WITH_YOUR_KEY
@@ -15,8 +15,14 @@ web:
     name: killrvideo.sid
     secret: THE_INTERNET_IS_FULL_OF_CAT_VIDEOS
     cassandra:
-      keyspace: killrvideo
       table: express_session
+
+# Cassandra settings
+cassandra:
+  # The keyspace (will be created if it doesn't exist)
+  keyspace: killrvideo_web
+  # The replication string (i.e. after WITH REPLICATION) to use when creating the keyspace if it doesn't exist
+  replication: "{ 'class' : 'SimpleStrategy', 'replication_factor' : 1 }"
 
 # Logging config
 logging:

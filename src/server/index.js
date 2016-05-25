@@ -7,10 +7,11 @@ import Promise from 'bluebird';
 import { initMiddlewareAsync } from './middleware';
 import { handleConnection } from './chat-handler';
 import { logger } from './utils/logging';
+import { withRetries } from './utils/with-retries';
+import { createKeyspaceIfNotExistsAsync } from './utils/cassandra-client';
 
 // Enable cancellation on Promises
 Promise.config({ cancellation: true });
-
 
 function startServer(app) {
   // Create the server
@@ -34,15 +35,26 @@ function startServer(app) {
   return server;
 }
 
+function initCassandra() {
+  return createKeyspaceIfNotExistsAsync()
+    .catch(err => {
+      logger.log('verbose', err.message);
+      throw err;
+    });
+}
+
 logger.log('info', 'Trying to start KillrVideo Web Server');
 
 // Create the express app
 const expressApp = express();
 
 // Run KillrVideo web server
-let startPromise = initMiddlewareAsync(expressApp).then(startServer)
+let startPromise = withRetries(initCassandra, 10, 10, 'Could not initialize Cassandra keyspace', false)
+  .return(expressApp)
+  .then(initMiddlewareAsync)
+  .then(startServer)
   .catch(err => {
-    logger.log('error', 'Unable to start KillrVideo Web Server', err);
+    logger.log('fatal', 'Unable to start KillrVideo Web Server', err);
     process.exit(1);
   });
 

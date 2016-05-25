@@ -1,10 +1,7 @@
+import Promise from 'bluebird';
 import { lookupServiceAsync } from '../utils/lookup-service';
-import { withRetries } from '../utils/with-retries';
 
-/**
- * Finds the location for a service and returns a Promise that resolves to a string of the IP:Port.
- */
-export function findServiceAsync(fullyQualifiedName) {
+function findService(fullyQualifiedName) {
   // Get just the service name from the fully qualified name
   let nameParts = fullyQualifiedName.split('.');
   let serviceName = nameParts[nameParts.length - 1];
@@ -15,9 +12,13 @@ export function findServiceAsync(fullyQualifiedName) {
     serviceName = serviceName.substr(1);
   }
   
-  // We should have something like 'video-catalog-service' now, so try and find the service with retries
-  // using 50101 as the default port for Grpc services 
-  let lookupFn = lookupServiceAsync.bind(undefined, serviceName, '50101');
-  return withRetries(lookupFn, 10, 1, `Unable to find service ${serviceName}`, true)
-    .then(hosts => { return hosts[0]; });
-};
+  // We should have something like 'video-catalog-service' now, so try and find the service using 50101 
+  // as the default port for Grpc services
+  return lookupServiceAsync(serviceName, '50101').then(hosts => hosts[0]);
+}
+
+/**
+ * Finds the location for a service from the fully qualified name and returns a Promise that resolves to a 
+ * string of the IP:Port where that service can be found.
+ */
+export const findServiceAsync = Promise.method(findService);
