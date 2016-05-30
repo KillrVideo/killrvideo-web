@@ -12,9 +12,8 @@ function findService(fullyQualifiedName) {
     serviceName = serviceName.substr(1);
   }
   
-  // We should have something like 'video-catalog-service' now, so try and find the service using 50101 
-  // as the default port for Grpc services
-  return lookupServiceAsync(serviceName, '50101').then(hosts => hosts[0]);
+  // We should have something like 'video-catalog-service' now, so try and find the service
+  return lookupServiceAsync(serviceName).then(hosts => hosts[0]);
 }
 
 /**

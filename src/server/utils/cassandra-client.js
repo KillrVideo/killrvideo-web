@@ -15,7 +15,7 @@ export function getCassandraClientAsync(keyspace) {
     return clientPromises.get(keyspace);
   }
     
-  const promise = lookupServiceAsync('cassandra', '9042')
+  const promise = lookupServiceAsync('cassandra')
     .then(contactPoints => {
       let clientOpts = {
         contactPoints,
