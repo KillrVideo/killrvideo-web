@@ -7,9 +7,7 @@
 			"request": "launch",
 			"program": "${workspaceRoot}\\dist\\server\\index.js",
 			"stopOnEntry": false,
-			"args": [
-				"dotenv_config_path=${workspaceRoot}\\lib\\killrvideo-docker-common\\killrvideo.env"
-			],
+			"args": [],
 			"cwd": "${workspaceRoot}",
 			"preLaunchTask": null,
 			"runtimeExecutable": null,
