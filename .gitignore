@@ -32,3 +32,6 @@ node_modules
 # Environment-specific config
 config/local.yaml
 config/production.yaml
+
+# Docker compose environment
+/.env
