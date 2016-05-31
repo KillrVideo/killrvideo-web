@@ -1,6 +1,7 @@
 import Promise from 'bluebird';
 import { concat as httpGet } from 'simple-get';
 import { logger } from './logging';
+import { ExtendableError } from './extendable-error';
 
 // In development environments, look for the docker IP to access etcd
 if (process.env.NODE_ENV === 'development' && !!process.env.KILLRVIDEO_DOCKER_IP) {
@@ -17,12 +18,25 @@ logger.log('info', `Using etcd endpoint ${ETCD_URL}`);
 
 const getAsync = Promise.promisify(httpGet, { multiArgs: true });
 
+/**
+ * Error thrown when getting keys from etcd returns a status other than 200 OK.
+ */
+export class GetKeysError extends ExtendableError {
+  constructor(response, body) {
+    super('Error getting keys from etcd');
+    
+    this.statusCode = response.statusCode;
+    this.statusMessage = response.statusMessage;
+    this.body = body;
+  }
+};
+
 function getKeysAsync(path) {
   let url = `${ETCD_URL}${path}`;
   return getAsync(url)
     .spread((res, data) => {
       if (res.statusCode !== 200) {
-        throw new Error(`HTTP Request to ${url} returned ${res.statusCode}:${res.statusMessage}`);
+        throw new GetKeysError(res, data.toString());
       }
       return JSON.parse(data.toString());
     });
@@ -51,5 +65,19 @@ export function getValueAsync(path) {
         throw new Error(`${path} is a directory in etcd`);
       }
       return res.node.value;
+    });
+};
+
+/**
+ * Gets a single value for the key at the given path in etcd and if the key is not found, returns the defaultValue instead.
+ */
+export function getValueOrDefaultAsync(path, defaultValue) {
+  return getValueAsync(path)
+    .catch(GetKeysError, err => {
+      if (err.statusCode === 404){
+        return defaultValue;
+      }
+      
+      throw err;
     });
 };
