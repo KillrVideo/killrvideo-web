@@ -6,12 +6,6 @@ function findService(fullyQualifiedName) {
   let nameParts = fullyQualifiedName.split('.');
   let serviceName = nameParts[nameParts.length - 1];
   
-  // Insert a dash before any capital letters, convert to lowercase, and remove any leading dash
-  serviceName = serviceName.replace(/[ABCDEFGHIJKLMNOPQRSTUVWXYZ]/g, '-$&').toLowerCase();
-  if (serviceName.startsWith('-')) {
-    serviceName = serviceName.substr(1);
-  }
-  
   // We should have something like 'video-catalog-service' now, so try and find the service
   return lookupServiceAsync(serviceName).then(hosts => hosts[0]);
 }
