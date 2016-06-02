@@ -22,24 +22,6 @@ function getFullyQualifiedName(value) {
 }
 
 /**
- * Custom promisifier for Grpc since currently doesn't follow node style callbacks where the callback
- * if the last argument. (There is a ticket open to fix this and it will change in a release soon).
- */
-function GrpcPromisifier(originalMethod) {
-  switch (originalMethod.name) {
-    case 'makeUnaryRequest':
-      return function makeUnaryRequestAsync(request, metadata, opts) {
-        let self = this;
-        return Promise.fromCallback(cb => {
-          originalMethod.call(self, request, cb, metadata, opts);
-        });
-      };
-    default:
-      throw new Error('Not supported yet');
-  }
-}
-
-/**
  * Turn service call arguments into strings so that memoization works properly.
  */
 function normalizeAsyncServiceCall(args) {
@@ -69,7 +51,7 @@ export function registerService(ClientConstructor) {
   }
   
   // Promisify all methods on the prototype (which should have the actual service methods)
-  Promise.promisifyAll(ClientConstructor.prototype, { promisifier: GrpcPromisifier });
+  Promise.promisifyAll(ClientConstructor.prototype);
   
   // Create a class for the service client
   class ServiceClient {
