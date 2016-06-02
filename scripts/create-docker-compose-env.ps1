@@ -3,7 +3,7 @@
   Create a docker compose .env file
 #>
 $scriptPath = Split-Path -parent $PSCommandPath
-$envFilePath = Resolve-Path "$scriptPath\..\.env"
+$envFilePath = "$scriptPath\..\.env"
 $getEnvCommand = Resolve-Path "$scriptPath\..\lib\killrvideo-docker-common\get-environment.ps1"
 
 # Base environment variables to be written
@@ -15,4 +15,5 @@ $dockerEnv = @("COMPOSE_PROJECT_NAME=killrvideoweb", "COMPOSE_FILE=.\lib\killrvi
 # We have to use .NET to do this so it gets written as UTF-8 without the BOM
 $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllLines($envFilePath, $dockerEnv, $Utf8NoBom)
+$envFilePath = Resolve-Path $envFilePath
 Write-Host "Environment file written to $envFilePath" 
