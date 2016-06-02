@@ -6,14 +6,6 @@ RUN groupadd -r killrvideo --gid=999 \
 
 # Default to production environment
 ENV NODE_ENV production
-    
-# Add dependencies for node-gyp
-RUN set -x \
-    && apt-get update \
-    && apt-get install -y python \
-                          make \
-                          g++ \
-    && rm -rf /var/lib/apt/lists/*
 
 # Create directory for app
 RUN mkdir -p /opt/killrvideo-web \
@@ -21,9 +13,21 @@ RUN mkdir -p /opt/killrvideo-web \
 
 WORKDIR /opt/killrvideo-web
 
-# Install the dependencies
+# Copy package.json for dependencies
 COPY package.json /opt/killrvideo-web/
-RUN npm install
+    
+# Add dependencies for node-gyp, then run npm install and remove dependencies
+RUN set -x \
+    && apt-get update \
+    && apt-get install -y python \
+                          make \
+                          g++ \
+    && npm install \
+    && apt-get purge -y python \
+                        make \
+                        g++ \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy the app itself
 COPY . /opt/killrvideo-web
