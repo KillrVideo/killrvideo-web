@@ -6,8 +6,7 @@ import Promise from 'bluebird';
 
 import { initMiddlewareAsync } from './middleware';
 import { handleConnection } from './chat-handler';
-import { withRetries } from './utils/with-retries';
-import { logger, createKeyspaceIfNotExistsAsync } from 'killrvideo-nodejs-common';
+import { logger, createKeyspaceIfNotExistsAsync, withRetries } from 'killrvideo-nodejs-common';
 
 // Enable cancellation on Promises
 Promise.config({ cancellation: true });

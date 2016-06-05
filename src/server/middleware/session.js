@@ -2,8 +2,7 @@ import Promise from 'bluebird';
 import expressSession from 'express-session';
 import CassandraStore from 'cassandra-store';
 import config from 'config';
-import { withRetries } from '../utils/with-retries';
-import { logger, getCassandraClientAsync } from 'killrvideo-nodejs-common';
+import { logger, getCassandraClientAsync, withRetries } from 'killrvideo-nodejs-common';
 
 // Wrap CassandraStore around the express session
 const CassandraSessionStore = CassandraStore(expressSession);
