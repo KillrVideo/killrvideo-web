@@ -1,15 +1,12 @@
 import path from 'path';
-import { load } from 'grpc';
-import { registerService } from './factory';
+import { loadServiceProto } from 'killrvideo-nodejs-common';
 
 // Path to .proto definitions (copied to output as part of the build)
 const PROTO_BASE_PATH = path.resolve(__dirname, '..', 'resources/protos');
 const PROTO_PATH = `search/search_service.proto`;
 
 // Load the protobuf files
-const proto = load({ file: PROTO_PATH, root: PROTO_BASE_PATH }, 'proto', { convertFieldsToCamelCase: true });
+const { proto, fullyQualifiedName } = loadServiceProto(PROTO_BASE_PATH, PROTO_PATH, p => p.killrvideo.search.SearchService);
 
 // Export the service name
-const SEARCH_SERVICE = registerService(proto.killrvideo.search.SearchService);
-export default SEARCH_SERVICE;
-export { SEARCH_SERVICE };
+export const SEARCH_SERVICE = fullyQualifiedName;

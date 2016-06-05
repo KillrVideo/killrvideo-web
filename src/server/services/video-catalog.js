@@ -1,18 +1,15 @@
 import path from 'path';
-import { load } from 'grpc';
-import { registerService } from './factory';
+import { loadServiceProto } from 'killrvideo-nodejs-common';
 
 // Path to .proto definitions (copied to output as part of the build)
 const PROTO_BASE_PATH = path.resolve(__dirname, '..', 'resources/protos');
 const PROTO_PATH = `video-catalog/video_catalog_service.proto`;
 
 // Load the protobuf files
-const proto = load({ file: PROTO_PATH, root: PROTO_BASE_PATH }, 'proto', { convertFieldsToCamelCase: true });
+const { proto, fullyQualifiedName } = loadServiceProto(PROTO_BASE_PATH, PROTO_PATH, p => p.killrvideo.video_catalog.VideoCatalogService);
 
 // Export the service name
-const VIDEO_CATALOG_SERVICE = registerService(proto.killrvideo.video_catalog.VideoCatalogService);
-export default VIDEO_CATALOG_SERVICE;
-export { VIDEO_CATALOG_SERVICE };
+export const VIDEO_CATALOG_SERVICE = fullyQualifiedName;
 
 // Export the VideoLocationType enum for lookups/conversion to int
 const VideoLocationType = proto.killrvideo.video_catalog.VideoLocationType;
