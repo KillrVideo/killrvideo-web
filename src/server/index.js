@@ -8,7 +8,7 @@ import { initMiddlewareAsync } from './middleware';
 import { handleConnection } from './chat-handler';
 import { logger } from './utils/logging';
 import { withRetries } from './utils/with-retries';
-import { createKeyspaceIfNotExistsAsync } from './utils/cassandra-client';
+import { createKeyspaceIfNotExistsAsync } from 'killrvideo-nodejs-common';
 
 // Enable cancellation on Promises
 Promise.config({ cancellation: true });
@@ -36,11 +36,14 @@ function startServer(app) {
 }
 
 function initCassandra() {
-  return createKeyspaceIfNotExistsAsync()
-    .catch(err => {
-      logger.log('verbose', err.message);
-      throw err;
-    });
+  return Promise.try(() => {
+    const { keyspace, replication } = config.get('cassandra');
+    return createKeyspaceIfNotExistsAsync(keyspace, replication);
+  })
+  .catch(err => {
+    logger.log('verbose', err.message);
+    throw err;
+  });
 }
 
 logger.log('info', 'Trying to start KillrVideo Web Server');
