@@ -1,6 +1,6 @@
 import R from 'ramda';
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
-import { logger } from '../../utils/logging';
+import { logger } from 'killrvideo-nodejs-common';
 
 export const catchErrors = R.invoker(1, 'catch');
 

@@ -5,7 +5,7 @@ import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { pipe, prop } from 'ramda';
 import { createPropPicker } from './common/props';
 import * as Common from './common';
-import { logger } from '../utils/logging';
+import { logger } from 'killrvideo-nodejs-common';
 
 const userMap = {
   'userId': pipe(prop('userId'), uuidToString)

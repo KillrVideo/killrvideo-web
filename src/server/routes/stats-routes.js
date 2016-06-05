@@ -2,7 +2,7 @@ import { STATS_SERVICE } from '../services/stats';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { defaultPropPicker } from './common/props';
 import * as Common from './common';
-import { logger } from '../utils/logging';
+import { logger } from 'killrvideo-nodejs-common';
 
 // Route definitions handled by the statistics service
 const routes = [

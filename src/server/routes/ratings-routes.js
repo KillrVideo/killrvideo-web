@@ -3,7 +3,7 @@ import { RATINGS_SERVICE } from '../services/ratings';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { createPropPicker, defaultPropPicker } from './common/props';
 import * as Common from './common';
-import { logger } from '../utils/logging';
+import { logger } from 'killrvideo-nodejs-common';
 
 const ratingsMap = {
   'count': prop('ratingsCount'),

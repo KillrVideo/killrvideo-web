@@ -4,7 +4,7 @@ import { toRef } from './common/sentinels';
 import { createPropPicker } from './common/props';
 import { pipe, prop, of as toArray, prepend } from 'ramda';
 import * as Common from './common';
-import { logger } from '../utils/logging';
+import { logger } from 'killrvideo-nodejs-common';
 import uuid from 'uuid';
 
 const commentsMap = {

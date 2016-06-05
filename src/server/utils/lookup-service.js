@@ -1,5 +1,5 @@
 import { getValuesAsync } from './etcd';
-import { logger } from './logging';
+import { logger } from 'killrvideo-nodejs-common';
 
 /**
  * Looks up a service with a given name. Returns an array of strings in the format of 'ip:port'.

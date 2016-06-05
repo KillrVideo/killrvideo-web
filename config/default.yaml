@@ -23,7 +23,3 @@ cassandra:
   keyspace: killrvideo_web
   # The replication string (i.e. after WITH REPLICATION) to use when creating the keyspace if it doesn't exist
   replication: "{ 'class' : 'SimpleStrategy', 'replication_factor' : 1 }"
-
-# Logging config
-logging:
-  level: verbose

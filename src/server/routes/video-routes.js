@@ -5,7 +5,7 @@ import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestam
 import { toAtom, toRef, toError } from './common/sentinels';
 import { createPropPicker } from './common/props';
 import * as Common from './common';
-import { logger } from '../utils/logging';
+import { logger } from 'killrvideo-nodejs-common';
 
 const videoPropsMap = {
   'tags': pipe(prop('tags'), toAtom),

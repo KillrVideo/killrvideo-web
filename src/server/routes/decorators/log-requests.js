@@ -1,4 +1,4 @@
-import { logger } from '../../utils/logging';
+import { logger } from 'killrvideo-nodejs-common';
 
 function logFalcor(fn) {
   switch (fn.name) {

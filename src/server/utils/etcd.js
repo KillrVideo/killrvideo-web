@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import { concat as httpGet } from 'simple-get';
-import { logger } from './logging';
+import { logger } from 'killrvideo-nodejs-common';
 import { ExtendableError } from './extendable-error';
 
 // In development environments, look for the docker IP to access etcd

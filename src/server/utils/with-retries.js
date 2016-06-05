@@ -1,5 +1,5 @@
 import Promise from 'bluebird';
-import { logger } from './logging';
+import { logger } from 'killrvideo-nodejs-common';
 
 
 /**
