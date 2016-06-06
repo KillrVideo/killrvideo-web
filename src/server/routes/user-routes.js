@@ -1,6 +1,7 @@
 import { ref as $ref, atom as $atom, error as $error } from 'falcor-json-graph';
 import uuid from 'uuid';
 import { USER_MANAGEMENT_SERVICE } from '../services/user-management';
+import { getServiceClientAsync } from '../services/factory';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { pipe, prop } from 'ramda';
 import { createPropPicker } from './common/props';
@@ -42,8 +43,8 @@ const routes = [
     route: 'currentUser.login',
     call(callPath, args) {
       let [ email, password ] = args;
-      let client = this.getServiceClient(USER_MANAGEMENT_SERVICE);
-      return client.verifyCredentialsAsync({ email, password })
+      return getServiceClientAsync(USER_MANAGEMENT_SERVICE)
+        .then(client => client.verifyCredentialsAsync({ email, password })) 
         .tap(response => {
           // Log the user in if successfully verified
           if (!response.userId) {
@@ -80,11 +81,9 @@ const routes = [
     call(callPath, args) {
       let [ firstName, lastName, email, password ] = args;
       let userId = uuid.v4();
-      let client = this.getServiceClient(USER_MANAGEMENT_SERVICE);
-      
-      return client.createUserAsync({
-          firstName, lastName, email, password, userId: stringToUuid(userId)
-        })
+     
+      return getServiceClientAsync(USER_MANAGEMENT_SERVICE)
+        .then(client => client.createUserAsync({ firstName, lastName, email, password, userId: stringToUuid(userId) })) 
         .tap(response => {
           // This will only get called on non-errors, so log the user in if successful
           return this.setCurrentUserId(userId);

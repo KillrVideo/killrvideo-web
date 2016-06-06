@@ -1,4 +1,5 @@
 import { COMMENTS_SERVICE } from '../services/comments';
+import { getServiceClientAsync } from '../services/factory';
 import { uuidToString, stringToUuid, timestampToDateString } from '../utils/protobuf-conversions';
 import { toRef } from './common/sentinels';
 import { createPropPicker } from './common/props';
@@ -107,8 +108,8 @@ const routes = [
       };
       
       // Make the request
-      let client = this.getServiceClient(COMMENTS_SERVICE);
-      return client.commentOnVideoAsync(request)
+      return getServiceClientAsync(COMMENTS_SERVICE)
+        .then(client => client.commentOnVideoAsync(request))
         .then(response => {
           return [
             { path: [ 'videosById', videoId, 'comments' ], invalidated: true },

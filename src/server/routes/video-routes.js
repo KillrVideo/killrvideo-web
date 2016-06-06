@@ -1,6 +1,7 @@
 import { pipe, prepend, append, prop, of as toArray } from 'ramda';
 import uuid from 'uuid';
 import { VIDEO_CATALOG_SERVICE, VideoLocationType } from '../services/video-catalog';
+import { getServiceClientAsync } from '../services/factory';
 import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestamp, enumToInteger } from '../utils/protobuf-conversions';
 import { toAtom, toRef, toError } from './common/sentinels';
 import { createPropPicker } from './common/props';
@@ -113,8 +114,8 @@ const routes = [
       };
       
       // Do request
-      let client = this.getServiceClient(VIDEO_CATALOG_SERVICE);
-      return client.submitYouTubeVideoAsync(request)
+      return getServiceClientAsync(VIDEO_CATALOG_SERVICE)
+        .then(client => client.submitYouTubeVideoAsync(request)) 
         .then(response => {
           // Since YouTube videos are available immediately, invalidate the recentVideos collection
           return [
@@ -159,8 +160,8 @@ const routes = [
       };
       
       // Do the request
-      let client = this.getServiceClient(VIDEO_CATALOG_SERVICE);
-      return client.submitUploadedVideoAsync(request)
+      return getServiceClientAsync(VIDEO_CATALOG_SERVICE)
+        .then(client => client.submitUploadedVideoAsync(request)) 
         .then(response => {
           // Since uploaded videos won't be available immediately, we don't need to invalidate the
           // recentVideos collection yet

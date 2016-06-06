@@ -1,4 +1,5 @@
 import { STATS_SERVICE } from '../services/stats';
+import { getServiceClientAsync } from '../services/factory';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { defaultPropPicker } from './common/props';
 import * as Common from './common';
@@ -35,8 +36,8 @@ const routes = [
       const videoId = callPath.videoIds[0];
       
       let request = { videoId: stringToUuid(videoId) };
-      let client = this.getServiceClient(STATS_SERVICE);
-      return client.recordPlaybackStartedAsync(request)
+      return getServiceClientAsync(STATS_SERVICE)
+        .then(client => client.recordPlaybackStartedAsync(request)) 
         .then(response => {
           return [
             { path: [ 'videosById', videoId, 'stats', 'views' ], invalidated: true }

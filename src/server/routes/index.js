@@ -1,7 +1,6 @@
 import Router from 'falcor-router';
 import Promise from 'bluebird';
 
-import { getServiceClient } from '../services/factory';
 import { PagingStateCache } from '../utils/paging-state-cache';
 
 import { logRequests } from './decorators/log-requests';
@@ -55,22 +54,8 @@ export class KillrVideoRouter extends Router.createClass(routes) {
     // Save the request for use by routes
     this.req = req;
     this.pagingStateCache = new PagingStateCache(req);
-    this.serviceClients = new Map();
   }
-  
-  /**
-   * Gets a service client for the given service. Client instances are shared for the duration
-   * of a request.
-   */
-  getServiceClient(serviceName) {
-    let client = this.serviceClients.get(serviceName);
-    if (!client) {
-      client = getServiceClient(serviceName);
-      this.serviceClients.set(serviceName, client);
-    }
-    return client;
-  }
-  
+    
   /**
    * Gets the currently logged in user's id.
    * 

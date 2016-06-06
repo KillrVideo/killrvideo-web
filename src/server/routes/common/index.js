@@ -1,6 +1,7 @@
 import R from 'ramda';
 import Promise from 'bluebird';
 
+import { getServiceClientAsync } from '../../services/factory';
 import { expandPathSet } from './pathsets';
 import { generatePaths, expandPaths } from './paths';
 import { handleRequestErrors, catchErrors } from './promises';
@@ -19,14 +20,15 @@ export function serviceRequest(createRequestFn, serviceName, requestFn, propPick
     const propsIdx = pathSet.length - 1;
     const reqIdx = propsIdx - 1;
     
-    // Generate initial paths and requests based on each path at the request index
+    // Generate initial paths based on each path at the request index
     let paths = generatePaths(reqIdx, pathSet);
-    let requests = R.map(createRequestFn, paths);
     
     // Do requests with the client
-    let client = this.getServiceClient(serviceName);
-    requestFn = R.pipe(R.partialRight(requestFn, [ client ]), catchErrors(handleErrors));
-    let promises = R.map(requestFn, requests);
+    let clientPromise = getServiceClientAsync(serviceName);
+    let promises = paths.map(path => {
+      let req = createRequestFn(path);
+      return clientPromise.then(client => requestFn(req, client)).catch(handleErrors);
+    });
     
     // Wait for all requests to finish and then pick props
     const props = pathSet[propsIdx];
@@ -46,13 +48,14 @@ export function listReference(createRequestFn, serviceName, requestFn, tokenProp
     // Generate initial paths and requests based on each path at the request index and clear paging state for the list(s)
     let paths = generatePaths(listIdx, pathSet);
     clearPagingStateCache(this.pagingStateCache, paths);
-    let requests = R.map(createRequestFn, paths);
     
     // Do requests with the client
-    let client = this.getServiceClient(serviceName);
-    requestFn = R.pipe(R.partialRight(requestFn, [ client ]), catchErrors(handleErrors));
-    let promises = R.map(requestFn, requests);
-    
+    let clientPromise = getServiceClientAsync(serviceName);
+    let promises = paths.map(path => {
+      let req = createRequestFn(path);
+      return clientPromise.then(client => requestFn(req, client)).catch(handleErrors);
+    });
+        
     // Wait for all requests to finish, then create token refs to the list(s)
     let createTokenRefs = R.zipWith(R.partial(createTokenRef, [ propPicker, tokenProps ]), paths);
     return Promise.all(promises).then(createTokenRefs);
@@ -94,9 +97,10 @@ export function pagedServiceRequest(createRequestFn, serviceName, requestFn, pro
     let requests = createRequests(createRequestFn, pages);
     
     // Do requests with the client
-    let client = this.getServiceClient(serviceName);
-    requestFn = R.pipe(R.partialRight(requestFn, [ client ]), catchErrors(handleErrors));
-    let promises = R.map(requestFn, requests);
+    let clientPromise = getServiceClientAsync(serviceName);
+    let promises = requests.map(req => {
+      return clientPromise.then(client => requestFn(req, client)).catch(handleErrors);
+    });
     
     // Wait for all requests to finish, then pick props from responses
     let pickResponses = R.zipWith(pickResponseValuesForPage, pages);
@@ -119,11 +123,11 @@ export function batchedServiceRequest(createRequestFn, serviceName, requestFn, m
     let paths = generatePaths(reqIdx, pathSet);
     let request = createRequestFn(paths);
     
-    // Do requests with the client
-    let client = this.getServiceClient(serviceName);
-    requestFn = R.pipe(R.partialRight(requestFn, [ client ]), catchErrors(handleErrors));
-    let promise = requestFn(request);
-    
+    // Do request with the client
+    let promise = getServiceClientAsync(serviceName)
+      .then(client => requestFn(request, client))
+      .catch(handleErrors);
+        
     // Wait for request to finish, then match response values in the batch to paths and pick props from those values
     let pickResponseValues = R.partial(pickResponseValuesForBatch, [ matchFn, paths ]);
     const props = pathSet[propsIdx];

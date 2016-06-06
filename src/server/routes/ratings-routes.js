@@ -1,9 +1,11 @@
 import { prop } from 'ramda';
 import { RATINGS_SERVICE } from '../services/ratings';
+import { getServiceClientAsync } from '../services/factory';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { createPropPicker, defaultPropPicker } from './common/props';
 import * as Common from './common';
 import { logger } from 'killrvideo-nodejs-common';
+
 
 const ratingsMap = {
   'count': prop('ratingsCount'),
@@ -69,8 +71,8 @@ const routes = [
         rating
       };
       
-      let client = this.getServiceClient(RATINGS_SERVICE);
-      return client.rateVideoAsync(request)
+      return getServiceClientAsync(RATINGS_SERVICE)
+        .then(client => client.rateVideoAsync(request)) 
         .then(response => {
           return [
             { path: [ 'videosById', videoId, 'rating' ], invalidated: true },

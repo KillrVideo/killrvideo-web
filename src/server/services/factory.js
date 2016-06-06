@@ -1,25 +1,6 @@
 import Promise from 'bluebird';
 import memoize from 'memoizee';
-import memoizeMethods from 'memoizee/methods';
-import d from 'd';
-import { findServiceAsync } from './discovery';
-import { credentials } from 'grpc';
-
-/**
- * Recursively gets the fully qualified name of a probuf.js reflection value
- */
-function getFullyQualifiedName(value) {
-  if (value === null || value === undefined) {
-    return '';
-  }
-  
-  let name = value.name;
-  const parentName = getFullyQualifiedName(value.parent);
-  if (parentName !== '') {
-    name = parentName + '.' + name;
-  }
-  return name;
-}
+import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
 
 /**
  * Turn service call arguments into strings so that memoization works properly.
@@ -32,95 +13,57 @@ function normalizeAsyncServiceCall(args) {
   return argsStr;
 }
 
-// Services and their class/constructor mapped by fully qualified service name
-const serviceRegistrations = new Map();
+/**
+ * Wraps a memoized function in one that clears its cache after a short timeout. This allows multiple requests
+ * to a service within quick succession to use the same values.
+ */
+function wrapMemoizedServiceCallWithInvalidation(memoizedFn) {
+  let invalidationScheduled = false;
+  
+  return function doServiceCall(...args) {
+    // Invoke the memoized function with the arguments
+    let results = memoizedFn(...args);
+    
+    // If we haven't scheduled an invalidation yet, do it
+    if (invalidationScheduled === false) {
+      process.nextTick(function clearMemoizedFnCache() {
+        memoizedFn.clear();
+        invalidationScheduled = false;
+      });
+      invalidationScheduled = true;
+    }
+    
+    return results;
+  };
+}
 
 /**
- * Register a service with the cache and returns the fully qualified name of the service.
+ * Ensures a service client's methods have been memoized.
  */
-export function registerService(ClientConstructor) {
-  // Grpc client constructor functions currently have a name property set to 'Client'
-  if (ClientConstructor.name !== 'Client' || !ClientConstructor.service) {
-    throw new Error('ClientConstructor must be a grpc Service constructor');
+function ensureMemoized(clientInstance) {
+  if (clientInstance.__hasBeenMemoized === true) {
+    return clientInstance;
   }
   
-  // Use the reflection value on the constructor to get the service name
-  const serviceName = getFullyQualifiedName(ClientConstructor.service);
-  if (serviceRegistrations.has(serviceName)) {
-    throw new Error(`There is already a service registered for ${serviceName}`);
-  }
-  
-  // Promisify all methods on the prototype (which should have the actual service methods)
-  Promise.promisifyAll(ClientConstructor.prototype);
-  
-  // Create a class for the service client
-  class ServiceClient {
-    constructor() {
-    }
-  }
-  
-  // Static properties on the ServiceClient class for this Grpc service
-  ServiceClient.__serviceName = serviceName;
-  ServiceClient.__client = null;
-  ServiceClient.__clientPromise = null;
-  
-  // Static method for dispatching to a function on the underlying client
-  ServiceClient.__withClient = function(methodName, ...args) {
-    // If we have the client just dispatch to the method
-    if (ServiceClient.__client !== null) {
-      return ServiceClient.__client[methodName](...args);
-    }
-    
-    // If we haven't done the async creation or it's failed previously, find the service and create the client
-    // and store the promise so we know it's in progress
-    if (ServiceClient.__clientPromise === null) {
-      ServiceClient.__clientPromise = findServiceAsync(serviceName)
-        .then(host => {
-          ServiceClient.__client = new ClientConstructor(host, credentials.createInsecure());
-        })
-        .finally(() => {
-          ServiceClient.__clientPromise = null;
-        });
-    }
-    
-    // Wait until the promise completes, then dispatch to the method
-    return ServiceClient.__clientPromise.then(() => {
-      return ServiceClient.__client[methodName](...args);
-    });
-  };
-  
-  // Define properties on the ServiceClient class that get the client and then call the same method on the client
-  const serviceClientMethodDescriptors = {};
-  Object.getOwnPropertyNames(ClientConstructor.prototype).forEach(propName => {
-    let prop = ClientConstructor.prototype[propName];
+  // Look for async methods on the client instance
+  let proto = Object.getPrototypeOf(clientInstance);
+  Object.getOwnPropertyNames(proto).forEach(propName => {
+    let prop = proto[propName];
     if (typeof prop === 'function' && propName.endsWith('Async')) {
-      // For each async method on the real client, create a method on our ServiceClient class that gets the
-      // real client (async), then calls the corresponding method on the real client
-      let argsStrings = [];
-      for (let i = 0; i < prop.length; i++) {
-        argsStrings.push(`arg${i}`);
-      }
-      let argsStr = argsStrings.join(', ');
-      let value = eval(`(function ${propName}(${argsStr}) { return ServiceClient.__withClient('${propName}', ${argsStr}); })`);
-      serviceClientMethodDescriptors[propName] = d(value, { normalizer: normalizeAsyncServiceCall, primitive: true });
+      let newFn = memoize(prop.bind(clientInstance), { normalizer: normalizeAsyncServiceCall, primitive: true });
+      newFn = wrapMemoizedServiceCallWithInvalidation(newFn);
+      proto[propName] = newFn;
     }
   });
   
-  // Memoize those methods where the results are cached for each ServiceClient instance
-  Object.defineProperties(ServiceClient.prototype, memoizeMethods(serviceClientMethodDescriptors));
-  
-  // Save registration
-  serviceRegistrations.set(serviceName, ServiceClient);
-  return serviceName;
-};
+  clientInstance.___hasBeenMemoized = true;
+  return clientInstance;
+}
 
 /**
- * Gets a new service client instance for the given service name.
+ * Get a Grpc service client by the service's fully qualified name.
  */
-export function getServiceClient(serviceName) {
-  const ServiceClient = serviceRegistrations.get(serviceName);
-  if (!ServiceClient) {
-    throw new Error(`A service with name ${serviceName} is not registered`);
-  }
-  return new ServiceClient();
+export function getServiceClientAsync(fullyQualifiedName) {
+  return getGrpcClientAsync(fullyQualifiedName)
+    .then(ensureMemoized);
 };

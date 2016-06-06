@@ -7,7 +7,7 @@ $envFilePath = "$scriptPath\..\.env"
 $getEnvCommand = Resolve-Path "$scriptPath\..\lib\killrvideo-docker-common\get-environment.ps1"
 
 # Base environment variables to be written
-$dockerEnv = @("COMPOSE_PROJECT_NAME=killrvideoweb", "COMPOSE_FILE=.\lib\killrvideo-docker-common\docker-compose.yaml")
+$dockerEnv = @("COMPOSE_PROJECT_NAME=killrvideo", "COMPOSE_FILE=.\lib\killrvideo-docker-common\docker-compose.yaml")
 
 # Get the docker environment using the common script and add to array
 & "$getEnvCommand" |% { $dockerEnv += $_ }
