@@ -64,7 +64,7 @@ process.on('SIGINT', function handleSigint() {
   logger.log('info', 'Got SIGINT, attempting to shutdown');
   
   if (startPromise.isFulfilled()) {
-    let server = startPromise.value;
+    let server = startPromise.value();
     server.close(() => process.exit(0));
   } else {
     startPromise.cancel();
