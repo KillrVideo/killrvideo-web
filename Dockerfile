@@ -32,6 +32,13 @@ RUN set -x \
 # Copy the app itself
 COPY . /opt/killrvideo-web
 
+# Allow YouTube API Key to be passed in via build arguments and set an environment 
+# variable based on it (Note: This is NOT a best practice to include API keys in 
+# the build since they'll be exposed, but for our reference app purposes, this is
+# preferrable to making every user that wants to try KillrVideo sign up for a key)
+ARG KILLRVIDEO_YOUTUBE_API_KEY
+ENV KILLRVIDEO_YOUTUBE_API_KEY ${KILLRVIDEO_YOUTUBE_API_KEY}
+
 # Expose the default port
 EXPOSE 3000
 
