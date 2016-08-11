@@ -28,6 +28,7 @@
     "type": "git",
     "url": "https://github.com/LukeTillman/killrvideo-web.git"
   },
+  "homepage": "https://killrvideo.github.io",
   "files": [
     "*.md",
     "dist"
