@@ -1,5 +1,7 @@
 # KillrVideo Web UI
 
+[![Build Status](https://travis-ci.org/KillrVideo/killrvideo-web.svg?branch=master)](https://travis-ci.org/KillrVideo/killrvideo-web)
+
 This project is the web front-end (UI) for KillrVideo, a sample web application for developers looking
 to learn more about Apache Cassandra and DataStax Enterprise. This project contains:
 - A single page app that runs in the browser and makes heavy use of:
