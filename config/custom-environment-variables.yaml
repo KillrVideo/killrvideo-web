@@ -1,0 +1,7 @@
+# Allow configuration in YAML files to be overridden by environment variable values
+client:
+  youTubeApiKey: KILLRVIDEO_YOUTUBE_API_KEY
+
+web:
+  session:
+    secret: KILLRVIDEO_SESSION_SECRET
