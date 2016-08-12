@@ -8,7 +8,6 @@ import { logErrors } from './decorators/log-errors';
 
 import commentsRoutes from './comments-routes';
 import ratingsRoutes from './ratings-routes';
-import sampleDataRoutes from './sample-data-routes';
 import searchRoutes from './search-routes';
 import statsRoutes from './stats-routes';
 import suggestionsRoutes from './suggestions-routes';
@@ -20,7 +19,6 @@ import videoRoutes from './video-routes';
 const routes = [
   ...commentsRoutes,
   ...ratingsRoutes,
-  ...sampleDataRoutes,
   ...searchRoutes,
   ...statsRoutes,
   ...suggestionsRoutes,
