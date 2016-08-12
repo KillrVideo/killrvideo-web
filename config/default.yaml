@@ -1,6 +1,8 @@
 # Loaded using https://github.com/lorenwest/node-config
 # Can be overridden by creating a local.yaml file
 
+loggingLevel: verbose
+
 # Configuration injected into the client code when it's loaded
 client:
   # The API key for talking to YouTube

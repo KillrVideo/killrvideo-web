@@ -7,12 +7,27 @@ import Promise from 'bluebird';
 import { initMiddlewareAsync } from './middleware';
 import { handleConnection } from './chat-handler';
 import { initCassandraAsync } from './utils/cassandra';
-import { logger, withRetries } from 'killrvideo-nodejs-common';
+import { logger, setLoggingLevel, withRetries } from 'killrvideo-nodejs-common';
 
 // Enable cancellation on Promises
 Promise.config({ cancellation: true });
 
-function startServer(app) {
+// Try to start the server
+const startPromise = Promise.try(() => {
+  // Set default logging level based on config
+  let loggingLevel = config.get('loggingLevel');
+  setLoggingLevel(loggingLevel);
+  logger.log(loggingLevel, `Logging initialized at ${loggingLevel}`);
+
+  logger.log('info', 'Trying to start KillrVideo Web Server');
+  return withRetries(initCassandraAsync, 10, 10, 'Could not initialize Cassandra keyspace', false);
+})
+.then(() => {
+  // Create the express app and init middleware
+  const expressApp = express();
+  return initMiddlewareAsync(expressApp).return(expressApp);
+})
+.then(app => {
   // Create the server
   const server = createServer(app);
 
@@ -32,22 +47,11 @@ function startServer(app) {
   const { port } = config.get('web');
   server.listen(port);
   return server;
-}
-
-logger.log('info', 'Trying to start KillrVideo Web Server');
-
-// Create the express app
-const expressApp = express();
-
-// Run KillrVideo web server
-let startPromise = withRetries(initCassandraAsync, 10, 10, 'Could not initialize Cassandra keyspace', false)
-  .return(expressApp)
-  .then(initMiddlewareAsync)
-  .then(startServer)
-  .catch(err => {
-    logger.log('fatal', 'Unable to start KillrVideo Web Server', err);
-    process.exit(1);
-  });
+})
+.catch(err => {
+  logger.log('error', 'Unable to start KillrVideo Web Server', err);
+  process.exit(1);
+});
 
 // If we get SIGINT, try and cancel/exit
 process.on('SIGINT', function handleSigint() {
