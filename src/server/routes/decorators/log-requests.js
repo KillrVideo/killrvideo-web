@@ -1,21 +1,21 @@
 import { logger } from 'killrvideo-nodejs-common';
 
-function logFalcor(fn) {
-  switch (fn.name) {
+function logFalcor(routeType, routeFn) {
+  switch (routeType) {
     case 'get':
-      return function get(...args) {
+      return function logGetRequest(...args) {
         let [ pathSet ] = arguments;
         logger.log('verbose', 'Falcor GET', { pathSet });
-        return fn.apply(this, args);
+        return routeFn.apply(this, args);
       };
     case 'call':
-      return function call(...args) {
+      return function logCallRequest(...args) {
         let [ callPath, callArgs ] = arguments;
         logger.log('verbose', 'Falcor CALL', { callPath, callArgs });
-        return fn.apply(this, args);
+        return routeFn.apply(this, args);
       };
     default:
-      return fn;
+      return routeFn;
   }
 }
 

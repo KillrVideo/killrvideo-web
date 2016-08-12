@@ -27,22 +27,27 @@ const routes = [
   ...uploadsRoutes,
   ...userRoutes,
   ...videoRoutes
-];
-
 // Wrap routes with decorators
-routes.forEach(route => {
+].map(route => {
   // The string representing the route definition
   let routeDef = route.route;
+
+  // Find the function (should be 'get', 'call', or 'set')
+  let routeType = Object.keys(route).find(prop => typeof route[prop] === 'function');
+  if (!routeType) {
+    throw new Error('Unexpected route object without a function');
+  }  
   
-  // Look for function on the route object (should be a 'get', 'call', 'set', etc.)
-  Object.keys(route).forEach(prop => {
-    if (typeof route[prop] === 'function') {
-      // Wrap function with decorator functions
-      let value = logRequests(logErrors(routeDef, route[prop]));
-      Object.defineProperty(route, prop, { value });
-    }
-  });
+  let routeFn = route[routeType];
+
+  // Wrap with decorators
+  let value = logErrors(routeDef, routeType, routeFn);
+  value = logRequests(routeType, value);
+  Object.defineProperty(route, routeType, { value });
+  return route;
 });
+
+let blah = routes;
 
 /**
  * The Falcor router implementation
