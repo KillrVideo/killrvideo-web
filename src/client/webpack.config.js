@@ -31,15 +31,14 @@ var BootswatchPlugin = {
   }
 }
 
-var PROJECT_DIR = path.resolve(__dirname);
+var CLIENT_DIR = path.resolve(__dirname);
 
 // Path constants
 var Paths = {
-  SRC: path.resolve(PROJECT_DIR, 'src/client'),
-  JS: path.resolve(PROJECT_DIR, 'src/client/js'),
-  CSS: path.resolve(PROJECT_DIR, 'src/client/css'),
-  IMAGES: path.resolve(PROJECT_DIR, 'src/client/images'),
-  BUILD_OUTPUT: path.resolve(PROJECT_DIR, 'dist/client')
+  JS: path.resolve(CLIENT_DIR, 'js'),
+  CSS: path.resolve(CLIENT_DIR, 'css'),
+  IMAGES: path.resolve(CLIENT_DIR, 'images'),
+  BUILD_OUTPUT: path.resolve(CLIENT_DIR, '../../dist/client')
 };
 
 // Plugins for the build
@@ -81,9 +80,9 @@ if (process.env.NODE_ENV === 'production') {
 // Export Webpack configuration
 module.exports = {
   devtool: 'source-map',
-  context: Paths.SRC,
+  context: CLIENT_DIR,
   entry: {
-    killrvideo: './webpack.js',
+    killrvideo: './index.js',
     vendor: [ 
       'bluebird', 'classnames', 'falcor', 'falcor-http-datasource', 'gemini-scrollbar', 'jsuri', 'load-script',
       'lodash', 'md5', 'moment', 'react', 'react-bootstrap', 'react-dom', 'react-dropzone', 'react-gemini-scrollbar',
@@ -105,7 +104,7 @@ module.exports = {
   module: {
     loaders: [
       // Babel transpiler (see .babelrc file for presets)
-      { test: /\.jsx?$/, include: Paths.SRC, loader: 'babel' },
+      { test: /\.jsx?$/, include: Paths.JS, loader: 'babel' },
       
       // Extract CSS files from our app that are referenced by require('') calls and have assets that are required
       // in the CSS file append '../' to the URLs (i.e. so fonts required will be calls to ../fonts/[name].[ext])
@@ -113,8 +112,8 @@ module.exports = {
       
       // Allow PNG images to be required from code
       { 
-        test: /\.png$/, 
-        include: Paths.SRC, 
+        test: /\.png$/,
+        include: Paths.IMAGES,
         loader: 'file',
         query: { name: 'images/[name].[ext]' } 
       },

@@ -6,6 +6,7 @@
 	},
 	"exclude": [
 		"node_modules",
+		"src\\client\\node_modules",
 		"bower_components",
 		"jspm_packages",
 		"tmp",
