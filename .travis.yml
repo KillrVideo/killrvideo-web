@@ -2,6 +2,11 @@ language: node_js
 node_js:
 - "6"
 
+# Install client dependencies also before building
+install:
+- npm install
+- npm run install:client
+
 # Build the app and a docker image
 script:
 - npm run release
@@ -40,3 +45,4 @@ addons:
 cache:
   directories:
   - node_modules
+  - src/client/node_modules

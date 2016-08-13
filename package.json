@@ -4,7 +4,7 @@
   "description": "Web UI for the KillrVideo application demo.",
   "main": "dist/server/index.js",
   "scripts": {
-    "install": "cd src/client && npm install",
+    "install:client": "cd src/client && npm install",
     "clean": "npm-run-all --parallel \"clean:*\"",
     "clean:client": "cd src/client && npm run clean",
     "clean:server": "rimraf dist/server",
