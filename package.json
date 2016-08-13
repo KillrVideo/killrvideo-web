@@ -4,6 +4,7 @@
   "description": "Web UI for the KillrVideo application demo.",
   "main": "dist/server/index.js",
   "scripts": {
+    "install": "cd src/client && npm install",
     "clean": "npm-run-all --parallel \"clean:*\"",
     "clean:client": "cd src/client && npm run clean",
     "clean:server": "rimraf dist/server",
@@ -64,7 +65,7 @@
     "grpc": "^1.0.0-pre1",
     "js-yaml": "^3.6.1",
     "killrvideo-nodejs-common": "https://github.com/KillrVideo/killrvideo-nodejs-common/releases/download/v2.1.1/killrvideo-nodejs-common-2.1.1.tgz",
-    "memoizee": "^0.3.10",
+    "memoizee": "^0.4.1",
     "passport": "^0.3.2",
     "ramda": "^0.21.0",
     "socket.io": "^1.4.8",
