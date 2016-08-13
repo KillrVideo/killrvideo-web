@@ -6,7 +6,8 @@
   "scripts": {
     "clean": "rimraf ../../dist/client",
     "build": "webpack --progress",
-    "watch": "npm run build -- --watch"
+    "watch": "npm run build -- --watch",
+    "analyze": "webpack --json | webpack-bundle-size-analyzer > webpack-bundle-size-analyzer.log"
   },
   "repository": {
     "type": "git",
