@@ -1,6 +1,6 @@
 import { createAction } from 'redux-actions';
 import { createActionTypeConstants } from './promises';
-import model from 'stores/falcor-model';
+import { model } from 'stores/falcor-model';
 import { map, isUndefined } from 'lodash';
 import { Promise } from 'lib/promise';
 import { throwAsReduxFormError } from 'lib/redux-form-error';

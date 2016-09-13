@@ -1,5 +1,5 @@
 import { createAction } from 'redux-actions';
-import model from 'stores/falcor-model';
+import { model } from 'stores/falcor-model';
 
 import { createActionTypeConstants } from './promises';
 import { createPagedActions } from './paged';

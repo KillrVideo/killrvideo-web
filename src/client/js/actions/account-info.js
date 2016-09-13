@@ -1,6 +1,6 @@
 import { createAction } from 'redux-actions';
 import { createActionTypeConstants } from './promises';
-import model from 'stores/falcor-model';
+import { model } from 'stores/falcor-model';
 import { isUndefined } from 'lodash';
 
 import { createPagedActions } from './paged';

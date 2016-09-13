@@ -3,7 +3,7 @@ import { isUndefined } from 'lodash';
 import { Promise } from 'lib/promise';
 import Uri from 'jsuri';
 import xhr from 'xhr';
-import model from 'stores/falcor-model';
+import { model } from 'stores/falcor-model';
 import { createActionTypeConstants } from './promises';
 import { deepFind } from 'lib/deep-find';
 import { ExtendableError } from 'lib/extendable-error';

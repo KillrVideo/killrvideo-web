@@ -2,7 +2,7 @@ import { createAction } from 'redux-actions';
 import { isUndefined } from 'lodash';
 import { Promise } from 'lib/promise';
 
-import model from 'stores/falcor-model';
+import { model } from 'stores/falcor-model';
 import { change } from 'redux-form';
 
 import { createActionTypeConstants } from './promises';
