@@ -30,60 +30,48 @@ const defaultUserAttributes = [ 'userId', 'firstName', 'lastName', 'email' ];
 
 // Log a user in
 export function login(email, password) {
-  return dispatch => {
-    // Make the request
-    const promise = model.call('currentUser.login', [ email, password ], defaultUserAttributes)
-      .catch(throwAsReduxFormError)
-      .then(response => response.json.currentUser);
+  // Make the request
+  const promise = model.call('currentUser.login', [ email, password ], defaultUserAttributes)
+    .catch(throwAsReduxFormError)
+    .then(response => response.json.currentUser);
       
-    dispatch({
-      type: LOGIN,
-      payload: {
-        promise,
-        data: { promise }
-      }
-    });
-    
-    return promise;
+  return {
+    type: LOGIN,
+    payload: {
+      promise,
+      data: { promise }
+    }
   };
 };
 
 // Log the current user out
 export function logout() {
-  return dispatch => {
-    // Make the falcor request
-    const promise = model.call('currentUser.logout')
-      .catch(throwAsReduxFormError);
-    
-    dispatch({
-      type: LOGOUT,
-      payload: {
-        promise,
-        data: { promise }
-      }
-    });
-    
-    return promise;
+  // Make the falcor request
+  const promise = model.call('currentUser.logout')
+    .catch(throwAsReduxFormError);
+  
+  return {
+    type: LOGOUT,
+    payload: {
+      promise,
+      data: { promise }
+    }
   };
 };
 
 // Get information about the currently logged in user
 export function getCurrentUser(queries) {
-  return dispatch => {
-    const falcorQueries = queries.map(q => [ 'currentUser', ...q ]);
+  const falcorQueries = queries.map(q => [ 'currentUser', ...q ]);
+  
+  const promise = model.get(...falcorQueries)
+    .then(response => { return isUndefined(response) ? null : response.json.currentUser; });
     
-    const promise = model.get(...falcorQueries)
-      .then(response => { return isUndefined(response) ? null : response.json.currentUser; });
-      
-    dispatch({
-      type: GET_CURRENT_USER,
-      payload: {
-        promise,
-        data: { promise }
-      }
-    });
-    
-    return promise;
+  return {
+    type: GET_CURRENT_USER,
+    payload: {
+      promise,
+      data: { promise }
+    }
   };
 };
 
@@ -93,20 +81,16 @@ export function getIsLoggedIn() {
 
 // Register a new user
 export function register(firstName, lastName, email, password) {
-  return dispatch => {
-    // Make falcor request and handle results
-    const promise = model.call('currentUser.register', [ firstName, lastName, email, password ], defaultUserAttributes)
-      .catch(throwAsReduxFormError)
-      .then(response => response.json.currentUser);
+  // Make falcor request and handle results
+  const promise = model.call('currentUser.register', [ firstName, lastName, email, password ], defaultUserAttributes)
+    .catch(throwAsReduxFormError)
+    .then(response => response.json.currentUser);
       
-    dispatch({
-      type: REGISTER,
-      payload: {
-        promise,
-        data: { promise }
-      }
-    });
-    
-    return promise;
+  return {
+    type: REGISTER,
+    payload: {
+      promise,
+      data: { promise }
+    }
   };
 };

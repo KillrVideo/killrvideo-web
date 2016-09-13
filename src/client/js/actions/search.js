@@ -39,25 +39,21 @@ export const unload = results.unload;
 
 // Get search term suggestions
 export function getSuggestions(term) {
-  return dispatch => {
-    if (!term)
-      return dispatch(clearSuggestions());
-    
-    const promise = model.get([ 'search', term, 'suggestions'])
-      .catchReturn([])
-      .then(response => {
-        if (!response) return [];
-        return response.json.search[term].suggestions; 
-      });
-    
-    dispatch({
-      type: GET_SUGGESTIONS,
-      payload: {
-        promise,
-        data: { promise }
-      }
+  if (!term)
+    return clearSuggestions();
+  
+  const promise = model.get([ 'search', term, 'suggestions'])
+    .catchReturn([])
+    .then(response => {
+      if (!response) return [];
+      return response.json.search[term].suggestions; 
     });
-    
-    return promise;
+  
+  return {
+    type: GET_SUGGESTIONS,
+    payload: {
+      promise,
+      data: { promise }
+    }
   };
 }
