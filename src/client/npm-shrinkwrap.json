@@ -2981,9 +2981,9 @@
       "resolved": "https://registry.npmjs.org/redux-logger/-/redux-logger-2.6.1.tgz"
     },
     "redux-promise-middleware": {
-      "version": "2.4.0",
-      "from": "https://registry.npmjs.org/redux-promise-middleware/-/redux-promise-middleware-2.4.0.tgz",
-      "resolved": "https://registry.npmjs.org/redux-promise-middleware/-/redux-promise-middleware-2.4.0.tgz"
+      "version": "4.0.0",
+      "from": "redux-promise-middleware@4.0.0",
+      "resolved": "https://registry.npmjs.org/redux-promise-middleware/-/redux-promise-middleware-4.0.0.tgz"
     },
     "redux-thunk": {
       "version": "1.0.3",
