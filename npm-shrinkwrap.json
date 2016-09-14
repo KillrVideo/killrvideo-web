@@ -678,11 +678,6 @@
       "version": "0.1.0",
       "from": "base64id@0.1.0"
     },
-    "basic-auth": {
-      "version": "1.0.3",
-      "from": "basic-auth@>=1.0.3 <1.1.0",
-      "resolved": "https://registry.npmjs.org/basic-auth/-/basic-auth-1.0.3.tgz"
-    },
     "benchmark": {
       "version": "1.0.0",
       "from": "benchmark@1.0.0"
@@ -2953,11 +2948,6 @@
           "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.8.tgz"
         }
       }
-    },
-    "morgan": {
-      "version": "1.7.0",
-      "from": "morgan@latest",
-      "resolved": "https://registry.npmjs.org/morgan/-/morgan-1.7.0.tgz"
     },
     "ms": {
       "version": "0.7.1",

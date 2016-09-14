@@ -11,13 +11,7 @@ import { appHtml } from './app-html';
 export function initMiddlewareAsync(app) {
   // Serve up static build assets for the client
   app.use('/static', expressStatic(`${__dirname}/../../client`));
-  
-  // Request logging when in development
-  if (app.get('env') === 'development') {
-    let morgan = require('morgan');
-    app.use(morgan('dev'));
-  }
-  
+    
   return falcorRouterAsync().then(falcorRouter => {
     // Falcor requests to model.json
     app.use('/model.json', falcorRouter);

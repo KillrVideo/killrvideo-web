@@ -2,15 +2,7 @@ import { logger } from 'killrvideo-nodejs-common';
 import { EOL } from 'os';
 import util from 'util';
 import config from 'config';
-
-let debugEnabled = null;
-function isDebugEnabled() {
-  if (debugEnabled !== null) return debugEnabled;
-
-  let level = config.get('loggingLevel').toLowerCase();
-  debugEnabled = (level === 'debug' || level === 'silly'); 
-  return debugEnabled;
-}
+import { isDebugEnabled } from '../../utils/is-debug-enabled';
 
 /**
  * Helper function for determining if an object looks like a Promise. From:
@@ -42,12 +34,12 @@ function logFalcor(routeDef, routeType, routeFn) {
             return result.then(
               response => {
                 if (isDebugEnabled()) {
-                  logger.log('debug', `Falcor GET '${routeDef}'${EOL}${inspect({ pathSet, response })}`);
+                  logger.log('debug', `Falcor ROUTE '${routeDef}'${EOL}${inspect({ pathSet, response })}`);
                 }
                 return response;
               },
               err => {
-                logger.log('error', `Falcor GET '${routeDef}'${EOL}${inspect({ pathSet })}${EOL}`, err);
+                logger.log('error', `Falcor ROUTE '${routeDef}'${EOL}${inspect({ pathSet })}${EOL}`, err);
                 throw err;
               }
             );
@@ -56,11 +48,11 @@ function logFalcor(routeDef, routeType, routeFn) {
           // Log request and response now
           let response = result;
           if (isDebugEnabled()) {
-            logger.log('debug', `Falcor GET '${routeDef}'${EOL}${inspect({ pathSet, response })}`);
+            logger.log('debug', `Falcor ROUTE '${routeDef}'${EOL}${inspect({ pathSet, response })}`);
           }
           return result;
         } catch (err) {
-          logger.log('error', `Falcor GET '${routeDef}'${EOL}${inspect({ pathSet })}${EOL}`, err);
+          logger.log('error', `Falcor ROUTE '${routeDef}'${EOL}${inspect({ pathSet })}${EOL}`, err);
           throw err;
         }
       };
@@ -75,12 +67,12 @@ function logFalcor(routeDef, routeType, routeFn) {
             return result.then(
               response => {
                 if (isDebugEnabled()) {
-                  logger.log('debug', `Falcor CALL '${routeDef}'${EOL}${inspect({ callPath, callArgs, response })}${EOL}${inspect(response)}`);
+                  logger.log('debug', `Falcor ROUTE '${routeDef}'${EOL}${inspect({ callPath, callArgs, response })}${EOL}${inspect(response)}`);
                 }
                 return response;
               },
               err => {
-                logger.log('error', `Falcor CALL '${routeDef}'${EOL}${inspect({ callPath, callArgs })}${EOL}`, err);
+                logger.log('error', `Falcor ROUTE '${routeDef}'${EOL}${inspect({ callPath, callArgs })}${EOL}`, err);
                 throw err;
               }
             );
@@ -89,11 +81,11 @@ function logFalcor(routeDef, routeType, routeFn) {
           // Log request and response now
           let response = result;
           if (isDebugEnabled()) {
-            logger.log('debug', `Falcor CALL '${routeDef}'${EOL}${inspect({ callPath, callArgs, response })}${EOL}${inspect(result)}`);
+            logger.log('debug', `Falcor ROUTE '${routeDef}'${EOL}${inspect({ callPath, callArgs, response })}${EOL}${inspect(result)}`);
           }
           return result;
         } catch (err) {
-          logger.log('error', `Falcor CALL '${routeDef}'${EOL}${inspect({ callPath, callArgs })}${EOL}`, err);
+          logger.log('error', `Falcor ROUTE '${routeDef}'${EOL}${inspect({ callPath, callArgs })}${EOL}`, err);
           throw err;
         }
       };

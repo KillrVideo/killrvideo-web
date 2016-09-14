@@ -1,5 +1,9 @@
 import Router from 'falcor-router';
 import Promise from 'bluebird';
+import util from 'util';
+import { EOL } from 'os';
+import { logger } from 'killrvideo-nodejs-common';
+import { isDebugEnabled } from '../utils/is-debug-enabled';
 
 import { PagingStateCache } from '../utils/paging-state-cache';
 
@@ -13,6 +17,8 @@ import suggestionsRoutes from './suggestions-routes';
 import uploadsRoutes from './uploads-routes';
 import userRoutes from './user-routes';
 import videoRoutes from './video-routes';
+
+const INSPECT_OPTS = { depth: 5, colors: true, breakLength: 80 };
 
 // Combine all routes into a single array
 const routes = [
@@ -43,8 +49,6 @@ const routes = [
   return route;
 });
 
-let blah = routes;
-
 /**
  * The Falcor router implementation
  */
@@ -55,6 +59,27 @@ export class KillrVideoRouter extends Router.createClass(routes) {
     // Save the request for use by routes
     this.req = req;
     this.pagingStateCache = new PagingStateCache(req);
+  }
+
+  get(...args) {
+    if (isDebugEnabled()) {
+      logger.log('debug', `Falcor GET${EOL}${util.inspect(args, INSPECT_OPTS)}`);
+    }
+    return super.get(...args);
+  }
+
+  set(...args) {
+    if (isDebugEnabled()) {
+      logger.log('debug', `Falcor SET${EOL}${util.inspect(args, INSPECT_OPTS)}`);
+    }
+    return super.set(...args);
+  }
+
+  call(...args) {
+    if (isDebugEnabled()) {
+      logger.log('debug', `Falcor CALL${EOL}${util.inspect(args, INSPECT_OPTS)}`);
+    }
+    return super.call(...args);
   }
     
   /**
