@@ -4,7 +4,6 @@ import Promise from 'bluebird';
 import { PagingStateCache } from '../utils/paging-state-cache';
 
 import { logRequests } from './decorators/log-requests';
-import { logErrors } from './decorators/log-errors';
 
 import commentsRoutes from './comments-routes';
 import ratingsRoutes from './ratings-routes';
@@ -39,8 +38,7 @@ const routes = [
   let routeFn = route[routeType];
 
   // Wrap with decorators
-  let value = logErrors(routeDef, routeType, routeFn);
-  value = logRequests(routeType, value);
+  let value = logRequests(routeDef, routeType, routeFn);
   Object.defineProperty(route, routeType, { value });
   return route;
 });

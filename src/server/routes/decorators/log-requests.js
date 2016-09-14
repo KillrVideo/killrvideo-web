@@ -1,18 +1,83 @@
 import { logger } from 'killrvideo-nodejs-common';
+import { EOL } from 'os';
+import util from 'util';
 
-function logFalcor(routeType, routeFn) {
+/**
+ * Helper function for determining if an object looks like a Promise. From:
+ * https://github.com/then/is-promise/blob/master/index.js
+ */
+function isPromise(obj) {
+  return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
+}
+
+const INSPECT_OPTS = { depth: 5, colors: true, breakLength: 80 };
+
+/**
+ * Does util.inspect with consistent options.
+ */
+function inspect(obj) {
+  return util.inspect(obj, INSPECT_OPTS);
+}
+
+function logFalcor(routeDef, routeType, routeFn) {
   switch (routeType) {
     case 'get':
       return function logGetRequest(...args) {
         let [ pathSet ] = arguments;
-        logger.log('verbose', 'Falcor GET', { pathSet });
-        return routeFn.apply(this, args);
+        try {
+          let result = routeFn.apply(this, args);
+
+          // Log request and results once complete if a Promise
+          if (isPromise(result)) {
+            return result.then(
+              response => {
+                logger.log('debug', `Falcor GET '${routeDef}'${EOL}${inspect({ pathSet, response })}`);
+                return response;
+              },
+              err => {
+                logger.log('error', `Falcor GET '${routeDef}'${EOL}${inspect({ pathSet })}${EOL}`, err);
+                throw err;
+              }
+            );
+          }
+
+          // Log request and response now
+          let response = result;
+          logger.log('debug', `Falcor GET '${routeDef}'${EOL}${inspect({ pathSet, response })}`);
+          return result;
+        } catch (err) {
+          logger.log('error', `Falcor GET '${routeDef}'${EOL}${inspect({ pathSet })}${EOL}`, err);
+          throw err;
+        }
       };
     case 'call':
       return function logCallRequest(...args) {
         let [ callPath, callArgs ] = arguments;
-        logger.log('verbose', 'Falcor CALL', { callPath, callArgs });
-        return routeFn.apply(this, args);
+        try {
+          let result = routeFn.apply(this, args);
+
+          // Log request and results once complete if a Promise
+          if (isPromise(result)) {
+            return result.then(
+              response => {
+                logger.log('debug', `Falcor CALL '${routeDef}'${EOL}${inspect({ callPath, callArgs, response })}${EOL}${inspect(response)}`);
+                return response;
+              },
+              err => {
+                logger.log('error', `Falcor CALL '${routeDef}'${EOL}${inspect({ callPath, callArgs })}${EOL}`, err);
+                throw err;
+              }
+            );
+          }
+
+          // Log request and response now
+          let response = result;
+          logger.log('debug', `Falcor CALL '${routeDef}'${EOL}${inspect({ callPath, callArgs, response })}${EOL}${inspect(result)}`);
+          return result;
+        } catch (err) {
+          logger.log('error', `Falcor CALL '${routeDef}'${EOL}${inspect({ callPath, callArgs })}${EOL}`, err);
+          throw err;
+        }
       };
     default:
       return routeFn;
