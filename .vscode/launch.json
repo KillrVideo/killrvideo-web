@@ -19,7 +19,7 @@
 			"env": {
 				"NODE_ENV": "development"
 			},
-			"console": "internalConsole",
+			"console": "externalTerminal",
 			"sourceMaps": true,
 			"outDir": "${workspaceRoot}\\dist\\server"
 		},
