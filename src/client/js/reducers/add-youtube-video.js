@@ -37,7 +37,8 @@ const youTubeDefaultState = {
       return validateForm(vals, constraints);
     },
     asyncValidate(vals, dispatch) {
-      return dispatch(validateYouTubeUrl(vals.youTubeUrl));
+      // Validate URL and if successful, return empty object that redux-form expects
+      return dispatch(validateYouTubeUrl(vals.youTubeUrl)).return({});
     },
     onSubmit(vals, dispatch) {
       return dispatch(addYouTubeVideo(vals));
@@ -62,25 +63,25 @@ function youTube(state = youTubeDefaultState, action) {
         _validationPromise: action.payload.promise,
         _allowValidationToComplete: action.payload.allowValidationToComplete
       };
-      
-    case YouTubeActions.SET_YOUTUBE_VIDEO.LOADING:
+    
+    case YouTubeActions.VALIDATE_YOUTUBE_URL.SUCCESS:
       return {
         ...state,
-        setSelectionInProgress: true
+        setSelectionInProgress: false,
+        showCommonDetails: true,
+        youTubeVideoId: action.payload.videoId
       };
-      
-    case YouTubeActions.SET_YOUTUBE_VIDEO.FAILURE:
+
+    case YouTubeActions.VALIDATE_YOUTUBE_URL.FAILURE:
       return {
         ...state,
         setSelectionInProgress: false
-      };
+      }
       
-    case YouTubeActions.SET_YOUTUBE_VIDEO.SUCCESS:
+    case YouTubeActions.SET_YOUTUBE_VIDEO:
       return {
         ...state,
-        showCommonDetails: true,
-        setSelectionInProgress: false,
-        youTubeVideoId: action.payload.videoId
+        setSelectionInProgress: true
       };
       
     case YouTubeActions.ADD_YOUTUBE_VIDEO.SUCCESS:

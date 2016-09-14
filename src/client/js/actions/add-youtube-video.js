@@ -32,13 +32,12 @@ class InvalidYouTubeUrl extends ExtendableError {
  */
 
 const VALIDATE_YOUTUBE_URL = 'addVideo/VALIDATE_YOUTUBE_URL';
-const SET_YOUTUBE_VIDEO = 'addVideo/SET_YOUTUBE_VIDEO';
 const ADD_YOUTUBE_VIDEO = 'addVideo/ADD_YOUTUBE_VIDEO';
 
 // Public action types
 export const ActionTypes = {
   VALIDATE_YOUTUBE_URL: createActionTypeConstants(VALIDATE_YOUTUBE_URL),
-  SET_YOUTUBE_VIDEO: createActionTypeConstants(SET_YOUTUBE_VIDEO),
+  SET_YOUTUBE_VIDEO: 'addVideo/SET_YOUTUBE_VIDEO',
   ADD_YOUTUBE_VIDEO: createActionTypeConstants(ADD_YOUTUBE_VIDEO),
   CLEAR_YOUTUBE_VIDEO: 'addVideo/CLEAR_YOUTUBE_VIDEO'
 };
@@ -107,7 +106,7 @@ export function validateYouTubeUrl(youTubeUrl) {
     if (existingPromise) {
       // Is the URL we're validating the same as the current promise?
       if (validatedYouTubeUrl === youTubeUrl) {
-        return existingPromise.return({});
+        return existingPromise;
       }
       
       // Cancel existing validation so we can start again
@@ -124,11 +123,18 @@ export function validateYouTubeUrl(youTubeUrl) {
       .catchThrow(new YouTubeNotAvailable())
       .bind({ videoId })
       .then(lookupYouTubeVideo)
-      .finally(() => allowValidationPromise);   // Will wait for allowValidationPromise to resolve before passing through success/failure
-    
+      // Once we have the video Id from YouTube, prepopulate the form with some video details from the API
+      .bind({ dispatch })
+      .then(updateForm)
+      // Wait for allowValidationPromise to resolve before passing through success/failure
+      .then(
+        val => { return allowValidationPromise.return(val); },
+        err => { return allowValidationPromise.throw(err); }
+      );
+
     // Dispatch the promise so we can store the validation promise and the function for allowing
     // it to complete in state
-    dispatch({
+    return dispatch({
       type: VALIDATE_YOUTUBE_URL,
       payload: {
         promise,
@@ -139,42 +145,30 @@ export function validateYouTubeUrl(youTubeUrl) {
         }
       }
     });
-    
-    // The promise that reduxForm expects needs to return an empty object in the case of success, but the promise
-    // we currently have will return the results of the YouTube API lookup, so just return an empty object on success
-    return promise.return({});
   };
 };
 
 // Set the YouTube video selection
 export function setYouTubeVideoSelection() {
   return (dispatch, getState) => {
-    // Get the validation promise (which should be in progress) and the function we can
-    // invoke to allow it to resolve/reject
+    // Get the function which will lets us tell validation to go ahead and return a value/error 
     const { 
       addVideo: {
         youTube: {
-          _validationPromise: validationPromise,
           _allowValidationToComplete: allowValidationToComplete
         }
       }
     } = getState();
-    
-    // Create a promise that will take the snippet from the YouTube API and if the lookup was
-    // successful and set some of those values as default values on the addVideo form
-    const promise = validationPromise.bind({ dispatch }).then(updateForm);
-    
-    // Dispatch the promise
-    dispatch({
-      type: SET_YOUTUBE_VIDEO,
-      payload: { promise }
+
+    // Tell everyone we're trying to set the YouTube video
+    let returnVal = dispatch({
+      type: ActionTypes.SET_YOUTUBE_VIDEO
     });
-    
-    // Allow the promise to proceed
+
+    // Allow validation to go ahead
     allowValidationToComplete();
-    
-    // Return the promise
-    return promise;
+
+    return returnVal;
   };
 };
 
