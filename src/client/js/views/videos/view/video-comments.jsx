@@ -80,7 +80,7 @@ VideoComments.queries = {
   
   currentUser() {
     return [ 
-      [ 'firstName', 'lastName', 'email', 'userId' ]
+      [ [ 'firstName', 'lastName', 'email', 'userId' ] ]
     ];
   }
 };
