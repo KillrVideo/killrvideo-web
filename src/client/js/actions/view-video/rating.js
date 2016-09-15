@@ -19,36 +19,28 @@ export const ActionTypes = {
  */
 
 export function rateVideo(videoId, rating, videoQueries) {
-  return (dispatch, getState) => {
-    // Rate the video and if successful, return the rating as the action's payload
-    const promise = model.call([ 'videosById', videoId, 'rate' ], [ rating ], [], videoQueries)
-      .then(response => response.json.videosById[videoId]);
-    
-    dispatch({
-      type: RATE_VIDEO,
-      payload: {
-        promise,
-        data: { promise, rating }
-      }
-    });
-    
-    return promise;
+  // Rate the video and if successful, return the rating as the action's payload
+  const promise = model.call([ 'videosById', videoId, 'rate' ], [ rating ], [], videoQueries)
+    .then(response => response.json.videosById[videoId]);
+  
+  return {
+    type: RATE_VIDEO,
+    payload: {
+      promise,
+      data: { promise, rating }
+    }
   };
 };
 
 export function getCurrentUserRating(videoId) {
-  return (dispatch, getState) => {
-    const promise = model.get([ 'currentUser', 'ratings', videoId, 'rating' ])
-      .then(response => isUndefined(response) ? { rating: 0 } : response.json.currentUser.ratings[videoId]);
-      
-    dispatch({
-      type: GET_CURRENT_USER_RATING,
-      payload: {
-        promise,
-        data: { promise }
-      }
-    });
+  const promise = model.get([ 'currentUser', 'ratings', videoId, 'rating' ])
+    .then(response => isUndefined(response) ? { rating: 0 } : response.json.currentUser.ratings[videoId]);
     
-    return promise;
+  return {
+    type: GET_CURRENT_USER_RATING,
+    payload: {
+      promise,
+      data: { promise }
+    }
   };
 };

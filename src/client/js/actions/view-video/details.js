@@ -44,18 +44,14 @@ export const updateVideoLocation = createAction(ActionTypes.UPDATE_VIDEO_LOCATIO
 
 // Record playbacks
 export function recordPlayback(videoId, videoQueries) {
-  return (dispatch, getState) => {
-    const promise = model.call([ 'videosById', videoId, 'recordPlayback' ], [], [], videoQueries)
-      .then(response => response.json.videosById[videoId]);
+  const promise = model.call([ 'videosById', videoId, 'recordPlayback' ], [], [], videoQueries)
+    .then(response => response.json.videosById[videoId]);
     
-    dispatch({
-      type: RECORD_PLAYBACK,
-      payload: {
-        promise,
-        data: { promise }
-      }
-    });
-    
-    return promise;
+  return {
+    type: RECORD_PLAYBACK,
+    payload: {
+      promise,
+      data: { promise }
+    }
   };
 };
