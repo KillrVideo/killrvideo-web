@@ -11,22 +11,18 @@ export const ActionTypes = {
 };
 
 export function addComment(videoId, comment) {
-  return (dispatch, getState) => {
-    const promise = model.call([ 'videosById', videoId, 'comments', 'add' ], [ comment ], [], [])
-      .catch(throwAsReduxFormErrorForField('comment'))
-      .return(comment);
-    
-    dispatch({
-      type: ADD_COMMENT,
-      payload: {
-        promise,
-        data: {
-          promise
-        }
+  const promise = model.call([ 'videosById', videoId, 'comments', 'add' ], [ comment ], [], [])
+    .catch(throwAsReduxFormErrorForField('comment'))
+    .return(comment);
+  
+  return {
+    type: ADD_COMMENT,
+    payload: {
+      promise,
+      data: {
+        promise
       }
-    });
-    
-    return promise;
+    }
   };
 };
 
