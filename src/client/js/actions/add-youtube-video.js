@@ -185,12 +185,10 @@ export function addYouTubeVideo(vals) {
         return { addedVideoId };
       });
       
-    dispatch({
+    return dispatch({
       type: ADD_YOUTUBE_VIDEO,
       payload: { promise }
     });
-    
-    return promise;
   };
 };
 

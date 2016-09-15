@@ -67,18 +67,16 @@ function waitForVideoLocation() {
  */
 
 export function getStatusUpdates(videoId) {
-  return dispatch => {
-    // Create a promise that will return the latest status
-    const promise = Promise.bind({ dispatch, videoId }).then(getStatus).then(waitForVideoLocation);
-      
-    dispatch({
-      type: MONITOR,
-      payload: { 
-        promise,
-        data: { promise } 
-      }
-    });
-  };
+  // Create a promise that will return the latest status
+  const promise = Promise.bind({ dispatch, videoId }).then(getStatus).then(waitForVideoLocation);
+    
+  return dispatch({
+    type: MONITOR,
+    payload: { 
+      promise,
+      data: { promise } 
+    }
+  });
 };
 
 export const unload = createAction(ActionTypes.UNLOAD);
