@@ -1,10 +1,15 @@
 import R from 'ramda';
 import { isError, isAtom } from './sentinels';
 
+import './typedefs';
+
 /**
  * Creates a pick function that will pick a specified prop from an object using the supplied
  * key map to look up values in the object and the specified values map to convert the values
  * found at the key.
+ * @param {object} theMap - An object map where the keys are prop names and the values are transformation
+ *  functions to use on the original value when picking the property from an object.
+ * @returns {PropPicker} A function that can pick property values from objects, possibly transforming them.
  */
 export function createPropPicker(theMap) {
   // If the map has the key passed in, use the function from the map to get the value from the object, otherwise 

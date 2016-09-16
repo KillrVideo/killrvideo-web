@@ -5,7 +5,7 @@ import { getServiceClientAsync } from '../services/factory';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { pipe, prop } from 'ramda';
 import { createPropPicker } from './common/props';
-import * as Common from './common';
+import { batchedServiceRequest } from './common/index';
 import { logger } from 'killrvideo-nodejs-common';
 
 const userMap = {
@@ -30,7 +30,7 @@ const routes = [
   {
     // Lookup users by their unique id
     route: 'usersById[{keys:userIds}]["userId", "firstName", "lastName", "email"]',
-    get: Common.batchedServiceRequest(
+    get: batchedServiceRequest(
       paths => ({ userIds: paths.map(path => stringToUuid(path[1])) }),
       USER_MANAGEMENT_SERVICE,
       (req, client) => { return client.getUserProfileAsync(req); },

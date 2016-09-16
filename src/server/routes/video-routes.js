@@ -5,7 +5,7 @@ import { getServiceClientAsync } from '../services/factory';
 import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestamp, enumToInteger } from '../utils/protobuf-conversions';
 import { toAtom, toRef, toError } from './common/sentinels';
 import { createPropPicker } from './common/props';
-import * as Common from './common';
+import { serviceRequest, listReference, pagedServiceRequest } from './common/index';
 import { logger } from 'killrvideo-nodejs-common';
 
 const videoPropsMap = {
@@ -24,7 +24,7 @@ const routes = [
   {
     // Basic video catalog data by video Id
     route: 'videosById[{keys:videoIds}]["videoId", "addedDate", "description", "location", "locationType", "name", "tags", "author"]',
-    get: Common.serviceRequest(
+    get: serviceRequest(
       path => ({ videoId: stringToUuid(path[1]) }),
       VIDEO_CATALOG_SERVICE,
       (req, client) => { return client.getVideoAsync(req); },
@@ -34,7 +34,7 @@ const routes = [
   {
     // Reference point for the recent videos list
     route: 'recentVideos',
-    get: Common.listReference(
+    get: listReference(
       path => ({ pageSize: 1 }),
       VIDEO_CATALOG_SERVICE,
       (req, client) => { return client.getLatestVideoPreviewsAsync(req); },
@@ -45,7 +45,7 @@ const routes = [
   {
     // The recent videos list
     route: 'recentVideosList[{keys:startingVideoTokens}][{ranges:indexRanges}]["videoId", "name", "previewImageLocation", "addedDate", "author", "stats"]',
-    get: Common.pagedServiceRequest(
+    get: pagedServiceRequest(
       path => {
         let tokenParts = path[1].split('_');
         return {
@@ -61,7 +61,7 @@ const routes = [
   {
     // Reference point for list of videos by author (user) Id
     route: 'usersById[{keys:userIds}].videos',
-    get: Common.listReference(
+    get: listReference(
       path => ({ pageSize: 1, userId: stringToUuid(path[1]) }),
       VIDEO_CATALOG_SERVICE, 
       (req, client) => { return client.getUserVideoPreviewsAsync(req); },
@@ -72,7 +72,7 @@ const routes = [
   {
     // List of videos added by a particular user
     route: 'usersById[{keys:userIds}].videosList[{keys:startingVideoTokens}][{ranges:indexRanges}]["videoId", "name", "previewImageLocation", "addedDate", "author", "stats"]',
-    get: Common.pagedServiceRequest(
+    get: pagedServiceRequest(
       path => {
         let tokenParts = path[3].split('_');
         return {

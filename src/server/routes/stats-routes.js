@@ -2,7 +2,7 @@ import { STATS_SERVICE } from '../services/stats';
 import { getServiceClientAsync } from '../services/factory';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { defaultPropPicker } from './common/props';
-import * as Common from './common';
+import { batchedServiceRequest } from './common/index';
 import { logger } from 'killrvideo-nodejs-common';
 
 // Route definitions handled by the statistics service
@@ -10,7 +10,7 @@ const routes = [
   {
     // Number of views for a video by id
     route: 'videosById[{keys:videoIds}].stats["views"]',
-    get: Common.batchedServiceRequest(
+    get: batchedServiceRequest(
       paths => ({ videoIds: paths.map(p => stringToUuid(p[1])) }),
       STATS_SERVICE,
       (req, client) => { return client.getNumberOfPlaysAsync(req); },

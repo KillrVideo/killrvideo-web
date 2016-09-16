@@ -3,7 +3,7 @@ import { RATINGS_SERVICE } from '../services/ratings';
 import { getServiceClientAsync } from '../services/factory';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { createPropPicker, defaultPropPicker } from './common/props';
-import * as Common from './common';
+import { serviceRequest } from './common/index';
 import { logger } from 'killrvideo-nodejs-common';
 
 
@@ -19,7 +19,7 @@ const routes = [
   {
     // Gets a videos ratings stats by video Id
     route: 'videosById[{keys:videoIds}].rating["count", "total"]',
-    get: Common.serviceRequest(
+    get: serviceRequest(
       path => ({ videoId: stringToUuid(path[1]) }),
       RATINGS_SERVICE,
       (req, client) => { return client.getRatingAsync(req); },
@@ -29,7 +29,7 @@ const routes = [
   {
     // Gets the rating value a user gave to a video 
     route: 'usersById[{keys:userIds}].ratings[{keys:videoIds}]["rating"]',
-    get: Common.serviceRequest(
+    get: serviceRequest(
       path => ({ videoId: stringToUuid(path[3]), userId: stringToUuid(path[1]) }),
       RATINGS_SERVICE,
       (req, client) => { return client.getUserRatingAsync(req); },

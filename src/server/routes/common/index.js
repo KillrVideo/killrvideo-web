@@ -11,6 +11,22 @@ import { getPages, createRequests, pickResponseValuesForPage } from './paged';
 import { pickResponseValuesForBatch } from './batched';
 import { toAtom } from './sentinels';
 
+import './typedefs';
+
+/**
+ * Creates a route handler for common scenario of getting a single object from a service request and then
+ * picking property values from that object and returning them. Assumes that the last part of the requested
+ * paths will be the array of properties to pick.
+ * 
+ * @param {CreateRequestFunction} createRequestFn - Function called which each requested path that should
+ *  create a request object that can be used with the service.
+ * @param {string} serviceName - The service name constant of the service to call with the request object(s).
+ * @param {RequestFunction} requestFn - Function that should call the appropriate method on the service
+ *  client and return a Promise with the response from the service.
+ * @param {PropPicker} propPicker - A function that can pick properties from the response object, possibly
+ *  transforming the original values.
+ * @returns {GetRouteHandler} A route handler for Falcor get requests.
+ */
 export function serviceRequest(createRequestFn, serviceName, requestFn, propPicker) {
   let handleErrors = handleRequestErrors(serviceName);
   
@@ -37,6 +53,20 @@ export function serviceRequest(createRequestFn, serviceName, requestFn, propPick
   };
 };
 
+/**
+ * Creates a route handler for the common scenario of getting a stable reference to a list of objects
+ * (stable for paging). The route handler will return a reference with a starting point in the list.
+ * 
+ * @param {CreateRequestFunction} createRequestFn - Function called with each requested path that should
+ *  create a request object that can be used with the service.
+ * @param {string} serviceName - The service name constant of the service to call with the request object.
+ * @param {RequestFunction} requestFn - Function that should call the appropriate method on the service
+ *  client and return a Promise with the response from the service.
+ * @param {Array<string>} tokenProps - The props to pick from the response in order to create a "token"
+ *  that points at the start of the list.
+ * @param {PropPicker} propPicker - The function to pick the token property values with.
+ * @returns {GetRouteHandler} A route handler for Falcor get requests.
+ */
 export function listReference(createRequestFn, serviceName, requestFn, tokenProps, propPicker) {
   let handleErrors = handleRequestErrors(serviceName);
   
@@ -62,6 +92,13 @@ export function listReference(createRequestFn, serviceName, requestFn, tokenProp
   };
 };
 
+/**
+ * Creates a route handler for the common scenario of getting a stable reference to a list of objects
+ * where the service doesn't support a stable starting point for paging in the list. The route handler
+ * will return a reference to a list with a "dummy" value for the starting token.
+ * 
+ * @returns {GetRouteHandler} A route handler for Falcor get requests.
+ */
 export function listReferenceWithDummyToken() {
   return function doListReferenceWithDummyToken(pathSet) {
     pathSet = expandPathSet(pathSet);
@@ -74,6 +111,22 @@ export function listReferenceWithDummyToken() {
   };
 };
 
+/**
+ * Creates a route handler for the common scenario of getting a page from a list of objects in a service,
+ * then picking specific properties from those objects and returning them. Assumes that the last three parts of
+ * the requested paths will be: 1) a starting token for the first item in the list, 2) the indexes of the
+ * requested items in the list, and finally 3) the properties to pick from each object in the list.
+ * 
+ * @param {CreateRequestFunction} createRequestFn - Function called to generate a request object for each path
+ *  that is unique for a page that will be requested. Page-specific data like pageSize and pagingState props
+ *  do not need to be included in the returned object.
+ * @param {string} serviceName - The service name constant of the service to call with the requests.
+ * @param {RequestFunction} requestFn - Function that should call the appropriate method on the service client
+ *  and return a Promise with the response from the service.
+ * @param {PropPicker} propPicker - The function to pick property values from each response object in the list
+ *  that is returned from the service.
+ * @returns {GetRouteHandler} A route handler for Falcor get requests.
+ */
 export function pagedServiceRequest(createRequestFn, serviceName, requestFn, propPicker) {
   let handleErrors = handleRequestErrors(serviceName);
   
@@ -110,6 +163,23 @@ export function pagedServiceRequest(createRequestFn, serviceName, requestFn, pro
   };
 };
 
+/**
+ * Creates a route handler for the common scenario of getting multiple objects from a service that supports
+ * retrieving multiple objects by their unique identifiers in a single service request, then picking properties
+ * from those objects. Assumes that the service will respond with an object that has an Array property of the
+ * objects requested.
+ * 
+ * @param {CreateBatchRequestFunction} createRequestFn - Function called with all of the paths requested to create
+ *  the request object to be used with the service.
+ * @param {string} serviceName - The service name constant of the service to call with the request.
+ * @param {RequestFunction} requestFn - Function that should call the appropriate method on the service client
+ *  and return a Promise with the response from the service.
+ * @param {BatchMatchingFunction} matchFn - Function called to match each path that was requested in the batch
+ *  to the objects returned in the service's response.
+ * @param {PropPicker} propPicker - The function to pick the requested property values from each response object
+ *  returned from the service.
+ * @returns {GetRouteHandler} A route handler for Falcor get requests.
+ */
 export function batchedServiceRequest(createRequestFn, serviceName, requestFn, matchFn, propPicker) {
   let handleErrors = handleRequestErrors(serviceName);
   

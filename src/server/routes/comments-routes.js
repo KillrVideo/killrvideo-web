@@ -4,7 +4,7 @@ import { uuidToString, stringToUuid, timestampToDateString } from '../utils/prot
 import { toRef } from './common/sentinels';
 import { createPropPicker } from './common/props';
 import { pipe, prop, of as toArray, prepend } from 'ramda';
-import * as Common from './common';
+import { listReference, pagedServiceRequest } from './common/index';
 import { logger } from 'killrvideo-nodejs-common';
 import uuid from 'uuid';
 
@@ -21,7 +21,7 @@ const routes = [
   {
     // Reference point for comments on a video
     route: 'videosById[{keys:videoIds}].comments',
-    get: Common.listReference(
+    get: listReference(
       path => ({ pageSize: 1, videoId: stringToUuid(path[1]) }),
       COMMENTS_SERVICE,
       (req, client) => { return client.getVideoCommentsAsync(req); },
@@ -32,7 +32,7 @@ const routes = [
   {
     // The comments for a video list
     route: 'videosById[{keys:videoIds}].commentsList[{keys:startingTokens}][{ranges:indexRanges}]["commentId", "comment", "addedDate", "author"]',
-    get: Common.pagedServiceRequest(
+    get: pagedServiceRequest(
       path => {
         return {
           videoId: stringToUuid(path[1]),
@@ -47,7 +47,7 @@ const routes = [
   {
     // Reference point for comments made by a user
     route: 'usersById[{keys:userIds}].comments',
-    get: Common.listReference(
+    get: listReference(
       path => ({ pageSize: 1, userId: stringToUuid(path[1]) }),
       COMMENTS_SERVICE,
       (req, client) => { return client.getUserCommentsAsync(req); },
@@ -57,7 +57,7 @@ const routes = [
   },
   {
     route: 'usersById[{keys:userIds}].commentsList[{keys:startingTokens}][{ranges:indexRanges}]["commentId", "comment", "addedDate", "video"]',
-    get: Common.pagedServiceRequest(
+    get: pagedServiceRequest(
       path => {
         return {
           userId: stringToUuid(path[1]),

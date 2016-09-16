@@ -3,7 +3,7 @@ import { SEARCH_SERVICE } from '../services/search';
 import { uuidToString, timestampToDateString } from '../utils/protobuf-conversions';
 import { toRef, toAtom } from './common/sentinels';
 import { createPropPicker } from './common/props';
-import * as Common from './common';
+import { listReferenceWithDummyToken, pagedServiceRequest, serviceRequest } from './common/index';
 
 const videosMap = {
   'videoId': pipe(prop('videoId'), uuidToString),
@@ -23,12 +23,12 @@ const routes = [
   {
     // Reference point for search results list
     route: 'search[{keys:terms}].results',
-    get: Common.listReferenceWithDummyToken()
+    get: listReferenceWithDummyToken()
   },
   {
     // Video search results
     route: 'search[{keys:terms}].resultsList[{keys:startingVideoTokens}][{ranges:indexRanges}]["videoId", "addedDate", "name", "previewImageLocation", "author", "stats"]',
-    get: Common.pagedServiceRequest(
+    get: pagedServiceRequest(
       path => ({ query: path[1] }),
       SEARCH_SERVICE,
       (req, client) => { return client.searchVideosAsync(req); },
@@ -38,7 +38,7 @@ const routes = [
   {
     // Search term suggestions as an atom
     route: 'search[{keys:terms}].suggestions',
-    get: Common.serviceRequest(
+    get: serviceRequest(
       path => ({ query: path[1], pageSize: 5 }),
       SEARCH_SERVICE,
       (req, client) => { return client.getQuerySuggestionsAsync(req); },

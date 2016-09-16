@@ -3,7 +3,7 @@ import { uuidToString, stringToUuid, timestampToDateString } from '../utils/prot
 import { toRef } from './common/sentinels';
 import { pipe, prepend, append, prop, of as toArray } from 'ramda';
 import { createPropPicker } from './common/props';
-import * as Common from './common';
+import { listReferenceWithDummyToken, pagedServiceRequest } from './common/index';
 
 const pickVideoProps = createPropPicker({
   'videoId': pipe(prop('videoId'), uuidToString),
@@ -17,12 +17,12 @@ const routes = [
   {
     // Reference point for videos related to another video
     route: 'videosById[{keys:videoIds}].relatedVideos',
-    get: Common.listReferenceWithDummyToken()
+    get: listReferenceWithDummyToken()
   },
   {
     // Videos related to another video
     route: 'videosById[{keys:videoIds}].relatedVideosList[{keys:startingTokens}][{ranges:indexRanges}]["videoId", "addedDate", "name", "previewImageLocation", "author", "stats"]',
-    get: Common.pagedServiceRequest(
+    get: pagedServiceRequest(
       path => ({ videoId: stringToUuid(path[1]) }),
       SUGGESTED_VIDEO_SERVICE, 
       (req, client) => { return client.getRelatedVideosAsync(req); },
@@ -32,12 +32,12 @@ const routes = [
   {
     // Reference point for personalized suggestions
     route: 'usersById[{keys:userIds}].recommendedVideos',
-    get: Common.listReferenceWithDummyToken()
+    get: listReferenceWithDummyToken()
   },
   {
     // Personalized suggestions for a particular user
     route: 'usersById[{keys:userIds}].recommendedVideosList[{keys:startingTokens}][{ranges:indexRanges}]["videoId", "addedDate", "name", "previewImageLocation", "author", "stats"]',
-    get: Common.pagedServiceRequest(
+    get: pagedServiceRequest(
       path => ({ userId: stringToUuid(path[1]) }),
       SUGGESTED_VIDEO_SERVICE,
       (req, client) => { return client.getSuggestedForUserAsync(req); },
