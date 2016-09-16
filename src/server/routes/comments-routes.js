@@ -12,7 +12,7 @@ const commentsMap = {
   'commentId': pipe(prop('commentId'), uuidToString),
   'addedDate': pipe(prop('commentTimestamp'), timestampToDateString),
   'author': pipe(prop('userId'), uuidToString, toArray, prepend('usersById'), toRef),
-  'video': pipe(prop('videoId'), uuidToString, toArray, prepend('videosById'), toRef)
+  'video': pipe(prop('videoId'), uuidToString, toArray, prepend('videoPreviewsById'), toRef)
 };
 
 const pickCommentProps = createPropPicker(commentsMap);

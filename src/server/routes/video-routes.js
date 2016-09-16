@@ -5,7 +5,7 @@ import { getServiceClientAsync } from '../services/factory';
 import { uuidToString, stringToUuid, timestampToDateString, dateStringToTimestamp, enumToInteger } from '../utils/protobuf-conversions';
 import { toAtom, toRef, toError } from './common/sentinels';
 import { createPropPicker } from './common/props';
-import { serviceRequest, listReference, pagedServiceRequest } from './common/index';
+import { serviceRequest, listReference, pagedServiceRequest, batchedServiceRequest } from './common/index';
 import { logger } from 'killrvideo-nodejs-common';
 
 const videoPropsMap = {
@@ -28,6 +28,16 @@ const routes = [
       path => ({ videoId: stringToUuid(path[1]) }),
       VIDEO_CATALOG_SERVICE,
       (req, client) => { return client.getVideoAsync(req); },
+      pickVideoProps
+    )
+  },
+  {
+    route: 'videoPreviewsById[{keys:videoIds}]["videoId", "addedDate", "name", "previewImageLocation", "author"]',
+    get: batchedServiceRequest(
+      paths => ({ videoIds: paths.map(p => stringToUuid(p[1])) }),
+      VIDEO_CATALOG_SERVICE,
+      (req, client) => { return client.getVideoPreviewsAsync(req); },
+      (path, responseObj) => path[1] === uuidToString(responseObj.videoId),
       pickVideoProps
     )
   },
