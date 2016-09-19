@@ -1,5 +1,6 @@
 import express from 'express';
 import { createServer } from 'http';
+import { createInterface } from 'readline';
 import SocketIO from 'socket.io';
 import config from 'config';
 import Promise from 'bluebird';
@@ -49,14 +50,13 @@ const startPromise = Promise.try(() => {
   return server;
 })
 .catch(err => {
-  logger.log('error', 'Unable to start KillrVideo Web Server', err);
+  console.error('Unable to start KillrVideo Web Server');
+  console.error(err);
   process.exit(1);
 });
 
-// If we get SIGINT, try and cancel/exit
-process.on('SIGINT', function handleSigint() {
-  logger.log('info', 'Got SIGINT, attempting to shutdown');
-  
+function stop() {
+  logger.log('info', 'Attempting to shutdown');
   if (startPromise.isFulfilled()) {
     let server = startPromise.value();
     server.close(() => process.exit(0));
@@ -64,4 +64,18 @@ process.on('SIGINT', function handleSigint() {
     startPromise.cancel();
     process.exit(0);
   }
-});
+}
+
+// Try to gracefully shutdown on SIGTERM and SIGINT
+process.on('SIGTERM', stop);
+process.on('SIGINT', stop);
+
+// Graceful shutdown attempt in Windows
+if (process.platform === 'win32') {
+  // Simulate SIGINT on Windows (see http://stackoverflow.com/questions/10021373/what-is-the-windows-equivalent-of-process-onsigint-in-node-js)
+  createInterface({
+    input: process.stdin,
+    output: process.stdout
+  })
+  .on('SIGINT', () => process.emit('SIGINT'));
+}
