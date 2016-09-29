@@ -4,6 +4,7 @@ import { createInterface } from 'readline';
 import SocketIO from 'socket.io';
 import config from 'config';
 import Promise from 'bluebird';
+import { setLogger } from 'grpc';
 
 import { initMiddlewareAsync } from './middleware';
 import { handleConnection } from './chat-handler';
@@ -20,6 +21,13 @@ const startPromise = Promise.try(() => {
   let loggingLevel = config.get('loggingLevel');
   setLoggingLevel(loggingLevel);
   logger.log(loggingLevel, `Logging initialized at ${loggingLevel}`);
+
+  // Set gRPC logging to log via the main logger at DEBUG level
+  setLogger({
+    error(msg) {
+      logger.log('debug', msg);
+    }
+  });
 
   logger.log('info', 'Trying to start KillrVideo Web Server');
   return withRetries(initCassandraAsync, 10, 10, 'Could not initialize Cassandra keyspace', false);
