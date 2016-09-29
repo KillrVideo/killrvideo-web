@@ -156,7 +156,7 @@ export function pagedServiceRequest(createRequestFn, serviceName, requestFn, pro
     });
     
     // Wait for all requests to finish, then pick props from responses
-    let pickResponses = R.zipWith(pickResponseValuesForPage, pages);
+    let pickResponses = R.zipWith(R.partial(pickResponseValuesForPage, [ this.pagingStateCache ]), pages);
     const props = pathSet[propsIdx];
     let pickProps = R.zipWith(R.partial(pickPropsFromResponse, [ propPicker, props ]), paths);
     return Promise.all(promises).then(R.pipe(pickResponses, R.unnest, pickProps, R.unnest, R.concat(emptyPathValues)));

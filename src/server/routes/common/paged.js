@@ -57,12 +57,30 @@ export function createRequests(createRequestFn, pages) {
   return R.map(getRequest, pages);
 };
 
-export function pickResponseValuesForPage(page, response) {
+export function pickResponseValuesForPage(pagingStateCache, page, response) {
   if (isError(response)) {
     return R.map(R.always(response), page.paths);
   }
-  
+
+  // Find the array of things in the response
   let responseValues = getFirstArrayProp(response);
+
+  // Save the paging state
+  if (response.pagingState !== '') {
+    // Find the last path we requested and get the index that it was requested as
+    let lastPathOnPage = R.last(page.paths);
+    let lastIndexOnPage = R.last(lastPathOnPage);
+
+    // Calculate the cache key from the path
+    let cacheKey = getPagingCacheKeyForIndexPath(lastPathOnPage);
+
+    // Save in paging state cache using the cache key and the last index + 1 since that would be
+    // the starting index for that page
+    pagingStateCache.saveKey(cacheKey, lastIndexOnPage + 1, response.pagingState);
+  }
+  
+  // Map each path to its object in the response taking into account the starting index for
+  // the page that was requested
   return R.map(path => {
     let adjustedIdx = R.last(path) - page.startingIndex;
     return adjustedIdx >= responseValues.length
