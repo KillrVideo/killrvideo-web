@@ -14,7 +14,7 @@
     "build:server:js": "babel src/server --out-dir dist/server --source-maps",
     "build:server:resources": "cpx \"src/server/resources/**\" dist/server/resources --verbose",
     "build:server:protos": "cpx \"lib/killrvideo-service-protos/src/**\" dist/server/resources/protos --verbose",
-    "build:server:googleprotos": "cpx \"lib/google/**\" dist/server/resources/protos/google --verbose",
+    "build:server:googleprotos": "node scripts/copy-google-protos.js dist/server/resources/protos",
     "watch": "npm-run-all clean --parallel \"watch:*\"",
     "watch:client": "cd src/client && npm run watch",
     "watch:server": "npm-run-all --parallel \"build:server:* -- --watch\"",
@@ -47,6 +47,7 @@
     "cpx": "^1.5.0",
     "cross-env": "^2.0.1",
     "dotenv": "^2.0.0",
+    "grpc-tools": "^1.0.0",
     "npm-run-all": "^2.3.0",
     "rimraf": "^2.5.4"
   },
