@@ -1,4 +1,4 @@
-import { logger } from 'killrvideo-nodejs-common';
+import { logger } from '../../utils/logging';
 import { EOL } from 'os';
 import util from 'util';
 import config from 'config';

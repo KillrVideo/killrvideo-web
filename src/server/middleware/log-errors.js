@@ -1,4 +1,4 @@
-import { logger } from 'killrvideo-nodejs-common';
+import { logger } from '../utils/logging';
 
 /**
  * Express middleware for logging errors.

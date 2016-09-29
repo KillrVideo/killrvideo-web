@@ -3,7 +3,7 @@ import { dataSourceRoute } from 'falcor-express';
 import passport from 'passport';
 import Promise from 'bluebird';
 import util from 'util';
-import { logger } from 'killrvideo-nodejs-common';
+import { logger } from '../utils/logging';
 import { sessionAsync } from './session';
 import { KillrVideoRouter } from '../routes';
 import { isDebugEnabled } from '../utils/is-debug-enabled';

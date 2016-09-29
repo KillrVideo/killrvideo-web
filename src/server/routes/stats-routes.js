@@ -3,7 +3,7 @@ import { getServiceClientAsync } from '../services/factory';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { defaultPropPicker } from './common/props';
 import { batchedServiceRequest } from './common/index';
-import { logger } from 'killrvideo-nodejs-common';
+import { logger } from '../utils/logging';
 
 // Route definitions handled by the statistics service
 const routes = [

@@ -4,7 +4,7 @@ import { getServiceClientAsync } from '../services/factory';
 import { uuidToString, stringToUuid } from '../utils/protobuf-conversions';
 import { createPropPicker, defaultPropPicker } from './common/props';
 import { serviceRequest } from './common/index';
-import { logger } from 'killrvideo-nodejs-common';
+import { logger } from '../utils/logging';
 
 
 const ratingsMap = {

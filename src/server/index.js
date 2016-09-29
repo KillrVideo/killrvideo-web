@@ -8,7 +8,8 @@ import Promise from 'bluebird';
 import { initMiddlewareAsync } from './middleware';
 import { handleConnection } from './chat-handler';
 import { initCassandraAsync } from './utils/cassandra';
-import { logger, setLoggingLevel, withRetries } from 'killrvideo-nodejs-common';
+import { logger, setLoggingLevel } from './utils/logging'; 
+import { withRetries } from './utils/promises';
 
 // Enable cancellation on Promises
 Promise.config({ cancellation: true });

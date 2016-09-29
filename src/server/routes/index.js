@@ -2,7 +2,7 @@ import Router from 'falcor-router';
 import Promise from 'bluebird';
 import util from 'util';
 import { EOL } from 'os';
-import { logger } from 'killrvideo-nodejs-common';
+import { logger } from '../utils/logging';
 import { isDebugEnabled } from '../utils/is-debug-enabled';
 
 import { PagingStateCache } from '../utils/paging-state-cache';
