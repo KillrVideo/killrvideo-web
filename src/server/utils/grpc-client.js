@@ -1,7 +1,17 @@
-import { load, credentials } from 'grpc';
+import { load, credentials, getClientChannel } from 'grpc';
+import grpcExt from 'grpc/src/node/src/grpc_extension.js';
 import Promise from 'bluebird';
 import { lookupServiceAsync } from './lookup-service';
 import { logger } from './logging';
+
+/**
+ * Reverse lookup (int value => name) of gRPC connectivity states.
+ */
+const CONNECTIVITY_STATE_NAMES = Object.keys(grpcExt.connectivityState).reduce((acc, name) => {
+  let val = grpcExt.connectivityState[name];
+  acc[val] = name;
+  return acc;
+}, {});
 
 /**
  * Recursively gets the fully qualified name of a probuf.js reflection value
@@ -58,6 +68,69 @@ export function loadServiceProto(rootPath, filePath, clientConstructorSelector) 
 // Cache of service client promsies by fully qualified name
 const serviceClientPromises = new Map();
 
+// Maximum number of transient connection failures to allow before throwing away a client and creating a new one
+const MAX_TRANSIENT_FAILURES = 5;
+
+/**
+ * Kicks of monitoring of a gRPC client's underlying channel and removes any client
+ * from the Promise cache if it has a fatal failure.
+ */
+function monitorClientChannel(fullyQualifiedName, client) {
+  // Get the underlying channel for the client
+  let channel = getClientChannel(client);
+
+  // The number of transient failures we've seen
+  let failures = 0;
+
+  // Function that will be called recursively to keep track of the client's channel state
+  let checkState = function(err) {
+    // If called with an error, just remove the cached client Promise
+    if (err) {
+      logger.log('error', `Unexepected error watching client state for ${fullyQualifiedName}`, err);
+      serviceClientPromises.delete(fullyQualifiedName);
+      return;
+    }
+
+    // Get the latest state, connecting if we're not already connected
+    let newState = channel.getConnectivityState(true);
+    logger.log('debug', `Channel for ${fullyQualifiedName} has state ${CONNECTIVITY_STATE_NAMES[newState]}`);
+
+    let fatal = false;
+    switch (newState) {
+      case grpcExt.connectivityState.READY:
+        // Reset failure counter if connected
+        failures = 0;
+        break;
+
+      case grpcExt.connectivityState.TRANSIENT_FAILURE:
+        // Keep track of transient failures
+        failures++;
+        fatal = (failures >= MAX_TRANSIENT_FAILURES);
+        break;
+
+      case grpcExt.connectivityState.FATAL_FAILURE:
+        fatal = true;
+        break;
+
+      default:
+        break;
+    }
+
+    // If a fatal failure, remove the cached client Promise
+    if (fatal) {
+      logger.log('debug', `Removing client for ${fullyQualifiedName} from cache`);
+      serviceClientPromises.delete(fullyQualifiedName);
+      return;
+    }
+
+    // Wait for the next state change and call ourself as the callback when the state changes
+    channel.watchConnectivityState(newState, Infinity, checkState);
+  };
+
+  // Kick off initial state check
+  checkState();
+}
+
 const _getGrpcClientAsync = Promise.method(fullyQualifiedName => {
   // Get promise from cache if available
   if (serviceClientPromises.has(fullyQualifiedName)) {
@@ -81,6 +154,10 @@ const _getGrpcClientAsync = Promise.method(fullyQualifiedName => {
       // Remove from promise cache
       serviceClientPromises.delete(fullyQualifiedName);
       throw err;
+    })
+    .tap(client => {
+      // Monitor the underlying channel on a client for fatal errors
+      monitorClientChannel(fullyQualifiedName, client);
     });
   
   serviceClientPromises.set(fullyQualifiedName, promise);
