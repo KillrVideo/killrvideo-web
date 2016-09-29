@@ -4,7 +4,7 @@ import CassandraStore from 'cassandra-store';
 import config from 'config';
 import { logger } from '../utils/logging';
 import { withRetries } from '../utils/promises';
-import { getCassandraClientAsync } from 'killrvideo-nodejs-common';
+import { getCassandraClientAsync } from '../utils/cassandra';
 
 // Wrap CassandraStore around the express session
 const CassandraSessionStore = CassandraStore(expressSession);
