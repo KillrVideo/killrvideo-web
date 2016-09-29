@@ -67,6 +67,7 @@
     "memoizee": "^0.4.1",
     "passport": "^0.3.2",
     "ramda": "^0.21.0",
+    "simple-get": "^2.2.2",
     "socket.io": "^1.4.8",
     "uuid": "^2.0.2",
     "winston": "^2.2.0"

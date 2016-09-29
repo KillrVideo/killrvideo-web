@@ -1,6 +1,6 @@
 import Promise from 'bluebird';
 import memoize from 'memoizee';
-import { getGrpcClientAsync } from 'killrvideo-nodejs-common';
+import { getGrpcClientAsync } from '../utils/grpc-client';
 
 /**
  * Turn service call arguments into strings so that memoization works properly.

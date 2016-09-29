@@ -1,5 +1,5 @@
 import path from 'path';
-import { loadServiceProto } from 'killrvideo-nodejs-common';
+import { loadServiceProto } from '../utils/grpc-client';
 
 // Path to .proto definitions (copied to output as part of the build)
 const PROTO_BASE_PATH = path.resolve(__dirname, '..', 'resources/protos');
