@@ -1,8 +1,7 @@
-import { logger } from '../../utils/logging';
+import { logger, isDebugEnabled } from '../../utils/logging';
 import { EOL } from 'os';
 import util from 'util';
 import config from 'config';
-import { isDebugEnabled } from '../../utils/is-debug-enabled';
 
 /**
  * Helper function for determining if an object looks like a Promise. From:

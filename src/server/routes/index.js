@@ -2,8 +2,7 @@ import Router from 'falcor-router';
 import Promise from 'bluebird';
 import util from 'util';
 import { EOL } from 'os';
-import { logger } from '../utils/logging';
-import { isDebugEnabled } from '../utils/is-debug-enabled';
+import { logger, isDebugEnabled } from '../utils/logging';
 
 import { PagingStateCache } from '../utils/paging-state-cache';
 

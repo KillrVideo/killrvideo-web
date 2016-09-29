@@ -3,10 +3,9 @@ import { dataSourceRoute } from 'falcor-express';
 import passport from 'passport';
 import Promise from 'bluebird';
 import util from 'util';
-import { logger } from '../utils/logging';
+import { logger, isDebugEnabled } from '../utils/logging';
 import { sessionAsync } from './session';
 import { KillrVideoRouter } from '../routes';
-import { isDebugEnabled } from '../utils/is-debug-enabled';
 
 // Tell passport auth how to serialize and deserialize users
 passport.serializeUser(function(user, done) {
