@@ -23,13 +23,6 @@ export function withRetries(promiseFn, maxRetries, delaySeconds, errMsg, expBack
       retryCount++;
       
       logger.log('debug', '', err);
-      if (err instanceof AggregateError) {
-        logger.log('debug', 'Inner errors:');
-        err.innerErrors.forEach(innerError => {
-          logger.log('debug', '', innerError);
-        });
-      }
-
       logger.log('verbose', `${errMsg}. Retry ${retryCount} in ${delayMs}ms.`);
       return Promise.delay(delayMs).then(doIt);
     });
