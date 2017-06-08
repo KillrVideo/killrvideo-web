@@ -5,6 +5,7 @@ import { lookupServiceAsync } from './lookup-service';
 
 // Client promises by keyspace
 const clientPromises = new Map();
+const dse = require('dse-driver');
 
 /**
  * Gets a Cassandra client instance that is connected to the specified keyspace.
@@ -18,6 +19,7 @@ export function getCassandraClientAsync(keyspace) {
     .then(contactPoints => {
       let clientOpts = {
         contactPoints,
+        authProvider: new dse.auth.DsePlainTextAuthProvider("dfsds", "DSD"), 
         queryOptions: { 
           prepare: true,
           consistency: CassandraTypes.consistencies.localQuorum
