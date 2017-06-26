@@ -19,7 +19,7 @@ export function getCassandraClientAsync(keyspace) {
     .then(contactPoints => {
       let clientOpts = {
         contactPoints,
-        authProvider: new dse.auth.DsePlainTextAuthProvider("cassandra", "cassandra"), 
+        authProvider: new dse.auth.DsePlainTextAuthProvider("cassandra", "temp"), 
         queryOptions: { 
           prepare: true,
           consistency: CassandraTypes.consistencies.localQuorum
