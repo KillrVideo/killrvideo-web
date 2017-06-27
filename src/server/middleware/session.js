@@ -25,10 +25,10 @@ const createSessionTableIfNotExistsAsync = Promise.method(client => {
 
 // Internal function for creating the Cassandra session middleware
 const createSessionMiddleware = Promise.method(() => {
-  const { keyspace } = config.get('cassandra');
+  const { keyspace, dseUsername, dsePassword } = config.get('cassandra');
   
   // Get a client for the keyspace, create the table if necessary, then create the middleware
-  return getCassandraClientAsync(keyspace)
+  return getCassandraClientAsync(keyspace, dseUsername, dsePassword)
     .then(client => createSessionTableIfNotExistsAsync(client).return(client))
     .then(client => {
       const { name, secret, cassandra: { table } } = config.get('web.session');

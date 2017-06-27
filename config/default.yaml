@@ -25,3 +25,7 @@ cassandra:
   keyspace: killrvideo_web
   # The replication string (i.e. after WITH REPLICATION) to use when creating the keyspace if it doesn't exist
   replication: "{ 'class' : 'SimpleStrategy', 'replication_factor' : 1 }"
+  # The username and password needed to authenticate to the cluster.  
+  # Either set these values here directly or use the KILLRVIDEO_DSE_USERNAME and KILLRVIDEO_DSE_PASSWORD environment variables. 
+  dseUsername: null
+  dsePassword: null

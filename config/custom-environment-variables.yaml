@@ -7,3 +7,7 @@ client:
 web:
   session:
     secret: KILLRVIDEO_SESSION_SECRET
+
+cassandra:
+  dseUsername: KILLRVIDEO_DSE_USERNAME
+  dsePassword: KILLRVIDEO_DSE_PASSWORD
