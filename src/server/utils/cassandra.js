@@ -14,12 +14,33 @@ export function getCassandraClientAsync(keyspace) {
   if (clientPromises.has(keyspace)) {
     return clientPromises.get(keyspace);
   }
+
+  /** 
+   * Check for both KILLRVIDEO_DSE_USERNAME and KILLRVIDEO_DSE_PASSWORD environment
+   * variables.  If they both exist use the values set within them.  If not,
+   * use default values for authentication.
+   */
+  let dseUsername = process.env.KILLRVIDEO_DSE_USERNAME
+    ? `${process.env.KILLRVIDEO_DSE_USERNAME}`
+    : 'cassandra';
+
+  let dsePassword = process.env.KILLRVIDEO_DSE_PASSWORD
+    ? `${process.env.KILLRVIDEO_DSE_PASSWORD}`
+    : 'cassandra';
+
+  if (dseUsername === 'cassandra' && dsePassword === 'cassandra') {
+    console.log('Using default DSE username and password as at least one was not provided.  If you are not attempting to to set these values then this really doesn\'t matter.  If you are, check to ensure both KILLRVIDEO_DSE_USERNAME and KILLRVIDEO_DSE_PASSWORD are set in your environment');
+
+  } else {
+    let passwordLength = dsePassword.length;
+    console.log('Using supplied DSE username: "' + dseUsername + '" and password: "***' + dsePassword.substring(passwordLength - 4, passwordLength) + '" from environment variables')
+  }
     
   const promise = lookupServiceAsync('cassandra')
     .then(contactPoints => {
       let clientOpts = {
         contactPoints,
-        authProvider: new dse.auth.DsePlainTextAuthProvider("cassandra", "temp"), 
+        authProvider: new dse.auth.DsePlainTextAuthProvider(dseUsername, dsePassword), 
         queryOptions: { 
           prepare: true,
           consistency: CassandraTypes.consistencies.localQuorum
