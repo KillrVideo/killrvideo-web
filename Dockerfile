@@ -1,4 +1,4 @@
-FROM node:6.3-slim
+FROM node:6.11-slim
 
 # Add killrvideo group and user
 RUN groupadd -r killrvideo --gid=999 \
