@@ -26,7 +26,7 @@
     },
     "ansi-styles": {
       "version": "2.2.0",
-      "resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-2.2.0.tgz",
+      "resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-2.2.1.tgz",
       "integrity": "sha1-xZGRk25u0cExWktra5fzrPv6aLA=",
       "dev": true,
       "dependencies": {

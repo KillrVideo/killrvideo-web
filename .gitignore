@@ -36,3 +36,7 @@ config/production.yaml
 
 # Docker compose environment
 /.env
+
+# Webstorm/IDEA
+.idea
+*.iml
