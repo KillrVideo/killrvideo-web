@@ -11,6 +11,7 @@ import Icon from 'components/shared/icon';
 import UserProfileImage from 'components/users/user-profile-image';
 import WhatIsThis from './what-is-this';
 import SearchBox from './search-box';
+//TODO: import Tour from './tour';
 
 var logoUrl = require('killrvideo.png');
 
@@ -87,7 +88,11 @@ class Header extends Component {
           </Navbar.Header>
           <Navbar.Collapse>
             <SearchBox onSubmit={vals => this.submitSearch(vals.query)} getSuggestions={this.props.getSuggestions} />
-            <Nav navbar pullRight>
+            <Nav navbar pullRight> 
+              <NavItem eventKey={1} href="#" onSelect={e => this.props.toggleTour()} className={this.props.showTour ? 'dropup' : ''}>
+                <Icon name="map-signs" fixedWidth /> Tour: <span>{this.props.showTour ? 'On' : 'Off'}</span>
+              </NavItem> 
+              {/* TODO: Tour bar needs to include the state of on/off */}
               <NavItem eventKey={1} href="#" onSelect={e => this.props.toggleWhatIsThis()} className={this.props.showWhatIsThis ? 'dropup' : ''}>
                 What is this? <span className="caret"></span>
               </NavItem>
@@ -110,8 +115,10 @@ Header.propTypes = {
   // Mapped from state
   currentUser: PropTypes.object.isRequired,
   showWhatIsThis: PropTypes.bool.isRequired,
+  showTour: PropTypes.bool.isRequired,
   // Actions
   toggleWhatIsThis: PropTypes.func.isRequired,
+  toggleTour: PropTypes.func.isRequired, 
   getCurrentUser: PropTypes.func.isRequired,
   push: PropTypes.func.isRequired,
   getSuggestions: PropTypes.func.isRequired
@@ -128,11 +135,14 @@ Header.queries = {
 
 function mapStateToProps(state) {
   const { authentication: { currentUser }, whatIsThis, search } = state;
+  // TODO: const { authentication: { currentUser }, whatIsThis, search, tour } = state;
   return {
     currentUser: currentUser,
     showWhatIsThis: whatIsThis.visible,
-    searchSuggestions: search.suggestions
+    searchSuggestions: search.suggestions //,
+    // TODO: showTour: tour.visible
   };
 }
 
+// TODO: what needs to happen here?
 export default connect(mapStateToProps, { toggleWhatIsThis, getCurrentUser, push: routeActions.push, getSuggestions })(Header);
