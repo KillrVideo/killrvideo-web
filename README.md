@@ -35,7 +35,7 @@ PS> .\lib\killrvideo-docker-common\create-environment.ps1
 ```
 Or on Mac/Linux, run:
 ```
-> TODO: Waiting on sh script
+> lib/killrvideo-docker-common/create-environment.sh
 ```
 You'll then want to edit that `.env` file and add an environment variable that points at the
 default `docker-compose.yaml` file:
