@@ -129,6 +129,12 @@ ul.uimessage > li {
   border-bottom: 1px solid #dedede;
 }
 
+#tour {
+  padding-top: 60px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #dedede;
+}
+
 /**
  * Footer
  */

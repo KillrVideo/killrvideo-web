@@ -23,6 +23,15 @@ function whatIsThis(state = { visible: false }, action) {
   return state;
 }
 
+// Handle Tour UI state
+function tour(state = { visible: false }, action) {
+   if (action.type === ActionTypes.TOGGLE_TOUR) {
+     return { visible: !state.visible };
+   }
+
+   return state;
+}
+
 const rootReducer = combineReducers({
   routing,
   form,
@@ -35,7 +44,8 @@ const rootReducer = combineReducers({
   addVideo,
   uploadStatus,
   chat,
-  config
+  config,
+  tour
 });
 
 export default rootReducer;

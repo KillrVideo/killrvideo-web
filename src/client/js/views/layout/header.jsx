@@ -5,13 +5,14 @@ import { routeActions } from 'react-router-redux';
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 
 import { toggleWhatIsThis } from 'actions';
+import { toggleTour } from 'actions';
 import { getCurrentUser } from 'actions/authentication';
 import { getSuggestions } from 'actions/search';
 import Icon from 'components/shared/icon';
 import UserProfileImage from 'components/users/user-profile-image';
 import WhatIsThis from './what-is-this';
 import SearchBox from './search-box';
-//TODO: import Tour from './tour';
+import Tour from './tour';
 
 var logoUrl = require('killrvideo.png');
 
@@ -92,7 +93,6 @@ class Header extends Component {
               <NavItem eventKey={1} href="#" onSelect={e => this.props.toggleTour()} className={this.props.showTour ? 'dropup' : ''}>
                 <Icon name="map-signs" fixedWidth /> Tour: <span>{this.props.showTour ? 'On' : 'Off'}</span>
               </NavItem> 
-              {/* TODO: Tour bar needs to include the state of on/off */}
               <NavItem eventKey={1} href="#" onSelect={e => this.props.toggleWhatIsThis()} className={this.props.showWhatIsThis ? 'dropup' : ''}>
                 What is this? <span className="caret"></span>
               </NavItem>
@@ -105,6 +105,8 @@ class Header extends Component {
         </Navbar>
         
         <WhatIsThis showWhatIsThis={this.props.showWhatIsThis} toggleWhatIsThis={this.props.toggleWhatIsThis} />
+        <Tour showTour={this.props.showTour} toggleTour={this.props.toggleTour} />
+
       </div>
     );
   }
@@ -134,15 +136,13 @@ Header.queries = {
 };
 
 function mapStateToProps(state) {
-  const { authentication: { currentUser }, whatIsThis, search } = state;
-  // TODO: const { authentication: { currentUser }, whatIsThis, search, tour } = state;
+  const { authentication: { currentUser }, whatIsThis, tour, search } = state;
   return {
     currentUser: currentUser,
     showWhatIsThis: whatIsThis.visible,
-    searchSuggestions: search.suggestions //,
-    // TODO: showTour: tour.visible
+    showTour: tour.visible,
+    searchSuggestions: search.suggestions
   };
 }
 
-// TODO: what needs to happen here?
-export default connect(mapStateToProps, { toggleWhatIsThis, getCurrentUser, push: routeActions.push, getSuggestions })(Header);
+export default connect(mapStateToProps, { toggleWhatIsThis, toggleTour, getCurrentUser, push: routeActions.push, getSuggestions })(Header);
