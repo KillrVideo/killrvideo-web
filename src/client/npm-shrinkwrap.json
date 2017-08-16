@@ -4672,6 +4672,11 @@
       "dev": true,
       "optional": true
     },
+    "nested-property": {
+      "version": "0.0.7",
+      "resolved": "https://registry.npmjs.org/nested-property/-/nested-property-0.0.7.tgz",
+      "integrity": "sha1-/yIvIzyoeTxoKLQRcJG+pZcTD08="
+    },
     "node-fetch": {
       "version": "1.7.2",
       "resolved": "https://registry.npmjs.org/node-fetch/-/node-fetch-1.7.2.tgz",
@@ -5464,6 +5469,14 @@
       "integrity": "sha1-nsYfeQSYdXB9aUFFlv2Qek1xHnM=",
       "dev": true
     },
+    "rafl": {
+      "version": "1.2.2",
+      "resolved": "https://registry.npmjs.org/rafl/-/rafl-1.2.2.tgz",
+      "integrity": "sha1-/pMPdYIRAg1H44gV9Rlqi+QVB0A=",
+      "requires": {
+        "global": "4.3.2"
+      }
+    },
     "randomatic": {
       "version": "1.1.7",
       "resolved": "https://registry.npmjs.org/randomatic/-/randomatic-1.1.7.tgz",
@@ -5533,6 +5546,11 @@
         "fbjs": "0.6.1"
       }
     },
+    "react-autobind": {
+      "version": "1.0.6",
+      "resolved": "https://registry.npmjs.org/react-autobind/-/react-autobind-1.0.6.tgz",
+      "integrity": "sha1-k2u1jt9ribYZxQ+C8OYXFZ/f1PE="
+    },
     "react-bootstrap": {
       "version": "0.28.5",
       "resolved": "https://registry.npmjs.org/react-bootstrap/-/react-bootstrap-0.28.5.tgz",
@@ -5570,6 +5588,16 @@
       "integrity": "sha1-D7jcEuzPyA2y+z5CwXt9YP8soAA=",
       "requires": {
         "gemini-scrollbar": "1.5.2"
+      }
+    },
+    "react-joyride": {
+      "version": "1.10.1",
+      "resolved": "https://registry.npmjs.org/react-joyride/-/react-joyride-1.10.1.tgz",
+      "integrity": "sha1-mvOhk5rw8jEfy9gacPk9F9a8ePE=",
+      "requires": {
+        "nested-property": "0.0.7",
+        "react-autobind": "1.0.6",
+        "scroll": "2.0.0"
       }
     },
     "react-lazy-cache": {
@@ -5959,6 +5987,14 @@
       "resolved": "https://registry.npmjs.org/sax/-/sax-1.2.1.tgz",
       "integrity": "sha1-e45lYZCyKOgaZq6nSEgNgozS03o=",
       "dev": true
+    },
+    "scroll": {
+      "version": "2.0.0",
+      "resolved": "https://registry.npmjs.org/scroll/-/scroll-2.0.0.tgz",
+      "integrity": "sha1-Vcug2E64RdmP41eagB5XIqajqB8=",
+      "requires": {
+        "rafl": "1.2.2"
+      }
     },
     "set-immediate-shim": {
       "version": "1.0.1",
