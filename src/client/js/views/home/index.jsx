@@ -27,7 +27,7 @@ class Home extends Component {
     }
     
     return (
-      <div className="body-content container">
+      <div id="recent-videos" className="body-content container">
         <VideoPreviewList title="Recent Videos" {...recentVideos} {...recentVideosActions} />
         {recommendedVideosList}
         {userVideosList}
