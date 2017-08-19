@@ -90,7 +90,7 @@ class Header extends Component {
           <Navbar.Collapse>
             <SearchBox onSubmit={vals => this.submitSearch(vals.query)} getSuggestions={this.props.getSuggestions} />
             <Nav navbar pullRight> 
-              <NavItem eventKey={1} href="#" onSelect={e => this.props.toggleTour()} className={this.props.showTour ? 'dropup' : ''}>
+              <NavItem id="show-tour" eventKey={1} href="#" onSelect={e => this.props.toggleTour()} className={this.props.showTour ? 'dropup' : ''}>
                 <Icon name="map-signs" fixedWidth /> Tour: <span>{this.props.showTour ? 'On' : 'Off'}</span>
               </NavItem> 
               <NavItem eventKey={1} href="#" onSelect={e => this.props.toggleWhatIsThis()} className={this.props.showWhatIsThis ? 'dropup' : ''}>
