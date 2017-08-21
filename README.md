@@ -14,7 +14,7 @@ to learn more about Apache Cassandra and DataStax Enterprise. This project conta
   - [Grpc][5]
   
 The web server calls out to backend services using Grpc. Those backend services are provided in separate
-repos, for example the [C# implementation][6].
+repos, for example the [C# implementation][6], [Java implementation][7] or [node.js implementation][8].
 
 ## Setting up a Development Environment
 
@@ -47,6 +47,11 @@ You can then start those dependencies with:
 ```
 > docker-compose up -d
 ```
+
+Finally, you'll also need to download one of the service implementations listed above and 
+run it according to the provided instructions. (You won't need to use the docker-compose in
+the service implementation, the required elements are covered already.)
+
 ## Developing
 
 There is a developer task included in the `package.json` scripts. You can run this task with:
@@ -81,3 +86,5 @@ build and publish Docker images with those scripts as well.
 [4]: http://expressjs.com/
 [5]: http://www.grpc.io/
 [6]: https://github.com/luketillman/killrvideo-csharp
+[7]: https://github.com/killrvideo/killrvideo-java
+[8]: https://github.com/killrvideo/killrvideo-nodejs
