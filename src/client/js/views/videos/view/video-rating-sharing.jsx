@@ -74,7 +74,7 @@ class VideoRatingSharing extends Component {
     });
     
     return (
-      <Row className="video-rating-and-sharing">
+      <Row id="video-rating-and-sharing">
         <Col xs={2} sm={4}>
           <div className="video-rating-average">
             <div>

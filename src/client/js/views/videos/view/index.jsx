@@ -53,8 +53,8 @@ class ViewVideo extends Component {
    } = this.props;
     
     return (
-      <div className="body-content container">
-        <Row>
+      <div id="view-video" className="body-content container">
+        <Row id="view-video-row">
           <Col md={7} xs={12} id="view-video-embed">
             <VideoPlayer videoDetails={details} onPlaybackStarted={() => recordPlayback([ [ 'stats', 'views' ] ])} />
           </Col>
@@ -67,7 +67,9 @@ class ViewVideo extends Component {
                              location={location} onSubmit={vals => addComment(vals.comment)} />
           </Col>
         </Row>
-        <VideoPreviewList title="More Videos Like This" {...moreLikeThis} {...moreLikeThisActions}  />
+        <Row id="view-video-related">
+          <VideoPreviewList title="More Videos Like This" {...moreLikeThis} {...moreLikeThisActions}  />
+        </Row>
       </div>
     );
   }

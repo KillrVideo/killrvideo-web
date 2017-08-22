@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { Row } from 'react-bootstrap';
 
 import * as HomeActions from 'actions/home';
 import * as AuthActions from 'actions/authentication';
@@ -27,10 +28,16 @@ class Home extends Component {
     }
     
     return (
-      <div id="recent-videos" className="body-content container">
-        <VideoPreviewList title="Recent Videos" {...recentVideos} {...recentVideosActions} />
-        {recommendedVideosList}
-        {userVideosList}
+      <div id="video-lists" className="body-content container">
+        <Row id="recent-videos">
+          <VideoPreviewList title="Recent Videos" {...recentVideos} {...recentVideosActions} />
+        </Row>
+        <Row id="recommended-videos">
+          {recommendedVideosList}
+        </Row>
+        <Row id="user-videos">
+          {userVideosList}
+        </Row>
       </div>
     );
   }

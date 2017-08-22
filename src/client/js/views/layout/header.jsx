@@ -65,12 +65,12 @@ class Header extends Component {
     if (this.props.currentUser.isLoggedIn === false) {
       // Buttons for logging in or registering the site
       signIn = (
-        <NavItem eventKey={2} href="#" onSelect={e => this.props.push('/account/signin')} className="text-uppercase">
+        <NavItem id="sign-in" eventKey={2} href="#" onSelect={e => this.props.push('/account/signin')} className="text-uppercase">
           Sign in
         </NavItem>
       );
       register = (
-        <NavItem eventKey={3} href="#" onSelect={e => this.props.push('/account/register')} className="bg-success text-uppercase">
+        <NavItem id="register" eventKey={3} href="#" onSelect={e => this.props.push('/account/register')} className="bg-success text-uppercase">
           Register
         </NavItem>
       );
