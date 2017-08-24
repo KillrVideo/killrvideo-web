@@ -3,24 +3,51 @@ import { Button, Collapse } from 'react-bootstrap';
 import Icon from 'components/shared/icon';
 import Joyride from 'react-joyride';
 
+// create a one-time event
+function selectorCallback(event) {
+
+    console.log("Tour Callback - clickthrough hole callback");
+  
+    // removing callback so that we have a one-time event
+    event.target.removeEventListener(event.type, selectorCallback);
+
+    // TODO: Advance the tour
+}
+
 class Tour extends Component {
+
+/*   constructor(props) {
+    super(props);
+    this.selectorCallbackInternal = this.selectorCallbackInternal.bind(this);
+  } */
+
+  selectorCallbackInternal(event) {
+    console.log("Tour Callback - clickthrough hole callback");
+  
+    // removing callback so that we have a one-time event
+    event.target.removeEventListener(event.type, selectorCallbackInternal);
+
+    // TODO: Advance the tour
+  }
 
   handleJoyrideCallback(result) {
     //const{joyride} = this.props;
-
+    
     // if (result.action == 'close') {
     //   this.setState({run: false});
     // }
 
+    console.log("Tour Callback - action: " + result.type + ", index: " + result.index);
+    console.log(result);
+    if (result.step.allowClicksThruHole && result.type === "tooltip:before") {
+      console.log("Tour Callback - allowClicksThroughHole, selector: " + result.step.selector);
+      var selectedObj = document.querySelector(result.step.selector);
+      console.log(selectedObj);
+      selectedObj.addEventListener("click", this.selectorCallback );
+    }
   }
 
   render() {
-    // workaround for bug in react-joyride which doesn't render consecutive tooltips on 
-    // the same element correctly. Set a second classname to use as a workaround, which
-    // we can reference on alternating steps
-    // See: https://github.com/gilbarbara/react-joyride/pull/220
-    //var d = document.getElementById("logo");
-    //if (d) d.classList.add("logo1");
 
     return (
       <Joyride
@@ -33,6 +60,7 @@ class Tour extends Component {
         disableOverlay={true} // true - clicking on overlay has no effect, false - click closes tooltip
         showSkipButton={false} // we want to force them to enter things and not be able to skip steps, at least by default
         callback={this.handleJoyrideCallback}
+        //debug={true}
         steps={[
           // Starting on the Home Page (Unauthenticated)
           {
@@ -63,10 +91,17 @@ class Tour extends Component {
             selector: "#recent-videos div ul.list-unstyled li:first-child",
             //selector: "#recent-videos ul.list-unstyled li:first-child div.video-preview",
             position: "right",
-            text: "Let's get started by looking at a video. Click on a video to continue.",
+            text: "Let's get started by looking at a video. <br/><br/><strong>Click on a video to continue.</em>",
             allowClicksThruHole: true,
-            /* callToAction: "Click on a video to continue.",
-            beforeShowPromise: function () { return waitForElementIfNotPresent(this.target, "#recent-videos-list"); },
+            style: {
+              beacon: {
+                offsetY: 20
+              },
+              button: {
+                display: 'none',
+              }
+            }
+            /*beforeShowPromise: function () { return waitForElementIfNotPresent(this.target, "#recent-videos-list"); },
             showNextButton: false,
             onShow: function (tour) { addNextOnClickHandler("#recent-videos-list div.video-preview", tour); },
             onHide: function () { removeNextOnClickHandler(); } */}
@@ -123,7 +158,8 @@ class Tour extends Component {
           {
             selector: "#view-video-author",
             position: "bottom",
-            text: "Videos are added to the catalog by users on the site. Let's take a look at this user's profile. Click on the author for this video to continue.",
+            text: "Videos are added to the catalog by users on the site. Let's take a look at this user's profile. " +
+            "<br/><br/><strong>Click on the author for this video to continue.</em>",
             allowClicksThruHole: true,
             /* showNextButton: false,
             onShow: function (tour) { addNextOnClickHandler("#view-video-author > a", tour); },
@@ -170,7 +206,7 @@ class Tour extends Component {
             selector: "#register",
             position: "bottom",
             text: "Most of the interesting things you can do on KillrVideo like adding videos to the catalog or leaving comments on a video, require you to " +
-            "be logged in as a registered user. Let's take a look at the user registration process. Click on the Register button to continue.",
+            "be logged in as a registered user. Let's take a look at the user registration process. <br/><br/><strong>Click on the Register button to continue.</em>",
             isFixed: true
             /* waitForTargetOn: "#navbar-main",
             showNextButton: false,
@@ -206,7 +242,7 @@ class Tour extends Component {
             position: "bottom",
             text: "You might have noticed that our <code>users</code> table doesn't have a <code>password</code> column and so the <code>INSERT</code> " +
             "statement we just showed you isn't capturing that value from the form. Why not? Let's take a look at the Sign In page for an explanation. " +
-            "Click the Sign In button to continue.",
+            "<br/><br/><strong>Click the Sign In button to continue.</em>",
             isFixed: true
             /* showNextButton: false,
             onShow: function (tour) { addNextOnClickHandler("#sign-in", tour); },
@@ -274,7 +310,7 @@ class Tour extends Component {
             "FROM user_credentials\r\n" +
             "WHERE email = ?;" +
             "</code></pre>" +
-            "Let's sign into KillrVideo. We've filled in the form with some sample user credentials. Click the Sign In button to continue.",
+            "Let's sign into KillrVideo. We've filled in the form with some sample user credentials. <br/><br/><strong>Click the Sign In button to continue.</em>",
             /* showNextButton: false,
             onShow: function (tour) {
               // Fill in some sample user credentials
@@ -364,7 +400,7 @@ class Tour extends Component {
             selector: "#recent-videos div ul.list-unstyled li:first-child",            
             waitForTargetOn: "#recent-videos-list",
             position: "bottom",
-            text: "Let's look at a few other things we can do now that we're signed in to the site. Click on a video to continue.",
+            text: "Let's look at a few other things we can do now that we're signed in to the site. <br/><br/><strong>Click on a video to continue.</em>",
             /* beforeShowPromise: function () { return waitForElementIfNotPresent(this.target, "#recent-videos-list"); },
             showNextButton: false,
             onShow: function (tour) { addNextOnClickHandler("#recent-videos-list div.video-preview", tour); },
@@ -405,7 +441,8 @@ class Tour extends Component {
             selector: "#view-video-tags",
             position: "bottom",
             text: "When users add videos to the catalog, we ask them to provide tags for the video they are adding. These are just keywords that apply to the content " +
-            "of the video. Clicking on a tag is the same as using the search box in the header to search for videos with that keyword. Let's see how search works. Click on a tag to continue.",
+            "of the video. Clicking on a tag is the same as using the search box in the header to search for videos with that keyword. Let's see how search works. " +
+            "<br/><br/><strong>Click on a tag to continue.</em>",
             /* showNextButton: false,
             onShow: function (tour) { addNextOnClickHandler("#view-video-tags a", tour); },
             onHide: function () { removeNextOnClickHandler(); } */
@@ -483,7 +520,7 @@ class Tour extends Component {
             //selector: "#search-results div.row div.col-sm-3:first-child div.video-preview",
             position: "bottom",
             text: "There are some other cool things we can do with DataStax Enterprise Search beyond just full-text searching. Let's look at a video again to check out " +
-            "another KillrVideo feature powered by DSE Search. Click on a video to continue.",
+            "another KillrVideo feature powered by DSE Search. <br/><br/><strong>Click on a video to continue.</em>",
             /* showNextButton: false,
             onShow: function (tour) { addNextOnClickHandler("div.video-preview", tour); },
             onHide: function () { removeNextOnClickHandler(); } */
@@ -507,7 +544,7 @@ class Tour extends Component {
             selector: "#logo",
             position: "bottom",
             text: "DataStax Enterprise also offers some other interesting features beyond just Search. Let's go back to the home page to take a look at another one of those. " +
-            "Click on the KillrVideo logo to continue.",
+            "<br/><br/><strong>Click on the KillrVideo logo to continue.</em>",
             isFixed: true
             /* showNextButton: false,
             onShow: function (tour) { addNextOnClickHandler("#logo", tour); },
