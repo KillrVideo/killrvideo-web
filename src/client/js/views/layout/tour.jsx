@@ -3,30 +3,19 @@ import { Button, Collapse } from 'react-bootstrap';
 import Icon from 'components/shared/icon';
 import Joyride from 'react-joyride';
 
-// create a one-time event
-function selectorCallback(event) {
-
-    console.log("Tour Callback - clickthrough hole callback");
-  
-    // removing callback so that we have a one-time event
-    event.target.removeEventListener(event.type, selectorCallback);
-
-    // TODO: Advance the tour
-}
-
 class Tour extends Component {
 
   constructor(props) {
     super(props);
     this.handleJoyrideCallback = this.handleJoyrideCallback.bind(this);    
-    this.selectorCallbackInternal = this.selectorCallbackInternal.bind(this);
+    this.selectorCallback = this.selectorCallback.bind(this);
   }
 
-  selectorCallbackInternal(event) {
+  selectorCallback(event) {
     console.log("Tour Callback - clickthrough hole callback");
   
     // removing callback so that we have a one-time event
-    event.target.removeEventListener(event.type, this.selectorCallbackInternal);
+    event.target.removeEventListener(event.type, this.selectorCallback);
 
     // TODO: Advance the tour
     var joyride = this.joyride;
@@ -48,7 +37,7 @@ class Tour extends Component {
       console.log("Tour Callback - allowClicksThroughHole, selector: " + result.step.selector);
       var selectedObj = document.querySelector(result.step.selector);
       console.log(selectedObj);
-      selectedObj.addEventListener("click", this.selectorCallbackInternal );
+      selectedObj.addEventListener("click", this.selectorCallback );
     }
   }
 
@@ -86,7 +75,7 @@ class Tour extends Component {
             isFixed: true
           },
           {
-            selector: "#show-tour", // "#header .show-tour",
+            selector: "#show-tour", 
             position: "bottom",
             text: "You can toggle this guided tour off at any time using this button. Turning it back on will take you to the home page and " +
             "restart the tour from the beginning.",
@@ -99,18 +88,11 @@ class Tour extends Component {
             text: "Let's get started by looking at a video. <br/><br/><strong>Click on a video to continue.</em>",
             allowClicksThruHole: true,
             style: {
-              beacon: {
-                offsetY: 20
-              },
               button: {
                 display: 'none',
               }
             }
-            /*beforeShowPromise: function () { return waitForElementIfNotPresent(this.target, "#recent-videos-list"); },
-            showNextButton: false,
-            onShow: function (tour) { addNextOnClickHandler("#recent-videos-list div.video-preview", tour); },
-            onHide: function () { removeNextOnClickHandler(); } */}
-          ,
+          },
           // View video page (unauthenticated)
           {
             selector: "#view-video", 
@@ -166,9 +148,11 @@ class Tour extends Component {
             text: "Videos are added to the catalog by users on the site. Let's take a look at this user's profile. " +
             "<br/><br/><strong>Click on the author for this video to continue.</em>",
             allowClicksThruHole: true,
-            /* showNextButton: false,
-            onShow: function (tour) { addNextOnClickHandler("#view-video-author > a", tour); },
-            onHide: function () { removeNextOnClickHandler(); } */
+            style: {
+              button: {
+                display: 'none',
+              }
+            }
           },
           // View user profile (unauthenicated)
           {
@@ -212,22 +196,24 @@ class Tour extends Component {
             position: "bottom",
             text: "Most of the interesting things you can do on KillrVideo like adding videos to the catalog or leaving comments on a video, require you to " +
             "be logged in as a registered user. Let's take a look at the user registration process. <br/><br/><strong>Click on the Register button to continue.</em>",
-            isFixed: true
-            /* waitForTargetOn: "#navbar-main",
-            showNextButton: false,
-            onShow: function (tour) { addNextOnClickHandler("#register", tour); },
-            onHide: function () { removeNextOnClickHandler(); } */
+            isFixed: true,
+            allowClicksThruHole: true,
+            style: {
+              button: {
+                display: 'none',
+              }
+            }
           },
           // User registration page (unauthenticated)
           {
             selector: "#register-account form",
-            position: "right",
+            position: "bottom",
             text: "This is the user registration form for KillrVideo. It probably looks like many of the forms you've filled out before to register for a web " +
             "site. Here we collect basic information like your name and email address.",
           },
           {
             selector: "#register-account form button.btn-primary",
-            position: "top",
+            position: "right",
             text: "When a user submits the form, we insert the data into Cassandra. Here's what it looks like to use a CQL <code>INSERT</code> " +
             "statement to add data to our <code>users</code> table:<br/><br/>" +
             "<pre><code>" +
@@ -248,10 +234,13 @@ class Tour extends Component {
             text: "You might have noticed that our <code>users</code> table doesn't have a <code>password</code> column and so the <code>INSERT</code> " +
             "statement we just showed you isn't capturing that value from the form. Why not? Let's take a look at the Sign In page for an explanation. " +
             "<br/><br/><strong>Click the Sign In button to continue.</em>",
-            isFixed: true
-            /* showNextButton: false,
-            onShow: function (tour) { addNextOnClickHandler("#sign-in", tour); },
-            onHide: function () { removeNextOnClickHandler(); } */
+            isFixed: true,
+            allowClicksThruHole: true,
+            style: {
+              button: {
+                display: 'none',
+              }
+            }
           },
           // Sign In page (unauthenticated)
           {
@@ -315,7 +304,7 @@ class Tour extends Component {
             "FROM user_credentials\r\n" +
             "WHERE email = ?;" +
             "</code></pre>" +
-            "Let's sign into KillrVideo. We've filled in the form with some sample user credentials. <br/><br/><strong>Click the Sign In button to continue.</em>",
+            "Let's sign into KillrVideo with the account credentials you just created. <br/><br/><strong>Click the Sign In button to continue.</em>",
             /* showNextButton: false,
             onShow: function (tour) {
               // Fill in some sample user credentials
@@ -380,7 +369,6 @@ class Tour extends Component {
             "Videos list should only ever show videos from <em>at most</em> the last 7 days. As a result, we don't really need to retain any data that's older than " +
             "7 days. While we could write some kind of background job to delete old data from that table on a regular basis, instead we're leveraging Cassandra's " +
             "ability to specify a <strong>TTL</strong> or <strong>Time to Live</strong> when inserting data to that table.",
-            //beforeShowPromise: function () { return waitForElementIfNotPresent("#recent-videos-list ul.list-unstyled li:first-child div.video-preview", "#recent-videos-list"); }
           },
           {
             selector: "#recent-videos",
@@ -399,17 +387,18 @@ class Tour extends Component {
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_using/useExpire.html' target='_blank'>Expiring Data with Time-To-Live</a></li>" +
             "</ul>",
-            //beforeShowPromise: function () { return waitForElementIfNotPresent("#recent-videos-list ul.list-unstyled li:first-child div.video-preview", "#recent-videos-list"); }
           },
           {
             selector: "#recent-videos div ul.list-unstyled li:first-child",            
             waitForTargetOn: "#recent-videos-list",
             position: "bottom",
             text: "Let's look at a few other things we can do now that we're signed in to the site. <br/><br/><strong>Click on a video to continue.</em>",
-            /* beforeShowPromise: function () { return waitForElementIfNotPresent(this.target, "#recent-videos-list"); },
-            showNextButton: false,
-            onShow: function (tour) { addNextOnClickHandler("#recent-videos-list div.video-preview", tour); },
-            onHide: function () { removeNextOnClickHandler(); } */
+            allowClicksThruHole: true,
+            style: {
+              button: {
+                display: 'none',
+              }
+            }
           },
           // View video page (authenticated)
           {
@@ -448,9 +437,12 @@ class Tour extends Component {
             text: "When users add videos to the catalog, we ask them to provide tags for the video they are adding. These are just keywords that apply to the content " +
             "of the video. Clicking on a tag is the same as using the search box in the header to search for videos with that keyword. Let's see how search works. " +
             "<br/><br/><strong>Click on a tag to continue.</em>",
-            /* showNextButton: false,
-            onShow: function (tour) { addNextOnClickHandler("#view-video-tags a", tour); },
-            onHide: function () { removeNextOnClickHandler(); } */
+            allowClicksThruHole: true,
+            style: {
+              button: {
+                display: 'none',
+              }
+            }
           },
           // Search results page (authenticated)
           {
@@ -522,13 +514,15 @@ class Tour extends Component {
           },
           {
             selector: "#search-results div.row div.col-sm-3",
-            //selector: "#search-results div.row div.col-sm-3:first-child div.video-preview",
             position: "bottom",
             text: "There are some other cool things we can do with DataStax Enterprise Search beyond just full-text searching. Let's look at a video again to check out " +
             "another KillrVideo feature powered by DSE Search. <br/><br/><strong>Click on a video to continue.</em>",
-            /* showNextButton: false,
-            onShow: function (tour) { addNextOnClickHandler("div.video-preview", tour); },
-            onHide: function () { removeNextOnClickHandler(); } */
+            allowClicksThruHole: true,
+            style: {
+              button: {
+                display: 'none',
+              }
+            }
           },
           // View video page (authenticated)
           {
@@ -542,18 +536,19 @@ class Tour extends Component {
             "    <li><a href='https://lucene.apache.org/solr/guide/6_6/morelikethis.html' target='_blank'>MoreLikeThis Component</a></li>" +
             "</ul>",
             isFixed: true
-            // beforeShowPromise: function () { return waitForElementIfNotPresent(this.target, "#view-video-related"); },
-
           },
           {
             selector: "#logo",
             position: "bottom",
             text: "DataStax Enterprise also offers some other interesting features beyond just Search. Let's go back to the home page to take a look at another one of those. " +
             "<br/><br/><strong>Click on the KillrVideo logo to continue.</em>",
-            isFixed: true
-            /* showNextButton: false,
-            onShow: function (tour) { addNextOnClickHandler("#logo", tour); },
-            onHide: function () { removeNextOnClickHandler(); } */
+            isFixed: true,
+            allowClicksThruHole: true,
+            style: {
+              button: {
+                display: 'none',
+              }
+            }
           },
           // Home page (authenticated)
           {
@@ -605,8 +600,6 @@ class Tour extends Component {
             "    <li><a href='http://www.datastax.com/customers' target='_blank'>Companies Using DataStax Enterprise</a></li>" +
             "</ul>",
             isFixed: true
-            /* showNextButton: false,
-            showEndButton: true, */
           }
         ]}
       />
