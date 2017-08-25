@@ -16,18 +16,23 @@ function selectorCallback(event) {
 
 class Tour extends Component {
 
-/*   constructor(props) {
+  constructor(props) {
     super(props);
+    this.handleJoyrideCallback = this.handleJoyrideCallback.bind(this);    
     this.selectorCallbackInternal = this.selectorCallbackInternal.bind(this);
-  } */
+  }
 
   selectorCallbackInternal(event) {
     console.log("Tour Callback - clickthrough hole callback");
   
     // removing callback so that we have a one-time event
-    event.target.removeEventListener(event.type, selectorCallbackInternal);
+    event.target.removeEventListener(event.type, this.selectorCallbackInternal);
 
     // TODO: Advance the tour
+    var joyride = this.joyride;
+    setTimeout(function() {joyride.next();}, 0);
+
+    console.log("Tour Callback - clickthrough hole callback complete");
   }
 
   handleJoyrideCallback(result) {
@@ -43,7 +48,7 @@ class Tour extends Component {
       console.log("Tour Callback - allowClicksThroughHole, selector: " + result.step.selector);
       var selectedObj = document.querySelector(result.step.selector);
       console.log(selectedObj);
-      selectedObj.addEventListener("click", this.selectorCallback );
+      selectedObj.addEventListener("click", this.selectorCallbackInternal );
     }
   }
 
