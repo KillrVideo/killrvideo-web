@@ -31,7 +31,7 @@ class Tour extends Component {
     //   this.setState({run: false});
     // }
 
-    console.log("Tour Callback - action: " + result.type + ", index: " + result.index);
+    console.log("Tour Callback - type: " + result.type + ", action: " + result.action + ", index: " + result.index);
     console.log(result);
     if (result.step.allowClicksThruHole && result.type === "tooltip:before") {
       console.log("Tour Callback - allowClicksThroughHole, selector: " + result.step.selector);
