@@ -12,7 +12,7 @@ import Icon from 'components/shared/icon';
 import UserProfileImage from 'components/users/user-profile-image';
 import WhatIsThis from './what-is-this';
 import SearchBox from './search-box';
-import Tour from './tour';
+import Tour from 'components/shared/tour';
 
 var logoUrl = require('killrvideo.png');
 
