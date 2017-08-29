@@ -7,6 +7,7 @@ class Tour extends Component {
 
   constructor(props) {
     super(props);
+    // binding callbacks so that we can access variables inside the Tour object
     this.handleJoyrideCallback = this.handleJoyrideCallback.bind(this);    
     this.selectorCallback = this.selectorCallback.bind(this);
   }
@@ -17,28 +18,26 @@ class Tour extends Component {
     // removing callback so that we have a one-time event
     event.target.removeEventListener(event.type, this.selectorCallback);
 
-    // TODO: Advance the tour
+    // Advance the tour - but need to delay until after the page renders
     var joyride = this.joyride;
-    setTimeout(function() {joyride.next();}, 0);
+    setTimeout(function() {joyride.next();}, 20);
 
     console.log("Tour Callback - clickthrough hole callback complete");
   }
 
   handleJoyrideCallback(result) {
-    //const{joyride} = this.props;
-    
-    // if (result.action == 'close') {
-    //   this.setState({run: false});
-    // }
 
     console.log("Tour Callback - type: " + result.type + ", action: " + result.action + ", index: " + result.index);
     console.log(result);
-    if (result.step.allowClicksThruHole && result.type === "tooltip:before") {
+    if (result.type === "tooltip:before" && result.step.allowClicksThruHole) {
       console.log("Tour Callback - allowClicksThroughHole, selector: " + result.step.selector);
       var selectedObj = document.querySelector(result.step.selector);
       console.log(selectedObj);
       selectedObj.addEventListener("click", this.selectorCallback );
     }
+    if (result.action === 'close' || result.type === 'finished') {
+       this.props.toggleTour();
+     }
   }
 
   render() {
@@ -62,8 +61,8 @@ class Tour extends Component {
             selector: "#logo",
             position: "bottom",
             text: "KillrVideo is an open source demo video sharing application built on DataStax Enterprise powered by " +
-            "Apache Cassandra. If you're new to Cassandra, this demo is a great way to learn more about how to build your own " +
-            "applications and services on top of DataStax Enterprise.",
+            "Apache Cassandra. If you're new to technologies like Cassandra, Apache Spark, search, and graph, this demo is a " +
+            "great way to learn more about how to build your own applications and services on top of DataStax Enterprise.",
             isFixed: true
           },
           {
@@ -71,21 +70,27 @@ class Tour extends Component {
             position: "bottom",
             text: "This tour will walk you through some of the features of the site. Along the way we'll point out some of the " +
             "interesting technical things going on behind the scenes and provide you with links for learning more about those " +
-            "topics.",
-            isFixed: true
+            "topics. We'll start our tour on the home page. <br/><br/><strong>Click on the KillrVideo logo to go to the home page</strong>.",
+            isFixed: true,
+            allowClicksThruHole: true,
+            style: {
+              button: {
+                display: 'none',
+              }
+            }
           },
           {
             selector: "#show-tour", 
             position: "bottom",
-            text: "You can toggle this guided tour off at any time using this button. Turning it back on will take you to the home page and " +
-            "restart the tour from the beginning.",
+            text: "You can exit the tour at any time by clicking on the 'X' in the upper corner of the current step. " +
+            "You can re-start the tour from the beginning at any time using this 'Tour' button.",
             isFixed: true
           },
           {
             selector: "#recent-videos div ul.list-unstyled li:first-child",
             //selector: "#recent-videos ul.list-unstyled li:first-child div.video-preview",
             position: "right",
-            text: "Let's get started by looking at a video. <br/><br/><strong>Click on a video to continue.</em>",
+            text: "Let's get started by looking at a video. <br/><br/><strong>Click on a video to continue.</strong>",
             allowClicksThruHole: true,
             style: {
               button: {
@@ -98,7 +103,7 @@ class Tour extends Component {
             selector: "#view-video", 
             position: "bottom",
             text: "This is the View Video page where users can playback videos added to the site. Details like the video's description and name " +
-            "are stored in a catalog in Cassandra, similar to how a Product Catalog might work on an e-commerce site. Cassandra Query Language or " +
+            "are stored in a catalog in Cassandra, similar to how a Product Catalog might work on an e-commerce site. The Cassandra Query Language or " +
             "CQL makes it easy to store this information. If you're experienced with SQL syntax from working with relational databases, it will " +
             "look very familiar to you.",
           },
@@ -119,7 +124,7 @@ class Tour extends Component {
             "  added_date timestamp,\r\n" +
             "  PRIMARY KEY (videoid)\r\n" +
             ");</code></pre>" +
-            "See also: " +
+            "<br/>See also: " +
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_using/useCreateTableTOC.html' target='_blank'>Managing Tables</a></li>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_reference/cql_commands/cqlCreateTable.html' target='_blank'>CREATE TABLE reference</a></li>" +
@@ -136,7 +141,7 @@ class Tour extends Component {
             "</code></pre>" +
             "In CQL, the <code>?</code> character is used as a placeholder for bind variable values. If you've ever done parameterized SQL queries before, the idea " +
             "is the same." +
-            "<br>See also: " +
+            "<br/><br/>See also: " +
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_using/queriesTOC.html' target='_blank'>Querying Data with CQL</a></li>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_reference/cql_commands/cqlSelect.html' target='_blank'>SELECT statement reference</a></li>" +
@@ -146,7 +151,7 @@ class Tour extends Component {
             selector: "#view-video-author",
             position: "bottom",
             text: "Videos are added to the catalog by users on the site. Let's take a look at this user's profile. " +
-            "<br/><br/><strong>Click on the author for this video to continue.</em>",
+            "<br/><br/><strong>Click on the author for this video to continue.</strong>",
             allowClicksThruHole: true,
             style: {
               button: {
@@ -186,7 +191,7 @@ class Tour extends Component {
             "WHERE userid = ?;" +
             "</code></pre>" +
             "Pretty straightforward, right?" +
-            "<br/>See also: " +
+            "<br/><br/>See also: " +
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_using/useSimplePrimaryKeyConcept.html' target='_blank'>Defining a Basic Primary Key with CQL</a></li>" +
             "</ul>",
@@ -195,7 +200,7 @@ class Tour extends Component {
             selector: "#register",
             position: "bottom",
             text: "Most of the interesting things you can do on KillrVideo like adding videos to the catalog or leaving comments on a video, require you to " +
-            "be logged in as a registered user. Let's take a look at the user registration process. <br/><br/><strong>Click on the Register button to continue.</em>",
+            "be logged in as a registered user. Let's take a look at the user registration process. <br/><br/><strong>Click on the Register button to continue.</strong>",
             isFixed: true,
             allowClicksThruHole: true,
             style: {
@@ -206,10 +211,13 @@ class Tour extends Component {
           },
           // User registration page (unauthenticated)
           {
-            selector: "#register-account form",
+            selector: "#register-account-fields",
+            //selector: "#register-account form",
             position: "bottom",
             text: "This is the user registration form for KillrVideo. It probably looks like many of the forms you've filled out before to register for a web " +
-            "site. Here we collect basic information like your name and email address.",
+            "site. Here we collect basic information like your name and email address. " +
+            "<br/><br/><strong>Optional: enter your information to create an account if you haven't done so already, then select 'Next'.</strong>",
+            allowClicksThruHole: true
           },
           {
             selector: "#register-account form button.btn-primary",
@@ -226,14 +234,17 @@ class Tour extends Component {
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_using/useInsertDataTOC.html' target='_blank'>Inserting and Updating Data with CQL</a></li>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_reference/cql_commands/cqlInsert.html' target='_blank'>INSERT statement reference</a></li>" +
-            "</ul>",
+            "</ul>" +
+            "<br/><br/><strong>If you've entered values to create a new user, click the 'Register' button. If you already have an account you may skip this step " +
+            " by selecting the 'Next' button.</strong>",
+            allowClicksThruHole: true
           },
           {
             selector: "#sign-in",
             position: "bottom",
             text: "You might have noticed that our <code>users</code> table doesn't have a <code>password</code> column and so the <code>INSERT</code> " +
             "statement we just showed you isn't capturing that value from the form. Why not? Let's take a look at the Sign In page for an explanation. " +
-            "<br/><br/><strong>Click the Sign In button to continue.</em>",
+            "<br/><br/><strong>Click the Sign In button to continue.</strong>",
             isFixed: true,
             allowClicksThruHole: true,
             style: {
@@ -244,10 +255,11 @@ class Tour extends Component {
           },
           // Sign In page (unauthenticated)
           {
-            selector: "#signin-account",
+            selector: "#signin-fields",
             position: "right",
             text: "This is the sign in form for KillrVideo. Once a user enters their credentials, we'll need to look them up by email address and verify " +
-            "their password.",
+            "their password. <br/><br/><strong>Enter your credentials here now.</strong>",
+            allowClicksThruHole: false,
           },
           {
             selector: "#signin-email",
@@ -259,17 +271,20 @@ class Tour extends Component {
             "WHERE email = ?;" +
             "</code></pre>" +
             "But if we try to execute that query, Cassandra will give us an <code>InvalidQuery</code> error. Why is that?",
+            allowClicksThruHole: true,
           },
           {
-            selector: "#signin-account",
+            selector: "#signin-account div.panel-body",
+            //selector: "#signin-fields",
             position: "right",
             text: "In Cassandra, the <code>WHERE</code> clause of your query is limited to columns that are part of the <code>PRIMARY KEY</code> of the table. You'll " +
             "remember that in our <code>users</code> table, this was the <code>userid</code> column (so that we could look users up by unique id on the user profile " +
             "page). So how do we do a query to look a user up by email address so we can log them in?" +
-            "<br/>See also: " +
+            "<br/><br/>See also: " +
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_using/whereConditionsPK.html?hl=where' target='_blank'>Restricting queries using WHERE clauses</a></li>" +
             "</ul>",
+            allowClicksThruHole: false
           },
           {
             selector: "#signin-email",
@@ -285,7 +300,7 @@ class Tour extends Component {
             ");</code></pre>",
           },
           {
-            selector: "#signin-account",
+            selector: "#signin-fields",
             position: "right",
             text: "When a user registers for the site, we'll insert the data captured into both the <code>users</code> and <code>user_credentials</code> tables. This is a " +
             "data modeling technique called <strong>denormalization</strong> and is something that you'll use a lot when working with Cassandra." +
@@ -304,18 +319,13 @@ class Tour extends Component {
             "FROM user_credentials\r\n" +
             "WHERE email = ?;" +
             "</code></pre>" +
-            "Let's sign into KillrVideo with the account credentials you just created. <br/><br/><strong>Click the Sign In button to continue.</em>",
-            /* showNextButton: false,
-            onShow: function (tour) {
-              // Fill in some sample user credentials
-              $("#signin-email").val("guidedtour@killrvideo.com").change();
-              $("#signin-password").val("guidedtour").change();
-
-              addNextOnClickHandler("#signin-account button.btn-primary", tour); // TODO: Next on valid authentication, not just click
-            },
-            onHide: function () {
-              removeNextOnClickHandler();
-            } */
+            "Let's sign into KillrVideo with the account credentials you just created. <br/><br/><strong>Click the Sign In button to continue.</strong>",
+            allowClicksThruHole: true,
+            style: {
+              button: {
+                display: 'none',
+              }
+            }
           },
           // Home page (authenticated)
           {
@@ -355,7 +365,7 @@ class Tour extends Component {
             text: "This is a really simple example of a <strong>time series data model</strong>. Cassandra is great at storing time series data and lots of companies " +
             "use DataStax Enterprise for use cases like the Internet of Things (IoT) which are often collecting a lot of time series data from a multitude of " +
             "sensors or devices." +
-            "<br/>See also: " +
+            "<br/><br/>See also: " +
             "<ul>" +
             "    <li><a href='https://academy.datastax.com/use-cases/internet-of-things-time-series' target='_blank'>Cassandra IoT use cases</a></li>" +
             "    <li><a href='https://www.datastax.com/internet-of-things' target='_blank'>DataStax IoT case studies</a></li>" +
@@ -392,7 +402,7 @@ class Tour extends Component {
             selector: "#recent-videos div ul.list-unstyled li:first-child",            
             waitForTargetOn: "#recent-videos-list",
             position: "bottom",
-            text: "Let's look at a few other things we can do now that we're signed in to the site. <br/><br/><strong>Click on a video to continue.</em>",
+            text: "Let's look at a few other things we can do now that we're signed in to the site. <br/><br/><strong>Click on a video to continue.</strong>",
             allowClicksThruHole: true,
             style: {
               button: {
@@ -420,7 +430,7 @@ class Tour extends Component {
             ");</code></pre>" +
             "Columns of type <code>counter</code> are a special Cassandra column type that allow operations like increment/decrement and are great for storing " +
             "approximate counts." +
-            "<br/>See also: " +
+            "<br/><br/>See also: " +
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_using/useCountersConcept.html' target='_blank'>Creating a Counter table with CQL</a></li>" +
             "</ul>",
@@ -429,14 +439,14 @@ class Tour extends Component {
             selector: "#view-video-comments > h5",
             position: "left",
             text: "The latest comments for a video are also displayed and now that we're signed in, we can leave comments of our own. Comments are another simple " +
-            "example of a <strong>time series data model</strong>.",
+            "example of a <em>time series data model</em>.",
           },
           {
             selector: "#view-video-tags",
             position: "bottom",
             text: "When users add videos to the catalog, we ask them to provide tags for the video they are adding. These are just keywords that apply to the content " +
             "of the video. Clicking on a tag is the same as using the search box in the header to search for videos with that keyword. Let's see how search works. " +
-            "<br/><br/><strong>Click on a tag to continue.</em>",
+            "<br/><br/><strong>Click on a tag to continue.</strong>",
             allowClicksThruHole: true,
             style: {
               button: {
@@ -494,7 +504,7 @@ class Tour extends Component {
             "</code></pre>" +
             "This uses Solr's Extended DisMax parser to search across multiple columns and gives a boost to search results with <em>cassandra</em> in the <code>name</code> " +
             "or <code>tags</code> columns over just the <code>description</code> column." +
-            "</br>See also: " +
+            "<br/><br/>See also: " +
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/dse-dev/datastax_enterprise/search/queriesJSON.html' target='_blank'>DSE Search Queries with JSON</a></li>" +
             "    <li><a href='https://lucene.apache.org/solr/guide/6_6/the-extended-dismax-query-parser.html' target='_blank'>Extended DisMax Parser</a></li>" +
@@ -506,7 +516,7 @@ class Tour extends Component {
             text: "Search suggestions are also powered by DataStax Enterprise. If you start to enter a search term into the search box, you'll get video names " +
             "that match your search terms as suggestions. Try typing <em>cassandra</em> into the search box to see an example. This is done by enabling the Solr " +
             "Suggester component in DSE Search." +
-            "<br/>See also: " +
+            "<br/><br/>See also: " +
             "<ul>" +
             "    <li><a href='https://lucene.apache.org/solr/guide/6_6/suggester.html' target='_blank'>SOLR Suggester</a></li>" +
             "</ul>",
@@ -516,7 +526,7 @@ class Tour extends Component {
             selector: "#search-results div.row div.col-sm-3",
             position: "bottom",
             text: "There are some other cool things we can do with DataStax Enterprise Search beyond just full-text searching. Let's look at a video again to check out " +
-            "another KillrVideo feature powered by DSE Search. <br/><br/><strong>Click on a video to continue.</em>",
+            "another KillrVideo feature powered by DSE Search. <br/><br/><strong>Click on a video to continue.</strong>",
             allowClicksThruHole: true,
             style: {
               button: {
@@ -541,7 +551,7 @@ class Tour extends Component {
             selector: "#logo",
             position: "bottom",
             text: "DataStax Enterprise also offers some other interesting features beyond just Search. Let's go back to the home page to take a look at another one of those. " +
-            "<br/><br/><strong>Click on the KillrVideo logo to continue.</em>",
+            "<br/><br/><strong>Click on the KillrVideo logo to continue.</strong>",
             isFixed: true,
             allowClicksThruHole: true,
             style: {
@@ -582,7 +592,7 @@ class Tour extends Component {
             text: "Using DSE Analytics integration with Apache Spark, we're able to write a simple recommendation engine that leverages Spark's MLlib Machine Learning library " +
             "to consume the data in that table and output video recommendations based on the ratings you and other users on the site have given. Amazingly, the Spark job to do " +
             "this is less than 100 lines of code." +
-            "<br/>See also: " +
+            "<br/><br/>See also: " +
             "<ul>" +
             "    <li><a href='http://spark.apache.org/docs/latest/mllib-guide.html' target='_blank'>Apache Spark MLlib</a></li>" +
             "</ul>",
@@ -593,7 +603,7 @@ class Tour extends Component {
             text: "Thanks for taking the time to learn more about KillrVideo! Remember, KillrVideo is completely open source, so check it out on GitHub " +
             "to dig deeper into how things work. There's also great self-paced training courses for DataStax Enterprise available online at the DataStax " +
             "Academy web site." +
-            "<br/>See also: " +
+            "<br/><br/>See also: " +
             "<ul>" +
             "    <li><a href='https://github.com/KillrVideo' target='_blank'>KillrVideo on GitHub</a></li>" +
             "    <li><a href='https://academy.datastax.com/' target='_blank'>Free Online Courses at DataStax Academyb</a></li>" +
