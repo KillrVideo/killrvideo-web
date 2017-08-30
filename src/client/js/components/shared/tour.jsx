@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import { Button, Collapse } from 'react-bootstrap';
 import Icon from 'components/shared/icon';
 import Joyride from 'react-joyride';
 
@@ -22,23 +21,49 @@ class Tour extends Component {
     var joyride = this.joyride;
     setTimeout(function() {joyride.next();}, 50);
 
-    console.log("Tour Callback - clickthrough hole callback complete");
+    console.log("selectorCallback - clickthrough hole callback complete");
   }
 
   handleJoyrideCallback(result) {
 
-    console.log("Tour Callback - type: " + result.type + ", action: " + result.action + ", index: " + result.index);
+    console.log("handleJoyrideCallback - type: " + result.type + ", action: " + result.action + ", index: " + result.index);
     console.log(result);
-    if (result.type === "tooltip:before" && result.step.allowClicksThruHole) {
-      console.log("Tour Callback - allowClicksThroughHole, selector: " + result.step.selector);
+
+    // For steps where we allow a click through the overlay, the tour does not get advanced automatically
+    // Therefore we register our own (one time) callback on the selector that can advance the tour
+    if (result.type === "tooltip:before" && result.action === "next" && result.step.allowClicksThruHole) {
+      console.log("handleJoyrideCallback - allowClicksThroughHole, selector: " + result.step.selector);
       var selectedObj = document.querySelector(result.step.selector);
       console.log(selectedObj);
       selectedObj.addEventListener("click", this.selectorCallback );
     }
-    if (result.action === 'close' || result.type === 'finished') {
-       this.props.toggleTour();
-     }
+
+    // If the user clicks on the back button, we need to handle the reverse of the previous case
+    // We receive a "tooltip:before" callback with an action of "back" on the step we are going back to, 
+    // but that is too late. We need to go back a page before so we are sure the selector exists.
+    else if (result.type === "step:after" && result.action === "back")
+    {
+      var previousStep = this.joyride.props.steps[result.index - 1];
+      if (previousStep.allowClicksThruHole && !previousStep.isFixed)
+      {
+        console.log("Tour Callback - going back to allowClicksThruHole step: " + result.index -1);
+        window.history.back();
+      }
+    }
+    
+    // If the user exits the tour (via the 'X' in the upper right) or finishes the tour (via the 'Last' button
+    // on the final step), set the tour state to off
+    else if (result.type === "step:after" && result.action === "close" || result.type === "finished") {
+      this.props.toggleTour();
+      this.joyride.reset(true);
+    }
+
   }
+
+/*   componentDidUpdate()
+  {
+    console.log("Tour componentDidUpdate()");
+  } */
 
   render() {
 
@@ -52,8 +77,8 @@ class Tour extends Component {
         autoStart={true} // shows first step when enabled (instead of beacon)
         disableOverlay={true} // true - clicking on overlay has no effect, false - click closes tooltip
         showSkipButton={false} // we want to force them to enter things and not be able to skip steps, at least by default
+        scrollToSteps={false} // Gilardi says default behavior (true) is annoying
         callback={this.handleJoyrideCallback}
-        //debug={true}
         steps={[
           // Starting on the Home Page (Unauthenticated)
           {
@@ -133,7 +158,7 @@ class Tour extends Component {
           {
             selector: "#view-video-title",
             position: "bottom",
-            text: "Querying the data from that <code>videos</code> table to show things like the video title is also easy with CQL. Here's what the query looks like " +
+            text: "Querying the data from the <code>videos</code> table to show things like the video title is also easy with CQL. Here's what the query looks like " +
             "to retrieve a video from the catalog in Cassandra:<br/><br/>" +
             "<pre><code>" +
             "SELECT * FROM videos\r\n" +
