@@ -60,10 +60,10 @@ class Tour extends Component {
 
   }
 
-/*   componentDidUpdate()
+  componentDidUpdate()
   {
     console.log("Tour componentDidUpdate()");
-  } */
+  } 
 
   render() {
 
@@ -109,7 +109,8 @@ class Tour extends Component {
             position: "bottom",
             text: "You can exit the tour at any time by clicking on the 'X' in the upper corner of the current step. " +
             "You can re-start the tour from the beginning at any time using this 'Tour' button.",
-            isFixed: true
+            isFixed: true, 
+            allowClicksThruHole: false
           },
           {
             selector: "#recent-videos div ul.list-unstyled li:first-child",
@@ -125,7 +126,7 @@ class Tour extends Component {
           },
           // View video page (unauthenticated)
           {
-            selector: "#view-video", 
+            selector: "#view-video-row", 
             position: "bottom",
             text: "This is the View Video page where users can playback videos added to the site. Details like the video's description and name " +
             "are stored in a catalog in Cassandra, similar to how a Product Catalog might work on an e-commerce site. The Cassandra Query Language or " +
@@ -133,19 +134,15 @@ class Tour extends Component {
             "look very familiar to you.",
           },
           {
-            selector: "#view-video-row", 
-            position: "bottom",
+            selector: "#view-video-player", 
+            position: "right",
             text: "Here's what the <code>videos</code> table for the catalog looks like in CQL:<br/><br/>" +
             "<pre><code>" +
             "CREATE TABLE videos (\r\n" +
-            "  videoid uuid,\r\n" +
-            "  userid uuid,\r\n" +
-            "  name text,\r\n" +
-            "  description text,\r\n" +
-            "  location text,\r\n" +
-            "  location_type int,\r\n" +
-            "  preview_image_location text,\r\n" +
-            "  tags set&lt;text&gt;,\r\n" +
+            "  videoid uuid, userid uuid,\r\n" +
+            "  name text, description text,\r\n" +
+            "  location text, location_type int,\r\n" +
+            "  preview_image_location text, tags set&lt;text&gt;,\r\n" +
             "  added_date timestamp,\r\n" +
             "  PRIMARY KEY (videoid)\r\n" +
             ");</code></pre>" +
@@ -242,7 +239,6 @@ class Tour extends Component {
             text: "This is the user registration form for KillrVideo. It probably looks like many of the forms you've filled out before to register for a web " +
             "site. Here we collect basic information like your name and email address. " +
             "<br/><br/><strong>Optional: enter your information to create an account if you haven't done so already, then select 'Next'.</strong>",
-            allowClicksThruHole: true
           },
           {
             selector: "#register-account form button.btn-primary",
@@ -250,9 +246,8 @@ class Tour extends Component {
             text: "When a user submits the form, we insert the data into Cassandra. Here's what it looks like to use a CQL <code>INSERT</code> " +
             "statement to add data to our <code>users</code> table:<br/><br/>" +
             "<pre><code>" +
-            "INSERT INTO users (\r\n" +
-            "  userid, firstname, lastname,\r\n" +
-            "  email, created_date)\r\n" +
+            "INSERT INTO users (userid,\r\n" +
+            "  firstname, lastname, email, created_date)\r\n" +
             "VALUES (?, ?, ?, ?, ?);" +
             "</code></pre>" +
             "See also: " +
@@ -260,7 +255,7 @@ class Tour extends Component {
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_using/useInsertDataTOC.html' target='_blank'>Inserting and Updating Data with CQL</a></li>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_reference/cql_commands/cqlInsert.html' target='_blank'>INSERT statement reference</a></li>" +
             "</ul>" +
-            "<br/><br/><strong>If you've entered values to create a new user, click the 'Register' button. If you already have an account you may skip this step " +
+            "<strong>If you've entered values to create a new user, click the 'Register' button. If you already have an account you may skip this step " +
             " by selecting the 'Next' button.</strong>",
             allowClicksThruHole: true
           },
@@ -284,10 +279,9 @@ class Tour extends Component {
             position: "right",
             text: "This is the sign in form for KillrVideo. Once a user enters their credentials, we'll need to look them up by email address and verify " +
             "their password. <br/><br/><strong>Enter your credentials here now.</strong>",
-            allowClicksThruHole: false,
           },
           {
-            selector: "#signin-email",
+            selector: "#signin-password",
             position: "right",
             text: "If our <code>users</code> table had a <code>password</code> column in it, you might be tempted to try a query like this to look a user up by email " +
             "address:<br/><br/>" +
@@ -295,15 +289,9 @@ class Tour extends Component {
             "SELECT password FROM users\r\n" +
             "WHERE email = ?;" +
             "</code></pre>" +
-            "But if we try to execute that query, Cassandra will give us an <code>InvalidQuery</code> error. Why is that?",
-            allowClicksThruHole: true,
-          },
-          {
-            selector: "#signin-account div.panel-body",
-            //selector: "#signin-fields",
-            position: "right",
-            text: "In Cassandra, the <code>WHERE</code> clause of your query is limited to columns that are part of the <code>PRIMARY KEY</code> of the table. You'll " +
-            "remember that in our <code>users</code> table, this was the <code>userid</code> column (so that we could look users up by unique id on the user profile " +
+            "But if we try to execute that query, Cassandra will give us an <code>InvalidQuery</code> error. Why is that? <br/>" +
+            "In Cassandra, the <code>WHERE</code> clause of your query is limited to columns that are part of the <code>PRIMARY KEY</code> of the table. You'll " +
+            "Remember that in our <code>users</code> table, this was the <code>userid</code> column (so that we could look users up by unique id on the user profile " +
             "page). So how do we do a query to look a user up by email address so we can log them in?" +
             "<br/><br/>See also: " +
             "<ul>" +
@@ -322,12 +310,8 @@ class Tour extends Component {
             "  password text,\r\n" +
             "  userid uuid\r\n" +
             "  PRIMARY KEY (email)\r\n" +
-            ");</code></pre>",
-          },
-          {
-            selector: "#signin-fields",
-            position: "right",
-            text: "When a user registers for the site, we'll insert the data captured into both the <code>users</code> and <code>user_credentials</code> tables. This is a " +
+            ");</code></pre>" +
+            "When a user registers for the site, we'll insert the data captured into both the <code>users</code> and <code>user_credentials</code> tables. This is a " +
             "data modeling technique called <strong>denormalization</strong> and is something that you'll use a lot when working with Cassandra." +
             "<br/>See also: " +
             "<ul>" +
@@ -362,18 +346,15 @@ class Tour extends Component {
             "videos added to the site.",
           },
           {
-            selector: "#recent-videos div",
+            selector: "#video-lists div", 
             position: "bottom",
             text: "But by leveraging denormalization again, we can create a table that allows us to query the video data added to the site by time. In KillrVideo, the" +
             "<code>latest_videos</code> table looks like this:<br/><br/>" +
             "<pre><code>" +
             "CREATE TABLE latest_videos (\r\n" +
-            "  yyyymmdd text,\r\n" +
-            "  added_date timestamp,\r\n" +
-            "  videoid uuid,\r\n" +
-            "  userid uuid,\r\n" +
-            "  name text,\r\n" +
-            "  preview_image_location text,\r\n" +
+            "  yyyymmdd text, added_date timestamp,\r\n" +
+            "  videoid uuid, userid uuid,\r\n" +
+            "  name text, preview_image_location text,\r\n" +
             "  PRIMARY KEY (\r\n" +
             "    yyyymmdd, added_date, videoid)\r\n" +
             ") WITH CLUSTERING ORDER BY (\r\n" +
@@ -398,7 +379,7 @@ class Tour extends Component {
             "</ul>",
           },
           {
-            selector: "#recent-videos div",
+            selector: "#video-lists div", 
             position: "bottom",
             text: "One interesting thing about the <code>latest_videos</code> table is how we go about inserting data into it. In KillrVideo, we decided that the Recent " +
             "Videos list should only ever show videos from <em>at most</em> the last 7 days. As a result, we don't really need to retain any data that's older than " +
@@ -486,7 +467,7 @@ class Tour extends Component {
             text: "Here we see can see the search results for the keyword we clicked on. Searching for videos on KillrVideo is powered by the Search feature of " +
             "DataStax Enterprise. This feature creates indexes that allow us to do powerful Lucene queries on our video catalog data that are not possible to do " +
             "with just CQL. The indexes are automatically updated in the background as new data is added to our catalog tables in Cassandra." +
-            "<br/>See also: " +
+            "<br/><br/>See also: " +
             "<ul>" +
             "    <li><a href='http://www.datastax.com/products/datastax-enterprise-search' target='_blank'>DataStax Enterprise Search</a></li>" +
             "</ul>",
@@ -506,7 +487,7 @@ class Tour extends Component {
             "</ul>",
           },
           {
-            selector: "#search-result-page",
+            selector: "#search-result-page div",
             position: "right",
             text: "Lucene queries in DataStax Enterprise are also integrated with CQL, so I can get data from the <code>videos</code> table using that query like this:<br/><br/>" +
             "<pre><code>" +
@@ -549,7 +530,7 @@ class Tour extends Component {
           },
           {
             selector: "#search-results div.row div.col-sm-3",
-            position: "bottom",
+            position: "right",
             text: "There are some other cool things we can do with DataStax Enterprise Search beyond just full-text searching. Let's look at a video again to check out " +
             "another KillrVideo feature powered by DSE Search. <br/><br/><strong>Click on a video to continue.</strong>",
             allowClicksThruHole: true,
@@ -599,7 +580,7 @@ class Tour extends Component {
             isFixed: true
           },
           {
-            selector: "#recommended-videos div",
+            selector: "#video-lists div#recommended-videos",
             position: "top",
             text: "As you watch and rate videos on KillrVideo, we record those ratings in Cassandra. Here's what the <code>video_ratings_by_user</code> table looks like " +
             "where we store that information:<br/><br/>" +

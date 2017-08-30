@@ -26,7 +26,9 @@ class VideoPlayer extends Component {
     
     return (
       <ResponsiveEmbed a16by9>
-        {videoPlayer}
+        <div id="view-video-player">
+          {videoPlayer}
+        </div>
       </ResponsiveEmbed>
     );
   }
