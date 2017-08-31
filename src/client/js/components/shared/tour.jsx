@@ -77,6 +77,7 @@ class Tour extends Component {
         autoStart={true} // shows first step when enabled (instead of beacon)
         disableOverlay={true} // true - clicking on overlay has no effect, false - click closes tooltip
         showSkipButton={false} // we want to force them to enter things and not be able to skip steps, at least by default
+        showBackButton={false} // disabling back button (hopefully temporarily)
         scrollToSteps={false} // Gilardi says default behavior (true) is annoying
         callback={this.handleJoyrideCallback}
         steps={[
@@ -571,13 +572,13 @@ class Tour extends Component {
             selector: "#recommended-videos",
             position: "top",
             text: "Here, you see <strong>personalized recommendations</strong> for videos on the site that you might be interested in watching. This list of videos is " +
-            "driven by DataStax Enterprise Analytics. DSE Analytics enables you to run analytics workloads with Apache Spark or Hadoop on top of your transactional " +
-            "data stored in Cassandra." +
-            "<br/>See also: " +
+            "driven by DataStax Enterprise Graph. In addition to the Cassandra tables for data including users, videos, and ratings, KillrVideo also uses a graph to " +
+            "represent these elements as vertices, and the relationships between them as edges, for example, a rating edge that represents which user rated a particular " +
+            "video, and the value of that rating." + 
+            "<br/><br/>See also: " +
             "<ul>" +
-            "    <li><a href='http://www.datastax.com/products/datastax-enterprise-analytics' target='_blank'>DataStax Enterprise Analytics</a></li>" +
+            "    <li><a href='http://www.datastax.com/products/datastax-enterprise-graph' target='_blank'>DataStax Enterprise Graph</a></li>" +
             "</ul>",
-            isFixed: true
           },
           {
             selector: "#video-lists div#recommended-videos",
@@ -595,12 +596,13 @@ class Tour extends Component {
           {
             selector: "#recommended-videos",
             position: "top",
-            text: "Using DSE Analytics integration with Apache Spark, we're able to write a simple recommendation engine that leverages Spark's MLlib Machine Learning library " +
-            "to consume the data in that table and output video recommendations based on the ratings you and other users on the site have given. Amazingly, the Spark job to do " +
-            "this is less than 100 lines of code." +
+            text: "Using DSE Graph, we can leverage your ratings and to identify other users that gave similar ratings to those movies, and recommend other videos those users " +
+            "rated highly that you haven't seen. This approach is known as collaborative filtering. KillrVideo uses a graph traversal implemented using the Gremlin language " +
+            "and a Domain Specific Language (DSL) we built on top of Gremlin." +
             "<br/><br/>See also: " +
             "<ul>" +
-            "    <li><a href='http://spark.apache.org/docs/latest/mllib-guide.html' target='_blank'>Apache Spark MLlib</a></li>" +
+            "    <li><a href='http://tinkerpop.apache.org/' target='_blank'>Apache Tinkerpop (Gremlin)</a></li>" +
+            "    <li><a href='https://www.datastax.com/dev/blog/gremlin-dsls-in-java-with-dse-graph' target='_blank'>Gremlin DSLs in Java with DSE Graph</a></li>" +
             "</ul>",
           },
           {
