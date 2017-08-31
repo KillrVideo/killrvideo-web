@@ -13,6 +13,8 @@ import UserProfileImage from 'components/users/user-profile-image';
 import WhatIsThis from './what-is-this';
 import SearchBox from './search-box';
 import Tour from 'components/shared/tour';
+import { logout } from 'actions/authentication';
+
 
 var logoUrl = require('killrvideo.png');
 
@@ -28,6 +30,13 @@ class Header extends Component {
     });
   }
     
+  startTour(logout) {
+    // If current user is signed in, sign them out so tour steps work correctly ("Register" button needs to be available)
+    if (logout) this.props.push('/account/signout');
+    
+    this.props.toggleTour();    
+  }
+
   render() {
     // Leave these undefined if we haven't gotten the current user information from the server yet
     let loggedInMenu, signIn, register;
@@ -90,7 +99,7 @@ class Header extends Component {
           <Navbar.Collapse>
             <SearchBox onSubmit={vals => this.submitSearch(vals.query)} getSuggestions={this.props.getSuggestions} />
             <Nav navbar pullRight> 
-              <NavItem id="show-tour" eventKey={1} href="#" onSelect={e => this.props.toggleTour()} className={this.props.showTour ? 'dropup' : ''}>
+              <NavItem id="show-tour" eventKey={1} href="#" onSelect={e => this.startTour(this.props.currentUser.isLoggedIn)} >
                 <Icon name="map-signs" fixedWidth /> Tour: <span>{this.props.showTour ? 'On' : 'Off'}</span>
               </NavItem> 
               <NavItem eventKey={1} href="#" onSelect={e => this.props.toggleWhatIsThis()} className={this.props.showWhatIsThis ? 'dropup' : ''}>

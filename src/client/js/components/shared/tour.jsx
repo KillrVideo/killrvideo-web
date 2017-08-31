@@ -19,7 +19,7 @@ class Tour extends Component {
 
     // Advance the tour - but need to delay until after the page renders
     var joyride = this.joyride;
-    setTimeout(function() {joyride.next();}, 50);
+    setTimeout(function() {joyride.next();}, 100);
 
     console.log("selectorCallback - clickthrough hole callback complete");
   }
