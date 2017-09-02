@@ -2,7 +2,8 @@
  * Converts a JavaScript object representing a google.protobuf.Timestamp into a JavaScript ISO Date string. 
  */
 export function timestampToDateString(timestamp) {
-  if (!timestamp.seconds || !timestamp.nanos) {
+  if (!typeof(timestamp) === undefined) {
+  // if (!timestamp.seconds || !timestamp.nanos) {
     throw new Error('Object is not a google.protobuf.Timestamp');
   }
   const millis = (timestamp.seconds * 1000) + Math.trunc(timestamp.nanos / 1000000);
