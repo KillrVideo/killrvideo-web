@@ -9,5 +9,6 @@ web:
     secret: KILLRVIDEO_SESSION_SECRET
 
 cassandra:
+  replication: KILLRVIDEO_CASSANDRA_REPLICATION
   dseUsername: KILLRVIDEO_DSE_USERNAME
   dsePassword: KILLRVIDEO_DSE_PASSWORD
