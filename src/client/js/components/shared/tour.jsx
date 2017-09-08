@@ -19,7 +19,7 @@ class Tour extends Component {
 
     // Advance the tour - but need to delay until after the page renders
     var joyride = this.joyride;
-    setTimeout(function() {joyride.next();}, 100);
+    setTimeout(function() {joyride.next();}, 200);
   }
 
   handleJoyrideCallback(result) {
@@ -28,7 +28,7 @@ class Tour extends Component {
 
     // For steps where we allow a click through the overlay, the tour does not get advanced automatically
     // Therefore we register our own (one time) callback on the selector that can advance the tour
-    if (result.step.allowClicksThruHole) {
+    if (result.step && result.step.allowClicksThruHole) {
       //console.log("handleJoyrideCallback - allowClicksThroughHole, selector: " + result.step.selector);
       var selectedObj = document.querySelector(result.step.selector);
 
