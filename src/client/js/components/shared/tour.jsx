@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import Icon from 'components/shared/icon';
 import Joyride from 'react-joyride';
+import { connect } from 'react-redux';
+import { routeActions } from 'react-router-redux';
 
 class Tour extends Component {
 
@@ -12,58 +14,42 @@ class Tour extends Component {
   }
 
   selectorCallback(event) {
-    console.log("Tour Callback - clickthrough hole callback");
-  
     // removing callback so that we have a one-time event
     event.target.removeEventListener(event.type, this.selectorCallback);
 
     // Advance the tour - but need to delay until after the page renders
     var joyride = this.joyride;
     setTimeout(function() {joyride.next();}, 100);
-
-    console.log("selectorCallback - clickthrough hole callback complete");
   }
 
   handleJoyrideCallback(result) {
-
-    console.log("handleJoyrideCallback - type: " + result.type + ", action: " + result.action + ", index: " + result.index);
-    console.log(result);
+    //console.log("handleJoyrideCallback - type: " + result.type + ", action: " + result.action + ", index: " + result.index);
+    //console.log(result);
 
     // For steps where we allow a click through the overlay, the tour does not get advanced automatically
     // Therefore we register our own (one time) callback on the selector that can advance the tour
-    if (result.type === "tooltip:before" && result.action === "next" && result.step.allowClicksThruHole) {
-      console.log("handleJoyrideCallback - allowClicksThroughHole, selector: " + result.step.selector);
+    if (result.step.allowClicksThruHole) {
+      //console.log("handleJoyrideCallback - allowClicksThroughHole, selector: " + result.step.selector);
       var selectedObj = document.querySelector(result.step.selector);
-      console.log(selectedObj);
-      selectedObj.addEventListener("click", this.selectorCallback );
-    }
 
-    // If the user clicks on the back button, we need to handle the reverse of the previous case
-    // We receive a "tooltip:before" callback with an action of "back" on the step we are going back to, 
-    // but that is too late. We need to go back a page before so we are sure the selector exists.
-    else if (result.type === "step:after" && result.action === "back")
-    {
-      var previousStep = this.joyride.props.steps[result.index - 1];
-      if (previousStep.allowClicksThruHole && !previousStep.isFixed)
-      {
-        console.log("Tour Callback - going back to allowClicksThruHole step: " + result.index -1);
-        window.history.back();
+      if (result.type === "tooltip:before" && result.action === "next") {
+        selectedObj.addEventListener("click", this.selectorCallback );        
       }
     }
     
     // If the user exits the tour (via the 'X' in the upper right) or finishes the tour (via the 'Last' button
     // on the final step), set the tour state to off
-    else if (result.type === "step:after" && result.action === "close" || result.type === "finished") {
+    if ( (result.type === "step:after" && result.action === "close") || result.type === "finished") {
       this.props.toggleTour();
       this.joyride.reset(true);
     }
 
-  }
+    // If current user is signed in, sign them out so tour steps work correctly
+    if (result.type === "step:after" && result.index === 13) { // special case
+      this.props.push('/account/signout');
+    }
 
-  componentDidUpdate()
-  {
-    console.log("Tour componentDidUpdate()");
-  } 
+  }
 
   render() {
 
@@ -132,7 +118,7 @@ class Tour extends Component {
             text: "This is the View Video page where users can playback videos added to the site. Details like the video's description and name " +
             "are stored in a catalog in Cassandra, similar to how a Product Catalog might work on an e-commerce site. The Cassandra Query Language or " +
             "CQL makes it easy to store this information. If you're experienced with SQL syntax from working with relational databases, it will " +
-            "look very familiar to you.",
+            "look very familiar to you."
           },
           {
             selector: "#view-video-player", 
@@ -151,7 +137,7 @@ class Tour extends Component {
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_using/useCreateTableTOC.html' target='_blank'>Managing Tables</a></li>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_reference/cql_commands/cqlCreateTable.html' target='_blank'>CREATE TABLE reference</a></li>" +
-            "</ul>",
+            "</ul>"
           },
           {
             selector: "#view-video-title",
@@ -168,7 +154,7 @@ class Tour extends Component {
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_using/queriesTOC.html' target='_blank'>Querying Data with CQL</a></li>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_reference/cql_commands/cqlSelect.html' target='_blank'>SELECT statement reference</a></li>" +
-            "</ul>",
+            "</ul>"
           },
           {
             selector: "#view-video-author",
@@ -187,7 +173,7 @@ class Tour extends Component {
             selector: "#user-profile", 
             position: "bottom",
             text: "This is the user profile page. Here you can see basic information about a user, along with any comments they've made on the site and " +
-            "any videos they've added to the catalog.",
+            "any videos they've added to the catalog."
           },
           {
             selector: "#user-profile-col",
@@ -202,7 +188,7 @@ class Tour extends Component {
             "  email text,\r\n" +
             "  created_date timestamp,\r\n" +
             "  PRIMARY KEY (userid)\r\n" +
-            ");</code></pre>",
+            ");</code></pre>"
           },
           {
             selector: "#user-profile-row", // TODO more focused?
@@ -217,7 +203,7 @@ class Tour extends Component {
             "<br/><br/>See also: " +
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_using/useSimplePrimaryKeyConcept.html' target='_blank'>Defining a Basic Primary Key with CQL</a></li>" +
-            "</ul>",
+            "</ul>"
           },
           {
             selector: "#register",
@@ -239,7 +225,7 @@ class Tour extends Component {
             position: "bottom",
             text: "This is the user registration form for KillrVideo. It probably looks like many of the forms you've filled out before to register for a web " +
             "site. Here we collect basic information like your name and email address. " +
-            "<br/><br/><strong>Optional: enter your information to create an account if you haven't done so already, then select 'Next'.</strong>",
+            "<br/><br/><strong>Optional: enter your information to create an account if you haven't done so already, then select 'Next'.</strong>"
           },
           {
             selector: "#register-account form button.btn-primary",
@@ -260,6 +246,14 @@ class Tour extends Component {
             " by selecting the 'Next' button.</strong>",
             allowClicksThruHole: true
           },
+          // Starting on the Home Page (Unauthenticated)
+          {
+            selector: "#logo",
+            position: "bottom",
+            text: "If you did register a new user, KillrVideo conveniently logs you in automatically. However, for the purposes of this tour we'll make sure you're logged out " + 
+            "so that we can talk a bit more about how the log in process works.",
+            isFixed: true
+          },    
           {
             selector: "#sign-in",
             position: "bottom",
@@ -279,7 +273,7 @@ class Tour extends Component {
             selector: "#signin-fields",
             position: "right",
             text: "This is the sign in form for KillrVideo. Once a user enters their credentials, we'll need to look them up by email address and verify " +
-            "their password. <br/><br/><strong>Enter your credentials here now.</strong>",
+            "their password. <br/><br/><strong>Enter your credentials here now.</strong>"
           },
           {
             selector: "#signin-password",
@@ -318,7 +312,7 @@ class Tour extends Component {
             "<ul>" +
             "    <li><a href='https://academy.datastax.com/courses/ds220-data-modeling' target='_blank'>DS220: Data Modeling Course</a></li>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/ddl/dataModelingCQLTOC.html' target='_blank'>CQL Data Modeling</a></li>" +
-            "</ul>",
+            "</ul>"
           },
           {
             selector: "#signin-account button.btn-primary",
@@ -345,6 +339,7 @@ class Tour extends Component {
             "<code>videos</code> table when we were discussing the video catalog, you'll recall that it had a <code>PRIMARY KEY</code> of <code>videoid</code> for " +
             "looking videos up by unique identifier. As you can probably guess, that table isn't going to help us for this section where we need to show the latest " +
             "videos added to the site.",
+            allowClicksThruHole: false
           },
           {
             selector: "#video-lists div", 
@@ -364,7 +359,7 @@ class Tour extends Component {
             "See also: " +
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_using/useCompoundPrimaryKeyConcept.html' target='_blank'>Defining a partition key with clustering columns</a></li>" +
-            "</ul>",
+            "</ul>"
           },
           {
             selector: "#recent-videos",
@@ -377,7 +372,7 @@ class Tour extends Component {
             "    <li><a href='https://academy.datastax.com/use-cases/internet-of-things-time-series' target='_blank'>Cassandra IoT use cases</a></li>" +
             "    <li><a href='https://www.datastax.com/internet-of-things' target='_blank'>DataStax IoT case studies</a></li>" +
             "    <li><a href='https://www.datastax.com/2014/10/connecting-to-the-future-of-internet-of-things-with-cassandra' target='_blank'>Connecting to the Future of Internet of Things with Cassandra</a></li>" +
-            "</ul>",
+            "</ul>"
           },
           {
             selector: "#video-lists div", 
@@ -403,7 +398,7 @@ class Tour extends Component {
             "<br/>See also: " +
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_using/useExpire.html' target='_blank'>Expiring Data with Time-To-Live</a></li>" +
-            "</ul>",
+            "</ul>"
           },
           {
             selector: "#recent-videos div ul.list-unstyled li:first-child",            
@@ -422,7 +417,7 @@ class Tour extends Component {
             selector: "#view-video-details",
             position: "bottom",
             text: "Since we're signed in, we can now rate videos as we watch them on the site. The overall rating for a video is calculated using the values " +
-            "from two <code>counter</code> columns stored in Cassandra.",
+            "from two <code>counter</code> columns stored in Cassandra."
           },
           {
             selector: "#video-rating-and-sharing",
@@ -440,13 +435,13 @@ class Tour extends Component {
             "<br/><br/>See also: " +
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/cql/cql/cql_using/useCountersConcept.html' target='_blank'>Creating a Counter table with CQL</a></li>" +
-            "</ul>",
+            "</ul>"
           },
           {
             selector: "#view-video-comments > h5",
             position: "left",
             text: "The latest comments for a video are also displayed and now that we're signed in, we can leave comments of our own. Comments are another simple " +
-            "example of a <em>time series data model</em>.",
+            "example of a <em>time series data model</em>."
           },
           {
             selector: "#view-video-tags",
@@ -471,7 +466,7 @@ class Tour extends Component {
             "<br/><br/>See also: " +
             "<ul>" +
             "    <li><a href='http://www.datastax.com/products/datastax-enterprise-search' target='_blank'>DataStax Enterprise Search</a></li>" +
-            "</ul>",
+            "</ul>"
           },
           {
             selector: "#search-results",
@@ -485,7 +480,7 @@ class Tour extends Component {
             "See also: " +
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/dse-dev/datastax_enterprise/search/queriesAbout.html' target='_blank'>DSE Search Queries</a></li>" +
-            "</ul>",
+            "</ul>"
           },
           {
             selector: "#search-result-page div",
@@ -499,7 +494,7 @@ class Tour extends Component {
             "See also: " +
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/dse-dev/datastax_enterprise/search/queriesCql.html' target='_blank'>CQL Solr Queries in DSE Search</a></li>" +
-            "</ul>",
+            "</ul>"
           },
           {
             selector: "#search-results",
@@ -515,7 +510,7 @@ class Tour extends Component {
             "<ul>" +
             "    <li><a href='http://docs.datastax.com/en/dse/5.1/dse-dev/datastax_enterprise/search/queriesJSON.html' target='_blank'>DSE Search Queries with JSON</a></li>" +
             "    <li><a href='https://lucene.apache.org/solr/guide/6_6/the-extended-dismax-query-parser.html' target='_blank'>Extended DisMax Parser</a></li>" +
-            "</ul>",
+            "</ul>"
           },
           {
             selector: "#search-box",
@@ -578,7 +573,7 @@ class Tour extends Component {
             "<br/><br/>See also: " +
             "<ul>" +
             "    <li><a href='http://www.datastax.com/products/datastax-enterprise-graph' target='_blank'>DataStax Enterprise Graph</a></li>" +
-            "</ul>",
+            "</ul>"
           },
           {
             selector: "#video-lists div#recommended-videos",
@@ -591,7 +586,7 @@ class Tour extends Component {
             "  userid uuid,\r\n" +
             "  rating int,\r\n" +
             "  PRIMARY KEY (videoid, userid)\r\n" +
-            ");</code></pre>",
+            ");</code></pre>"
           },
           {
             selector: "#recommended-videos",
@@ -603,7 +598,7 @@ class Tour extends Component {
             "<ul>" +
             "    <li><a href='http://tinkerpop.apache.org/' target='_blank'>Apache Tinkerpop (Gremlin)</a></li>" +
             "    <li><a href='https://www.datastax.com/dev/blog/gremlin-dsls-in-java-with-dse-graph' target='_blank'>Gremlin DSLs in Java with DSE Graph</a></li>" +
-            "</ul>",
+            "</ul>"
           },
           {
             selector: "#logo",
@@ -625,4 +620,11 @@ class Tour extends Component {
   }
 }
 
-export default Tour;
+// Prop validation
+Tour.propTypes = {
+  push: PropTypes.func.isRequired
+};
+
+// Export component
+export default connect(null, { push: routeActions.push })(Tour);
+//export default Tour;
