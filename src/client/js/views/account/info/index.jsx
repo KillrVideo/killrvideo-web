@@ -37,9 +37,9 @@ class AccountInfo extends Component {
     const { userId, accountInfo: { user, comments, videos }, showMoreComments, videosNextPage, videosPreviousPage } = this.props;
     
     return (
-      <div className="body-content container">
+      <div id="user-profile" className="body-content container">
         <Row>
-          <Col md={5}>
+          <Col id="user-profile-col" md={5}>
             <h3>
               <Icon name="info-circle" /> Profile
             </h3>

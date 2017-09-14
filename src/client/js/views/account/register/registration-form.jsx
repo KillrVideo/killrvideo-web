@@ -17,17 +17,19 @@ class RegistrationForm extends Component {
         </Alert>
         <Alert bsStyle="danger" className={error ? undefined : 'hidden'}>{error}</Alert>
         
-        <Row>
-          <Col md={5}>
-            <Input {...firstName} type="text" placeholder="First name" label="First name" focusOnMount />
-          </Col>
-          <Col md={7}>
-            <Input {...lastName} type="text" placeholder="Last name" label="Last name" />
-          </Col>
-        </Row>
-        <Input {...email} type="email" placeholder="Enter email address" label="Email address" />
-        <Input {...password} type="password" placeholder="Choose a password" label="Password" />
-        <Input {...retypePassword} type="password" placeholder="Retype your password" label="Retype password" />
+        <div id="register-account-fields">
+          <Row>
+            <Col md={5}>
+              <Input {...firstName} type="text" placeholder="First name" label="First name" focusOnMount />
+            </Col>
+            <Col md={7}>
+              <Input {...lastName} type="text" placeholder="Last name" label="Last name" />
+            </Col>
+          </Row>
+          <Input {...email} type="email" placeholder="Enter email address" label="Email address" />
+          <Input {...password} type="password" placeholder="Choose a password" label="Password" />
+          <Input {...retypePassword} type="password" placeholder="Retype your password" label="Retype password" />
+        </div>
         
         <Button type="submit" bsStyle="primary" disabled={submitting}>
           <Icon name="cog" animate="spin" className={submitting ? undefined : 'hidden'} /> Register

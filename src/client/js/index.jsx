@@ -14,6 +14,7 @@ require('bootswatch/cosmo/bootstrap.css');
 require('font-awesome/css/font-awesome.css');
 require('gemini-scrollbar/gemini-scrollbar.css');
 require('app.css');
+require('react-joyride/lib/react-joyride-compiled.css')
 
 export function renderApp(el, opts) {
   // Configure the app

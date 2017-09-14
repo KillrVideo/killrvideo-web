@@ -20,21 +20,10 @@ class VideoTagLink extends Component {
   render() {
     const { tag, chatEnabled } = this.props;
     
-    const popover = (
-      <Popover id="view-video-tags-popover">
-        <Button onClick={() => this.gotoSearch()} title={`Search for '${tag}' videos`}>
-          <Icon name="search" fixedWidth />
-        </Button>
-        <Button onClick={() => this.gotoChat()} title={`Chat about '${tag}' videos`} className={chatEnabled ? undefined : 'hidden'}>
-          <Icon name="comment" fixedWidth />
-        </Button>
-      </Popover>
-    );
-    
     return (
-      <OverlayTrigger trigger="click" placement="bottom" rootClose overlay={popover}>
-        <Label bsStyle="default">{tag}</Label>
-      </OverlayTrigger>
+      <Button onClick={() => this.gotoSearch()} bsSize="small" title={`Search for '${tag}' videos`}>
+        {tag}
+      </Button>
     );
   }
 }

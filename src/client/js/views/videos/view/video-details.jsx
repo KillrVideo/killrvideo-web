@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, ButtonToolbar } from 'react-bootstrap';
 import GeminiScrollbar from 'react-gemini-scrollbar';
 import moment from 'moment';
 
@@ -58,7 +58,9 @@ class VideoDetails extends Component {
             </UserProfileLink>
           </Col>
           <Col xs={7} id="view-video-tags" className="text-right">
-            {video.tags.map(tag => <VideoTagLink tag={tag} key={tag} push={push} chatEnabled={chatEnabled} /> )}
+            <ButtonToolbar className="pull-right" bsStyle="default">
+              {video.tags.map(tag => <VideoTagLink tag={tag} key={tag} push={push} chatEnabled={chatEnabled} /> )}
+            </ButtonToolbar>
           </Col>
         </Row>
         

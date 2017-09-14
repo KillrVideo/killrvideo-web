@@ -17,8 +17,11 @@ class SignInForm extends Component {
         </Alert>
         <Alert bsStyle="danger" className={error ? undefined : 'hidden'}>{error}</Alert>
         
-        <Input {...email} id="signin-email" type="email" placeholder="Enter email address" label="Email address" focusOnMount />
-        <Input {...password} id="signin-password" type="password" placeholder="Password" label="Password" />
+        <div id="signin-fields">
+          <Input {...email} id="signin-email" type="email" placeholder="Enter email address" label="Email address" focusOnMount />
+          <Input {...password} id="signin-password" type="password" placeholder="Password" label="Password" />
+        </div>
+
         <Button type="submit" bsStyle="primary" block disabled={submitting}>
           <Icon name="cog" animate="spin" className={submitting ? undefined : 'hidden'} /> Sign In
         </Button>

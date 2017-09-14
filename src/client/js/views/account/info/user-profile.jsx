@@ -18,7 +18,7 @@ class UserProfile extends Component {
     }
     
     return (
-      <Row>
+      <Row id="user-profile-row">
         <Col md={3}>
           <UserProfileImage email={email} className="img-responsive img-circle" /> 
         </Col>

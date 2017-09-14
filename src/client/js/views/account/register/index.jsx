@@ -21,7 +21,7 @@ class Register extends Component {
     
   render() {
     return (
-      <div className="body-content container">
+      <div id="register-account" className="body-content container">
         <Row>
           <Col md={6} mdOffset={3}>
             <h2>Register</h2>

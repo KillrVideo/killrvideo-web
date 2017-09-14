@@ -5,12 +5,16 @@ import { routeActions } from 'react-router-redux';
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 
 import { toggleWhatIsThis } from 'actions';
+import { toggleTour } from 'actions';
 import { getCurrentUser } from 'actions/authentication';
 import { getSuggestions } from 'actions/search';
 import Icon from 'components/shared/icon';
 import UserProfileImage from 'components/users/user-profile-image';
 import WhatIsThis from './what-is-this';
 import SearchBox from './search-box';
+import Tour from 'components/shared/tour';
+import { logout } from 'actions/authentication';
+
 
 var logoUrl = require('killrvideo.png');
 
@@ -26,6 +30,13 @@ class Header extends Component {
     });
   }
     
+  startTour(logout) {
+    // If current user is signed in, sign them out so tour steps work correctly ("Register" button needs to be available)
+    if (logout) this.props.push('/account/signout');
+    
+    this.props.toggleTour();    
+  }
+
   render() {
     // Leave these undefined if we haven't gotten the current user information from the server yet
     let loggedInMenu, signIn, register;
@@ -63,12 +74,12 @@ class Header extends Component {
     if (this.props.currentUser.isLoggedIn === false) {
       // Buttons for logging in or registering the site
       signIn = (
-        <NavItem eventKey={2} href="#" onSelect={e => this.props.push('/account/signin')} className="text-uppercase">
+        <NavItem id="sign-in" eventKey={2} href="#" onSelect={e => this.props.push('/account/signin')} className="text-uppercase">
           Sign in
         </NavItem>
       );
       register = (
-        <NavItem eventKey={3} href="#" onSelect={e => this.props.push('/account/register')} className="bg-success text-uppercase">
+        <NavItem id="register" eventKey={3} href="#" onSelect={e => this.props.push('/account/register')} className="bg-success text-uppercase">
           Register
         </NavItem>
       );
@@ -87,7 +98,10 @@ class Header extends Component {
           </Navbar.Header>
           <Navbar.Collapse>
             <SearchBox onSubmit={vals => this.submitSearch(vals.query)} getSuggestions={this.props.getSuggestions} />
-            <Nav navbar pullRight>
+            <Nav navbar pullRight> 
+              <NavItem id="show-tour" eventKey={1} href="#" onSelect={e => this.startTour(this.props.currentUser.isLoggedIn)} >
+                <Icon name="map-signs" fixedWidth /> Tour: <span>{this.props.showTour ? 'On' : 'Off'}</span>
+              </NavItem> 
               <NavItem eventKey={1} href="#" onSelect={e => this.props.toggleWhatIsThis()} className={this.props.showWhatIsThis ? 'dropup' : ''}>
                 What is this? <span className="caret"></span>
               </NavItem>
@@ -100,6 +114,8 @@ class Header extends Component {
         </Navbar>
         
         <WhatIsThis showWhatIsThis={this.props.showWhatIsThis} toggleWhatIsThis={this.props.toggleWhatIsThis} />
+        <Tour showTour={this.props.showTour} toggleTour={this.props.toggleTour} />
+
       </div>
     );
   }
@@ -110,8 +126,10 @@ Header.propTypes = {
   // Mapped from state
   currentUser: PropTypes.object.isRequired,
   showWhatIsThis: PropTypes.bool.isRequired,
+  showTour: PropTypes.bool.isRequired,
   // Actions
   toggleWhatIsThis: PropTypes.func.isRequired,
+  toggleTour: PropTypes.func.isRequired, 
   getCurrentUser: PropTypes.func.isRequired,
   push: PropTypes.func.isRequired,
   getSuggestions: PropTypes.func.isRequired
@@ -127,12 +145,13 @@ Header.queries = {
 };
 
 function mapStateToProps(state) {
-  const { authentication: { currentUser }, whatIsThis, search } = state;
+  const { authentication: { currentUser }, whatIsThis, tour, search } = state;
   return {
     currentUser: currentUser,
     showWhatIsThis: whatIsThis.visible,
+    showTour: tour.visible,
     searchSuggestions: search.suggestions
   };
 }
 
-export default connect(mapStateToProps, { toggleWhatIsThis, getCurrentUser, push: routeActions.push, getSuggestions })(Header);
+export default connect(mapStateToProps, { toggleWhatIsThis, toggleTour, getCurrentUser, push: routeActions.push, getSuggestions })(Header);

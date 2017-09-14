@@ -39,6 +39,7 @@
     "react-dom": "^0.14.2",
     "react-dropzone": "^3.3.0",
     "react-gemini-scrollbar": "^2.0.1",
+    "react-joyride": "^1.10.1",
     "react-redux": "^4.0.0",
     "react-router": "^2.0.0",
     "react-router-redux": "^2.1.0",
