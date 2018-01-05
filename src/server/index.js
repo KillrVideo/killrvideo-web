@@ -30,7 +30,7 @@ const startPromise = Promise.try(() => {
   });
 
   logger.log('info', 'Trying to start KillrVideo Web Server');
-  return withRetries(initCassandraAsync, 10, 10, 'Could not initialize Cassandra keyspace', false);
+  return withRetries(initCassandraAsync, 20, 10, 'Could not initialize Cassandra keyspace', false);
 })
 .then(() => {
   // Create the express app and init middleware
