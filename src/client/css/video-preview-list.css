@@ -1,6 +1,33 @@
 /* ------------------------------------------------------------
     Video Preview List and Video Preview
    ------------------------------------------------------------ */
+
+  .fadein {
+    /* opacity: 1; */
+    /* transition: opacity 10s; */
+    animation: mymove 5;
+    /* transition:  transform 2s; */
+    /* -webkit-transition: opacity 10s; */
+    /* transition:  transform 2s, opacity 2.5s; */
+  }
+
+  .fade-in {
+    opacity: 1;
+    animation-name: fadeInOpacity;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in;
+    animation-duration: 2s;
+  }
+  
+  @keyframes fadeInOpacity {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
 .video-preview-list {
   position: relative;
   border: 1px solid #dedede;

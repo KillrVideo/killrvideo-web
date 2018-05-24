@@ -38,7 +38,7 @@ class VideoPreviewList extends Component {
       'overlay': data.length > 0,
       'hidden': !isLoading
     });
-    
+
     return (
       <div>
         <h3 className="section-divider">
@@ -51,9 +51,9 @@ class VideoPreviewList extends Component {
             </h4>
           </div>
           <ul className="list-unstyled">
-            {0 >= data.length ?
-              <li><h4><span class="label label-default">No Videos Here Yet. </span></h4></li>
-            :
+            {0 >= data.length && !isLoading ? //If there are no videos then display msg
+                <li><h4><span className="fade-in"> These aren't the videos you are looking for </span></h4></li>
+            : //If there are videos then show
               range(0, pagingConfig.recordsPerPage).map(idx => {
                 // Get the index in the preview collection adjusting for the current page start index
                 const previewIdx = currentPageIndex + idx;
@@ -64,7 +64,6 @@ class VideoPreviewList extends Component {
                     return;   // Don't output anything for first video of next page if not available
                   }
                 }
-                
                 const preview = data[previewIdx];
                 if (idx < pagingConfig.incrementIndexPerPage) {
                   // Regular video previews
