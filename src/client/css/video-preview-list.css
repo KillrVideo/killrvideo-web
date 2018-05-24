@@ -23,15 +23,22 @@
     animation-name: bounceAnamation;
     animation-iteration-count: 1;
     animation-timing-function: ease-in;
+    animation-delay: 0.5s;
     animation-duration: 0.25s;
   }
   
   @keyframes bounceAnamation {
     0% {
-      opacity: 1;
+      background-color: fffff;
+      /* opacity: 1; */
+    }
+    50% {
+      background-color: rgb(77, 68, 68);
+      /* opacity: 0; */
     }
     100% {
-      opacity: 0;
+      background-color: fffff;
+      /* opacity: 0; */
     }
   }
 
