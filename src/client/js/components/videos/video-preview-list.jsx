@@ -45,16 +45,18 @@ class VideoPreviewList extends Component {
           <span><em>{titleFirstWord}</em> {restOfTitle ? restOfTitle.join(' ') : undefined}</span>
         </h3>
         <div className="video-preview-list">
-          <div className={loadingClasses}>
-            <h4>
-              <Icon name="spinner" animate="spin" /> Loading...
-            </h4>
-          </div>
-          <ul className="list-unstyled">
             {0 >= data.length && !isLoading ? //If there are no videos then display msg
-                <li><h4><span className="fade-in"> These aren't the videos you are looking for </span></h4></li>
-            : //If there are videos then show
-              range(0, pagingConfig.recordsPerPage).map(idx => {
+              <div className="fade-in"><h4><span > These aren't the videos you are looking for </span></h4></div>
+            :
+              <div className={loadingClasses}>
+                <h4>
+                  <Icon name="spinner" animate="spin" /> Loading...
+                </h4>
+              </div>
+            }
+
+          <ul className="list-unstyled">
+              {range(0, pagingConfig.recordsPerPage).map(idx => {
                 // Get the index in the preview collection adjusting for the current page start index
                 const previewIdx = currentPageIndex + idx;
                 if (previewIdx >= data.length) {
@@ -87,8 +89,7 @@ class VideoPreviewList extends Component {
                   );
                 }
                 
-              })
-            }
+              })}
             </ul>
 
 
