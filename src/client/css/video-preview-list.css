@@ -2,7 +2,7 @@
     Video Preview List and Video Preview
    ------------------------------------------------------------ */
 
-  .fade-in {
+   .fade-in {
     opacity: 1;
     animation-name: fadeInOpacity;
     animation-iteration-count: 1;
@@ -16,6 +16,22 @@
     }
     100% {
       opacity: 1;
+    }
+  }
+  .bounce {
+    opacity: 1;
+    animation-name: bounceAnamation;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in;
+    animation-duration: 0.25s;
+  }
+  
+  @keyframes bounceAnamation {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
     }
   }
 

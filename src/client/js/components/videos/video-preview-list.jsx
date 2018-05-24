@@ -40,7 +40,7 @@ class VideoPreviewList extends Component {
     });
 
     return (
-      <div>
+      <div className={0 >= data.length && !isLoading ? "bounce" : ""}>
         <h3 className="section-divider">
           <span><em>{titleFirstWord}</em> {restOfTitle ? restOfTitle.join(' ') : undefined}</span>
         </h3>
