@@ -9,7 +9,7 @@ export const setConfig = createAction(ActionTypes.SET_CONFIG, config => {
   if (typeof config !== 'object' || config === null) {
     throw new Error('Invalid client config object');
   }
-  
+  //Validate the youTubeApiKey is a string
   if (typeof config['youTubeApiKey'] !== 'string') {
     throw new Error('You must specify the youTubeApiKey on client config');
   }
