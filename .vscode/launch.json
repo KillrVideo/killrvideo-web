@@ -20,7 +20,7 @@
 			"env": {
 				"NODE_ENV": "development"
 			},
-			"console": "externalTerminal",
+			"console": "integratedTerminal",
 			"sourceMaps": true,
 			"outFiles": ["${workspaceRoot}/dist/server/*"]
 		},

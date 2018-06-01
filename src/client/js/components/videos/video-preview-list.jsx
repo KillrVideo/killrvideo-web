@@ -26,7 +26,11 @@ class VideoPreviewList extends Component {
       title, isLoading, data, currentPageIndex, moreDataOnServer, pagingConfig, nextPageDisabled, previousPageDisabled,
       nextPageClick, previousPageClick
     } = this.props;
-    
+
+    if (0 >= data.length) {
+      console.log("empty")
+      console.log(data)
+    }
     const [ titleFirstWord, ...restOfTitle ] = title.split(' ');
     
     const loadingClasses = classNames({
@@ -34,64 +38,73 @@ class VideoPreviewList extends Component {
       'overlay': data.length > 0,
       'hidden': !isLoading
     });
-    
+
     return (
       <div>
         <h3 className="section-divider">
           <span><em>{titleFirstWord}</em> {restOfTitle ? restOfTitle.join(' ') : undefined}</span>
         </h3>
-        <div className="video-preview-list">
-          <div className={loadingClasses}>
-            <h4>
-              <Icon name="spinner" animate="spin" /> Loading...
-            </h4>
-          </div>
-          <ul className="list-unstyled">
-            {range(0, pagingConfig.recordsPerPage).map(idx => {
-              // Get the index in the preview collection adjusting for the current page start index
-              const previewIdx = currentPageIndex + idx;
-              if (previewIdx >= data.length) {
-                if (idx < pagingConfig.incrementIndexPerPage) {
-                  return <li key={idx}></li>;
-                } else {
-                  return;   // Don't output anything for first video of next page if not available
-                }
+        <div className={0 >= data.length && !isLoading ? "blink" : ""}>
+          <div className="video-preview-list">
+              {0 >= data.length && !isLoading ? //If there are no videos then display msg
+                <div className="fade-in"><h4><span > These aren't the videos you are looking for </span></h4></div>
+              :
+                <div className={loadingClasses}>
+                  <h4>
+                    <Icon name="spinner" animate="spin" /> Loading...
+                  </h4>
+                </div>
               }
-              
-              const preview = data[previewIdx];
-              if (idx < pagingConfig.incrementIndexPerPage) {
-                // Regular video previews
-                return (
-                  <li className="popout-on-hover" key={preview.videoId}>
-                    <VideoPreview preview={preview} />
-                    {/* Shim for holding the width of the li when the video preview is "popped out" on hover in larger viewports */ }
-                    <div className="hidden-xs video-preview-shim"></div>
-                  </li>
-                );
-              } else {
-                // First video preview of the next page
-                return (
-                  <li className="hidden-xs" key={preview.videoId}>
-                    <VideoPreview preview={preview} onClick={() => {}} />
-                    {/* Overlay for hover that allows navigation to next page */}
-                    <div className="video-preview-list-nextpageoverlay" onClick={() => nextPageClick(VideoPreviewList.queries.preview())}>
-                      <Icon name="chevron-circle-right" size="4x" />
-                    </div>
-                  </li>
-                );
-              }
-              
-            })}
-          </ul>
-          <div className="video-preview-list-nav">
-            <Button bsStyle="primary" title="Next Page" disabled={nextPageDisabled} onClick={() => nextPageClick(VideoPreviewList.queries.preview())}>
-              <Icon name="caret-down" size="lg" className="visible-xs-inline" />
-              <Icon name="caret-right" size="lg" className="hidden-xs" />
-            </Button>
-            <Button bsStyle="default" title="Previous Page" disabled={previousPageDisabled} onClick={previousPageClick}>
-              <Icon name="caret-up" size="lg" className="visible-xs-inline" />
-              <Icon name="caret-left" size="lg" className="hidden-xs" />
-            </Button>
+
+            <ul className="list-unstyled">
+                {range(0, pagingConfig.recordsPerPage).map(idx => {
+                  // Get the index in the preview collection adjusting for the current page start index
+                  const previewIdx = currentPageIndex + idx;
+                  if (previewIdx >= data.length) {
+                    if (idx < pagingConfig.incrementIndexPerPage) {
+                      return <li key={idx}></li>;
+                    } else {
+                      return;   // Don't output anything for first video of next page if not available
+                    }
+                  }
+                  const preview = data[previewIdx];
+                  if (idx < pagingConfig.incrementIndexPerPage) {
+                    // Regular video previews
+                    return (
+                      <li className="popout-on-hover" key={preview.videoId}>
+                        <VideoPreview preview={preview} />
+                        {/* Shim for holding the width of the li when the video preview is "popped out" on hover in larger viewports */ }
+                        <div className="hidden-xs video-preview-shim"></div>
+                      </li>
+                    );
+                  } else {
+                    // First video preview of the next page
+                    return (
+                      <li className="hidden-xs" key={preview.videoId}>
+                        <VideoPreview preview={preview} onClick={() => {}} />
+                        {/* Overlay for hover that allows navigation to next page */}
+                        <div className="video-preview-list-nextpageoverlay" onClick={() => nextPageClick(VideoPreviewList.queries.preview())}>
+                          <Icon name="chevron-circle-right" size="4x" />
+                        </div>
+                      </li>
+                    );
+                  }
+                  
+                })}
+              </ul>
+
+
+
+            <div className="video-preview-list-nav">
+              <Button bsStyle="primary" title="Next Page" disabled={nextPageDisabled} onClick={() => nextPageClick(VideoPreviewList.queries.preview())}>
+                <Icon name="caret-down" size="lg" className="visible-xs-inline" />
+                <Icon name="caret-right" size="lg" className="hidden-xs" />
+              </Button>
+              <Button bsStyle="default" title="Previous Page" disabled={previousPageDisabled} onClick={previousPageClick}>
+                <Icon name="caret-up" size="lg" className="visible-xs-inline" />
+                <Icon name="caret-left" size="lg" className="hidden-xs" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,50 @@
 /* ------------------------------------------------------------
     Video Preview List and Video Preview
    ------------------------------------------------------------ */
+
+   .fade-in {
+    opacity: 1;
+    animation-name: fadeInOpacity;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in;
+    animation-duration: 1s;
+  }
+  
+  @keyframes fadeInOpacity {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  .blink {
+    opacity: 1;
+    animation-name: bounceAnimation;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in;
+    animation-duration: 0.1s;
+  }
+  
+  @keyframes bounceAnimation {
+    0% {
+      background-color: fffff;
+      /* opacity: 1; */
+    }
+    50% {
+      background-color: rgb(77, 68, 68);
+      /* opacity: 0; */
+    }
+    100% {
+      background-color: F5F5F5;
+      /* opacity: 0; */
+    }
+  }
+
+  .fade-in > h4 {
+    text-align: center;
+  }
+
 .video-preview-list {
   position: relative;
   border: 1px solid #dedede;
