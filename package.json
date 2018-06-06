@@ -1,6 +1,6 @@
 {
   "name": "killrvideo-web",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "description": "Web Server and UI for the KillrVideo reference application",
   "main": "dist/server/index.js",
   "scripts": {
