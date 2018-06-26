@@ -16,7 +16,9 @@ WORKDIR /opt/killrvideo-web
 # Copy package.json for dependencies
 COPY package.json /opt/killrvideo-web/
 COPY npm-shrinkwrap.json /opt/killrvideo-web/
-    
+
+COPY cassandra.cert /opt/killrvideo-web/
+
 # Add dependencies for node-gyp, then run npm install and remove dependencies
 RUN set -x \
     && apt-get update \

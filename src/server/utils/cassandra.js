@@ -44,6 +44,13 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
       } else {
         logger.info('No detected username/password combination was passed in. DSE cluster authentication method was NOT executed.');
       }
+
+      var fs = require('fs');
+      clientOpts.sslOptions = {
+        //key : fs.readFileSync('cassandra.cert'),
+        //cert : fs.readFileSync('cassandra.cert'),
+        ca : [fs.readFileSync('cassandra.cert')]
+      };
       
       // Create a client and promisify it
       let client = new Client(clientOpts);
