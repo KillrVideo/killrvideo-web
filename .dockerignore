@@ -4,4 +4,3 @@ config/local.yaml
 !dist/*
 !package.json
 !npm-shrinkwrap.json
-!cassandra.cert
