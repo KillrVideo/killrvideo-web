@@ -3,6 +3,7 @@ import config from 'config';
 import { Client, auth, types as CassandraTypes } from 'dse-driver';
 import { lookupServiceAsync } from './lookup-service';
 import { logger } from '../utils/logging';
+import { Filesystem } from 'fs'
 
 // Client promises by keyspace
 const clientPromises = new Map();
@@ -45,13 +46,25 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
         logger.info('No detected username/password combination was passed in. DSE cluster authentication method was NOT executed.');
       }
 
-      var fs = require('fs');
-      clientOpts.sslOptions = {
-        //key : fs.readFileSync('cassandra.cert'),
-        //cert : fs.readFileSync('cassandra.cert'),
-        ca : [fs.readFileSync('cassandra.cert')]
-      };
-      
+      let sslStat = process.env.KILLRVIDEO_ENABLE_SSL;
+      logger.info(sslStat);
+
+      if (sslStat === "true") {
+        logger.info('SSL is configured to be on.');
+        if (Filesystem.existsSync('cassandra.cert')) {
+          clientOpts.sslOptions = {
+            ca: [Filesystem.readFileSync('cassandra.cert')]
+          };
+          logger.info('Found cert, read file sync.')
+        } else {
+          logger.info('No cert found, SSL not enabled.')
+        }
+      } else if (sslStat === "false") {
+        logger.info('SSL is configured to be off.')
+      } else {
+        logger.info('SSL is not configured, should it be set?')
+      }
+
       // Create a client and promisify it
       let client = new Client(clientOpts);
       client = Promise.promisifyAll(client);
