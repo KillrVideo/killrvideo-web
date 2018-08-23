@@ -53,7 +53,10 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
         logger.info('SSL is configured to be on.');
         if (Filesystem.existsSync('cassandra.cert')) {
           clientOpts.sslOptions = {
-            ca: [Filesystem.readFileSync('cassandra.cert')]
+            ca: [Filesystem.readFileSync('cassandra.cert')],
+              // validate server cert and reject if not trusted
+            requestCert: true,
+            rejectUnauthorized: true
           };
           logger.info('Found cert, read file sync.')
         } else {
