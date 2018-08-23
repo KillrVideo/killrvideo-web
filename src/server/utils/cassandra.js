@@ -44,7 +44,30 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
       } else {
         logger.info('No detected username/password combination was passed in. DSE cluster authentication method was NOT executed.');
       }
-      
+
+      let Filesystem = require("fs");
+      let sslStat = process.env.KILLRVIDEO_ENABLE_SSL;
+      logger.info(sslStat);
+
+      if (sslStat === "true") {
+        logger.info('SSL is configured to be on.');
+        if (Filesystem.existsSync('cassandra.cert')) {
+          clientOpts.sslOptions = {
+            ca: [Filesystem.readFileSync('cassandra.cert')],
+              // validate server cert and reject if not trusted
+            requestCert: true,
+            rejectUnauthorized: true
+          };
+          logger.info('Found cert, read file sync.')
+        } else {
+          logger.info('No cert found, SSL not enabled.')
+        }
+      } else if (sslStat === "false") {
+        logger.info('SSL is configured to be off.')
+      } else {
+        logger.info('SSL is not configured, should it be set?')
+      }
+
       // Create a client and promisify it
       let client = new Client(clientOpts);
       client = Promise.promisifyAll(client);
