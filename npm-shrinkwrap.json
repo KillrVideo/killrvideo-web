@@ -1530,8 +1530,8 @@
       "dev": true
     },
     "dse-driver": {
-      "version": "1.3.0",
-      "resolved": "https://registry.npmjs.org/dse-driver/-/dse-driver-1.3.0.tgz",
+      "version": "1.6.0",
+      "resolved": "https://registry.npmjs.org/dse-driver/-/dse-driver-1.6.0.tgz",
       "integrity": "sha1-LH/T6axFbROl0IhIQgHGOzQtyvY=",
       "requires": {
         "long": "2.4.0"
