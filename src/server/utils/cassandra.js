@@ -5,7 +5,7 @@ import { lookupServiceAsync } from './lookup-service';
 import { logger } from '../utils/logging';
 
 const dse = require('dse-driver');
-const DseLoadBalancingPolicy = dse.policies.loadBalancing.DseLoadBalancingPolicy;
+const DCAwareRoundRobinPolicy = dse.policies.loadBalancing.DCAwareRoundRobinPolicy;
 const ConstantSpeculativeExecutionPolicy = dse.policies.speculativeExecution.ConstantSpeculativeExecutionPolicy;
 
 // Client promises by keyspace
@@ -28,7 +28,7 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
           consistency: CassandraTypes.consistencies.localOne
         },
         policies: {
-          loadBalancing: new DseLoadBalancingPolicy('AWS',3),
+          loadBalancing: new DCAwareRoundRobinPolicy('AWS',3),
           speculativeExecution: new ConstantSpeculativeExecutionPolicy(500,20)
         }
       };
