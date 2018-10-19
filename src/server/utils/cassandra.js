@@ -28,7 +28,7 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
           consistency: CassandraTypes.consistencies.localOne
         },
         policies: {
-          loadBalancing: new DCAwareRoundRobinPolicy('AWS',3),
+          loadBalancing: new DCAwareRoundRobinPolicy('onprem',3),
           speculativeExecution: new ConstantSpeculativeExecutionPolicy(500,20)
         }
       };
