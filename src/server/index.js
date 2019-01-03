@@ -43,7 +43,7 @@ const startPromise = Promise.try(() => {
 
   // Attach some logging to start/stop
   server.on('listening', () => {
-    logger.log('info', 'KillrVideo Web Server listening on %j', server.address());
+    logger.log('info', 'KillrVideo Web Server listening on %j', server.address(), {});
   });
   server.on('close', () => {
     logger.log('info', 'KillrVideo Web Server is closed');
