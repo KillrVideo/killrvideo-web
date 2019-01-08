@@ -18,7 +18,7 @@ export function getCassandraClientAsync(keyspace, dseUsername, dsePassword) {
   const promise = lookupServiceAsync('cassandra')
     .then(contactPoints => {
       let clientOpts = {
-        contactPoints,
+        contactPoints: ['dse'],
         queryOptions: {
           prepare: true,
           consistency: CassandraTypes.consistencies.localQuorum
