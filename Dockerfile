@@ -2,7 +2,7 @@ FROM node:6.11-slim
 
 # Add killrvideo group and user
 RUN groupadd -r killrvideo --gid=999 \
-    && useradd -r -g killrvideo --uid=999 killrvideo
+    && useradd  -m -r -g killrvideo --uid=999 killrvideo
 
 # Default to production environment
 ENV NODE_ENV production
