@@ -25,9 +25,9 @@ babel. After cloning the repo, you'll need to pull images, install all dependenc
 > docker-compose pull
 > docker-compose build
 > 
-> # Install dependencies & build code
+> # Install dependencies & build code for the server & client parts
 > docker-compose run --no-deps -e NODE_ENV=development web npm install
-> docker-compose run --no-deps -e NODE_ENV=development web sh -c 'cd src/client; npm install'
+> docker-compose run --no-deps -e NODE_ENV=development web npm run install:client'
 > docker-compose run --no-deps web npm run build
 >
 > # Run the project
