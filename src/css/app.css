@@ -1,0 +1,162 @@
+/**
+ * Common Styles
+ */
+.body-content {
+  padding-top: 65px;
+  padding-bottom: 15px;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  text-transform: uppercase;
+}
+
+h1 em, h2 em, h3 em, h4 em, h5 em, h6 em,
+.h1 em, .h2 em, .h3 em, .h4 em, .h5 em, .h6 em {
+  color: #da3610;
+  font-style: normal;
+}
+
+.section-divider {
+  border-top: 1px solid #dedede;
+  margin-top: 31.5px;
+  margin-bottom: 0;
+}
+
+.section-divider > span {
+  position: relative;
+  top: -0.6em;
+  background-color: #FFF;
+  margin: 0 0 0 0.5em;
+  padding: 0 0.25em;
+}
+
+a {
+  color: #da3610;
+}
+
+a:hover {
+  color: #b22c0d;
+  text-decoration: underline;
+}
+
+.text-red {
+    color: #da3610;
+}
+
+.user-gravatar.small {
+    width: 24px;
+    height: auto;
+}
+
+ul.uimessage {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 0 10px 0;
+}
+
+ul.uimessage > li {
+    padding: 1em;
+}
+
+/* Custom scrollbars with the gemini plugin */
+.gm-scrollbar .thumb {
+  background-color: rgba(218, 54, 16, 0.6);
+}
+
+.gm-scrollbar .thumb:hover {
+  background-color: rgba(218, 54, 16, 1);
+}
+
+/* Inverse button style (light instead of dark which is default) */
+.btn-inverse,
+.open > .dropdown-toggle.btn-inverse {
+  border-color: #ccc;
+  background-color: #fff;
+}
+
+.btn-inverse:hover, .btn-inverse:focus, .btn-inverse:active,
+.open > .dropdown-toggle.btn-inverse:hover, .open > .dropdown-toggle.btn-inverse:focus {
+  border-color: #adadad;
+  background-color: #e6e6e6;
+}
+
+.btn-inverse, .btn-inverse:hover, .btn-inverse:focus, .btn-inverse:active, 
+.open > .dropdown-toggle.btn-inverse, .open > .dropdown-toggle.btn-inverse:hover, .open > .dropdown-toggle.btn-inverse:focus {
+  color: #333;
+}
+
+/**
+ * Header Styles
+ */
+#navbar-main form > .input-group > .form-control,
+#navbar-main form > .input-group > .input-group-btn,
+#navbar-main form > .input-group > .input-group-btn > button {
+  background-color: #444;
+  border: none;
+  color: #888;
+}
+
+#navbar-main form > .input-group > .form-control {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#navbar-main form > .input-group > .form-control:focus {
+  box-shadow: none;
+}
+
+#navbar-main ul.navbar-nav {
+  border-right: 1px solid #333;
+}
+
+#navbar-main ul.navbar-nav > li {
+  border-left: 1px solid #333;
+}
+
+#navbar-main ul.navbar-nav > li.bg-success > a:hover {
+  background-color: #2f8912;
+}
+
+#navbar-main img.user-gravatar {
+  margin-top: -6px;
+}
+
+#what-is-this {
+  padding-top: 60px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #dedede;
+}
+
+#tour {
+  padding-top: 60px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #dedede;
+}
+
+/**
+ * Footer
+ */
+footer {
+  background-color: #222;
+  color: #888;
+  height: 50px;
+  padding: 1.4em 0 0;
+}
+
+footer a {
+  color: #888;
+}
+
+/* This will push the footer to the bottom */
+html, body, #killrvideo, #killrvideo > div {
+  height: 100%;
+}
+
+#body-wrapper {
+  min-height: 100%;
+  margin-bottom: -50px;
+}
+
+#push-footer {
+  height: 50px;
+}

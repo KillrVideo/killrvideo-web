@@ -1,0 +1,254 @@
+/* ------------------------------------------------------------
+    Video Preview List and Video Preview
+   ------------------------------------------------------------ */
+
+   .fade-in {
+    opacity: 1;
+    animation-name: fadeInOpacity;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in;
+    animation-duration: 1s;
+  }
+  
+  @keyframes fadeInOpacity {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  .blink {
+    opacity: 1;
+    animation-name: bounceAnimation;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in;
+    animation-duration: 0.1s;
+  }
+  
+  @keyframes bounceAnimation {
+    0% {
+      background-color: fffff;
+    }
+    100% {
+      background-color: F5F5F5;
+    }
+  }
+
+  .fade-in > h4 {
+    text-align: center;
+  }
+
+.video-preview-list {
+  position: relative;
+  border: 1px solid #dedede;
+  padding: 0.5em 0.5em 0 0.5em;
+  overflow: hidden;
+}
+
+.video-preview-list-loading.overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  background-color: #fff;
+  opacity: 0.5;
+}
+
+.video-preview-list-loading > h4 {
+  text-align: center;
+}
+
+.video-preview-list > ul > li {
+  position: relative;
+  margin-bottom: 0.5em;
+  min-height: 68px;
+}
+
+.video-preview-list > ul > li > .video-preview-list-nextpageoverlay {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  opacity: 0.5;
+  color: #fff;
+  text-align: center;
+  -webkit-transform-style: preserve-3d;
+  -moz-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
+.video-preview-list > ul > li > .video-preview-list-nextpageoverlay > i.fa {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.video-preview-list > ul > li:hover > .video-preview-list-nextpageoverlay {
+  display: block;
+  cursor: pointer;
+}
+
+.video-preview {
+  display: block;
+  background-color: #f6f6f6;
+  color: #888;
+  padding: 3px;
+  cursor: pointer;
+  border: 1px solid #dedede;
+}
+  
+.video-preview-image {
+  display: block;
+  width: 80px;
+  height: 60px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  float: left;
+  margin-right: 0.5em;
+}
+
+.video-preview-info > h6 {
+  display: block;
+  overflow: hidden;
+  height: 2.2em;
+  text-overflow: ellipsis;
+  font-weight: bold;
+  margin: 0 0 1px;
+}
+
+.video-preview-info > div {
+  overflow: hidden;
+  height: 1.4287em;
+  font-size: 70%;
+}
+
+.video-preview:hover {
+  background-color: #222222;
+}
+
+.video-preview:hover,
+.video-preview:active {
+  text-decoration: none;
+}
+
+.video-preview:hover > .video-preview-info {
+  color: #ffffff;
+}
+
+.video-preview-list-nav {
+  position: relative;
+  background-color: #ffffff;
+}
+
+.video-preview-list-nav > button {
+  width: 50%;
+  display: block;
+  float: right;
+}
+
+.video-preview-list-nav > button.btn-primary {
+  background-color: #da3610;
+  border-color: #da3610;
+}
+
+.video-preview-list-nav > button.btn-primary:hover, 
+.video-preview-list-nav > button.btn-primary:focus, 
+.video-preview-list-nav > button.btn-primary:active {
+  background-color: #b22c0d;
+}
+
+/* Small devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+  .video-preview-list {
+    padding: 0;
+  }
+
+  .video-preview-list > ul > li {
+    float: left;
+    margin: 0;
+    width: 20%;
+    min-height: 200px;
+  }
+
+  .video-preview {
+    padding: 0;
+    z-index: 10;
+    border: none;
+    border-right: 1px solid #dedede;
+  }
+
+  .video-preview-image {
+    float: none;
+    display: block;
+    width: auto;
+    height: 124px;
+    margin: 0;
+  }
+  
+  .video-preview-info {
+    padding: 0.5em;
+  }
+  
+  .video-preview-shim {
+    height: 1px;
+    background-color: #f6f6f6;
+  }
+  
+  .video-preview-list > ul > li.popout-on-hover .video-preview:hover {
+    position: absolute;
+    left: -25%;
+    top: 0;
+    width: 150%;
+    z-index: 15;
+  }
+  
+  .video-preview-list > ul > li.popout-on-hover:first-child .video-preview:hover {
+    left: 0;
+  }
+  
+  .video-preview-list-nav {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 20;
+    width: 5%;
+    height: 100%;
+  }
+  
+  .video-preview-list-nav > button {
+    position: relative;
+    float: none;
+    display: block;
+    width: 100%;
+    height: 50%;
+  }
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+  .video-preview-list > ul > li {
+    min-height: 240px;
+  }
+  
+  .video-preview-image {
+    height: 164px;
+  }
+}
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .video-preview-list > ul > li {
+    min-height: 280px;
+  }
+  
+  .video-preview-image {
+    height: 204px;
+  }
+}

@@ -1,0 +1,147 @@
+#body-wrapper.chat {
+  height: 100%;
+  padding-top: 50px;    /* Leave room for header */
+}
+
+#body-wrapper.chat > .body-content {
+  height: 100%;
+  padding-top: 0;
+  padding-bottom: 0;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+#chat-tabs {
+  display: flex;
+  flex-flow: row nowrap;
+  background-color: #222;
+  box-shadow: 0 1px 5px #ccc; 
+}
+
+#chat-tabs > li {
+  flex: 1;
+  text-align: center;
+  float: none;
+  margin: 0;
+}
+
+#chat-tabs > li > a {
+  background-color: #222;
+  color: #999;
+}
+
+#chat-tabs > li.active > a {
+  color: #fff;
+  border-bottom: 3px solid #fff;
+}
+
+#chat-content {
+  flex: 1;
+  margin: 0;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.chat-tab-content {
+  flex: 1;
+  display: none;
+  position: relative;
+  flex-flow: column nowrap;
+}
+
+.chat-tab-content.active {
+  display: flex;
+}
+
+#chat-messages-window {
+  flex: 1;
+  border-width: 1px 1px 0 1px;
+  border-style: solid;
+  border-color: #ccc;
+  position: relative;
+}
+
+#chat-messages-window > .gm-scrollbar-container {
+  position: absolute;
+}
+
+#chat-messages-list {
+  padding: 15px;
+}
+
+.chat-message {
+  padding-left: 45px;
+  padding-top: 15px;
+}
+
+.chat-message.chat-message-date {
+  padding-left: 0;
+  text-align: center;
+  color: #777;
+}
+
+.chat-message > img {
+  float: left;
+  width: 30px;
+  height: auto;
+  margin-left: -45px;
+}
+
+.chat-message-header {
+  color: #777;
+}
+
+.chat-message-header > small {
+  color: #aaa;
+}
+
+#chat-messages .form-group {
+  margin-bottom: 0;
+}
+
+#chat-users {
+  border: 1px solid #ccc;
+  position: relative;
+}
+
+#chat-users > .gm-scrollbar-container {
+  position: absolute;
+}
+
+#chat-users-list {
+  padding: 15px;
+}
+
+#chat-users-list > li {
+  margin-bottom: 7px;
+}
+
+/* Small devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+  #body-wrapper.chat {
+    padding-bottom: 50px; /* Leave room for footer */
+  }
+    
+  #chat-tabs {
+    display: none;
+  }
+  
+  #chat-content {
+    margin: 0 auto;
+  }
+    
+  .chat-tab-content {
+    display: flex;
+  }
+  
+  #chat-messages {
+    margin-right: 15px;
+    flex: 4;
+  }
+  
+  #chat-users {
+    flex: 1;
+  }
+}
