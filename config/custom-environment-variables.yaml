@@ -14,4 +14,4 @@ cassandra:
   dsePassword: KILLRVIDEO_DSE_PASSWORD
 
 services:
-  cassandra: KILLRVIDEO_DSE_CONTACTPOINTS
+  cassandra: KILLRVIDEO_DSE_CONTACT_POINTS
