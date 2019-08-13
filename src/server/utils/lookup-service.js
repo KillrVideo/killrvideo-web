@@ -27,5 +27,5 @@ export function lookupServiceAsync(serviceName) {
 
   logger.log('verbose', `Found service ${serviceName} at ${registry[serviceName]}`);
 
-  return new Promise (function(resolve, reject){resolve(registry[serviceName])});
+  return new Promise (function(resolve, reject){resolve([registry[serviceName]])});
 };

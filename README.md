@@ -27,7 +27,7 @@ babel. After cloning the repo, you'll need to pull images, install all dependenc
 > 
 > # Install dependencies & build code for the server & client parts
 > docker-compose run --no-deps -e NODE_ENV=development web npm install
-> docker-compose run --no-deps -e NODE_ENV=development web npm run install:client'
+> docker-compose run --no-deps -e NODE_ENV=development web npm run install:client
 > docker-compose run --no-deps web npm run build
 >
 > # Run the project
@@ -43,6 +43,29 @@ There is a developer task included in the `package.json` scripts. You can run th
 This will clean, do a build with webpack and babel, and watch the files for changes. If using
 VS Code for development, the tasks checked into the repo should allow you to start the server
 with debugging using `F5`.
+
+## Environment Variables
+
+To change behaviour of the application you can configure environment variables in docker-compose file. For example, you can configure the application to work with your own cassandra cluster instead of the 'built-in' dockerized one. Add the variable to a docker-compose file like here:
+```
+version: '3'
+services:
+  web:
+    ...
+    environment:
+      KILLRVIDEO_DSE_CONTACT_POINTS: 192.168.15.17
+```
+
+### Available Environment Variables
+```
+Logging Level       KILLRVIDEO_LOGGING_LEVEL          verbose
+YouTube API Key     KILLRVIDEO_YOUTUBE_API_KEY        REPLACE_WITH_YOUR_KEY
+Session Secret      KILLRVIDEO_SESSION_SECRET         THE_INTERNET_IS_FULL_OF_CAT_VIDEOS
+Cassandra Host      KILLRVIDEO_DSE_CONTACT_POINTS     dse
+Replication Factor  KILLRVIDEO_CASSANDRA_REPLICATION  "{ 'class' : 'SimpleStrategy', 'replication_factor' : 1 }"
+Username            KILLRVIDEO_DSE_USERNAME           Null
+Password            KILLRVIDEO_DSE_PASSWORD           Null
+```
 
 ## Releasing
 
