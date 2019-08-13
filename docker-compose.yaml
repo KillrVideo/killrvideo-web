@@ -1,7 +1,6 @@
 version: '3'
 services:
   web:
-    #image: hadesarchitect/killrvideo-web:no-etcd
     build: .
     volumes:
       - .:/opt/killrvideo-web
@@ -14,14 +13,14 @@ services:
       KILLRVIDEO_LOGGING_LEVEL: debug
 
   backend:
-    image: hadesarchitect/killrvideo-nodejs:no-etcd
+    image: killrvideo/killrvideo-java:3.0.0
     depends_on:
       - dse
     environment:
       KILLRVIDEO_LOGGING_LEVEL: debug
 
   dse:
-    image: datastax/dse-server:6.0.0
+    image: datastax/dse-server:6.7.0
     command: [ -s -g ]
     ports:
       - "9042:9042"
@@ -36,25 +35,16 @@ services:
       memlock: -1
 
   dse-config:
-    image: killrvideo/killrvideo-dse-config:2.2.1
+    image: killrvideo/killrvideo-dse-config:3.0.0
     environment:
       KILLRVIDEO_SERVICE_DISCOVERY_DISABLED: 'true'
     depends_on:
       - dse
 
   generator:
-    image: killrvideo/killrvideo-generator:3.0.0-rc4
+    image: killrvideo/killrvideo-generator:3.0.0
     depends_on:
       - dse
       - backend
     environment:
       KILLRVIDEO_LOGGING_LEVEL: debug
-
-#  studio:
-#    image: killrvideo/killrvideo-studio:2.0.0
-#    ports:
-#      - "9091:9091"
-#    depends_on:
-#      - dse
-#    environment:
-#      DS_LICENSE: accept
