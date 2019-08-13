@@ -12,3 +12,6 @@ cassandra:
   replication: KILLRVIDEO_CASSANDRA_REPLICATION
   dseUsername: KILLRVIDEO_DSE_USERNAME
   dsePassword: KILLRVIDEO_DSE_PASSWORD
+
+services:
+  cassandra: KILLRVIDEO_DSE_CONTACTPOINTS

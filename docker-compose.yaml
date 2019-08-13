@@ -13,7 +13,7 @@ services:
       KILLRVIDEO_LOGGING_LEVEL: debug
 
   backend:
-    image: killrvideo/killrvideo-java:3.0.0
+    image: killrvideo/killrvideo-nodejs:3.0.0
     depends_on:
       - dse
     environment:

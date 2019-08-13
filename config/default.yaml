@@ -31,14 +31,14 @@ cassandra:
   dsePassword: null
 
 services:
-  web:                    ['web:3000']
-  cassandra:              ['dse']
-  dse-search:             ['dse:8983']
-  UploadsService:         ['backend:50101']
-  RatingsService:         ['backend:50101']
-  CommentsService:        ['backend:50101']
-  SearchService:          ['backend:50101']
-  StatisticsService:      ['backend:50101']
-  VideoCatalogService:    ['backend:50101']
-  UserManagementService:  ['backend:50101']
-  SuggestedVideoService:  ['backend:50101']
+  web:                    'web:3000'
+  cassandra:              'dse'
+  dse-search:             'dse:8983'
+  UploadsService:         'backend:50101'
+  RatingsService:         'backend:50101'
+  CommentsService:        'backend:50101'
+  SearchService:          'backend:50101'
+  StatisticsService:      'backend:50101'
+  VideoCatalogService:    'backend:50101'
+  UserManagementService:  'backend:50101'
+  SuggestedVideoService:  'backend:50101'
