@@ -8,7 +8,11 @@ import { getGrpcClientAsync } from '../utils/grpc-client';
 function normalizeAsyncServiceCall(args) {
   let argsStr = '';
   for (let i = 0; i < args.length; i++) {
-    argsStr += JSON.stringify(args[i]);
+    try {
+      argsStr += JSON.stringify(args[i]);
+    } catch(err) {
+      console.error('Failed to stringify given object: ${err}', args[i])
+    }
   }
   return argsStr;
 }
