@@ -18,6 +18,9 @@ after_success:
 - docker tag ${TRAVIS_COMMIT} killrvideo/killrvideo-web:${TRAVIS_TAG}
 - docker login -u $DOCKER_USER -p $DOCKER_PASS
 - docker push killrvideo/killrvideo-web:${TRAVIS_TAG}
+- "[ \"$(git tag --sort=-v:refname | grep -P \"^\\d+.\\d+.\\d+$\" | head -n1)\" == \"$TRAVIS_TAG\" ] && { docker tag ${TRAVIS_COMMIT} killrvideo/killrvideo-web:latest; docker push killrvideo/killrvideo-web:latest; }"
+- "[ \"$(git tag --sort=-v:refname | grep -P \"^\\d+.\\d+.\\d+$\" | head -n1)\" == \"$TRAVIS_TAG\" ] && { docker tag ${TRAVIS_COMMIT} killrvideo/killrvideo-web:$(echo $TRAVIS_TAG | cut -d'.' -f 1); docker push killrvideo/killrvideo-web:$(echo $TRAVIS_TAG | cut -d'.' -f 1); }"
+- "[ \"$(git tag --sort=-v:refname | grep -P \"^\\d+.\\d+.\\d+$\" | head -n1)\" == \"$TRAVIS_TAG\" ] && { docker tag ${TRAVIS_COMMIT} killrvideo/killrvideo-web:$(echo $TRAVIS_TAG | cut -d'.' -f 1).$(echo $TRAVIS_TAG | cut -d'.' -f 2); docker push killrvideo/killrvideo-web:$(echo $TRAVIS_TAG | cut -d'.' -f 1).$(echo $TRAVIS_TAG | cut -d'.' -f 2); }"
 
 # Sudo required for doing docker build
 sudo: required
