@@ -60,7 +60,7 @@ function ensureMemoized(clientInstance) {
     }
   });
   
-  clientInstance.___hasBeenMemoized = true;
+  clientInstance.__hasBeenMemoized = true;
   return clientInstance;
 }
 
