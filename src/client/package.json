@@ -22,7 +22,7 @@
   "private": true,
   "dependencies": {
     "bluebird": "^3.4.1",
-    "bootstrap": "^3.3.6",
+    "bootstrap": "^3.4.1",
     "bootswatch": "^3.3.6",
     "classnames": "^2.2.3",
     "falcor": "^0.1.16",
